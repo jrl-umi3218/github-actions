@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const exec = require('@actions/exec');
 const io = require('@actions/io');
 const tc = require('@actions/tool-cache');
+const util = require('util');
 
 async function run()
 {
@@ -10,7 +11,7 @@ async function run()
     if(process.platform === 'win32')
     {
       const prefix = core.getInput('install-prefix');
-      const archive = tc.downloadTool("http://bitbucket.org/eigen/eigen/get/3.3.7.zip")
+      const archive = await tc.downloadTool("http://bitbucket.org/eigen/eigen/get/3.3.7.zip")
       const folder = await tc.extractZip(archive, '.');
       process.chdir('eigen-eigen-323c052e1731');
       await io.mkdirP('build');
