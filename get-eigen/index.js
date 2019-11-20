@@ -9,9 +9,9 @@ try
   {
     const prefix = core.getInput('install-prefix');
     const archive = tc.downloadTool("http://bitbucket.org/eigen/eigen/get/3.3.7.zip")
-    const folder = await tc.extractZip(archive, '.');
+    const folder = tc.extractZip(archive, '.');
     process.chdir('eigen-eigen-323c052e1731');
-    await io.mkdirP('build');
+    io.mkdirP('build');
     process.chdir('build');
     exec.exec(util.format('cmake ../ -DCMAKE_INSTALL_PREFIX="%s"', prefix));
     exec.exec('cmake --build . --target install --config RelWithDebInfo');
