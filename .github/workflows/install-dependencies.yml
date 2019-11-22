@@ -1,0 +1,28 @@
+name: Test install-dependencies
+on: [push,pull_request]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Test install dependencies
+      uses: jrl-umi3218/github-actions/install-dependencies@master
+      with:
+        ubuntu: |
+          ppa: pierre-gergondet+ppa/multi-contact-unstable
+          apt: libeigen3-dev libspacevecalg-dev
+          pip: Cython coverage nose numpy
+        macos: |
+          brew: eigen
+          pip: Cython coverage nose numpy
+        windows: |
+          pip: Cython coverage nose numpy
+          github:
+            - path: eigenteam/eigen-git-mirror
+              ref: 3.3.7
+
