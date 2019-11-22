@@ -1,0 +1,18 @@
+name: 'Build CMake-based project'
+description: 'Build a project based on CMake and run tests'
+inputs:
+  build-type:
+    description: 'Build type for CMake dependencies'
+    required: true
+    default: 'RelWithDebInfo'
+  compiler:
+    description: 'Compiler for CMake dependencies (Linux only)'
+    required: true
+    default: 'gcc'
+  options:
+    description: 'Extra CMake options'
+    required: true
+    default: ''
+runs:
+  using: 'node12'
+  main: 'index.js'
