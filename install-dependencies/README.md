@@ -91,7 +91,21 @@ If `compiler` is set to clang, all CMake dependencies will be built with clang. 
 ## Example usage
 
 ```yaml
-uses: jrl-umi3218/github-actions/get-eigen@master
+uses: jrl-umi3218/github-actions/install-dependencies@master
 with:
-  install-prefix: 'C:\devel\install'
+  compiler: clang
+  ubuntu: |
+    ppa: pierre-gergondet+ppa/multi-contact-unstable
+    apt: libeigen3-dev libspacevecalg-dev
+    pip: Cython coverage nose numpy
+  macos: |
+    brew: eigen
+    pip: Cython coverage nose numpy
+  windows: |
+    pip: Cython coverage nose numpy
+    github:
+      - path: eigenteam/eigen-git-mirror
+        ref: 3.3.7
+  github:
+    - path: jrl-umi3218/Eigen3ToPython
 ```
