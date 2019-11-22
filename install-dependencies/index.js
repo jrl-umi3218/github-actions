@@ -6,44 +6,50 @@ const util = require('util');
 
 async function handle_ppa(ppas)
 {
-  ppas.split(' ')
-    .forEach(async function(ppa)
-    {
-      await exec.exec('sudo add-apt-repository -y ppa:' + ppa);
-    });
+  return new Promise(resolve => {
+    ppas.split(' ')
+      .forEach(async function(ppa)
+      {
+        await exec.exec('sudo add-apt-repository -y ppa:' + ppa);
+      });
+  });
 }
 
 async function build_github_repo(path, ref, btype, options)
 {
-  console.log('--> Cloning ' + path);
-  await exec.exec('git clone --recursive --quiet https://github.com/' + path + ' ' + path)
-  const cwd = process.cwd();
-  io.mkdirP(path + '/build');
-  process.chdir(path + '/build');
-  console.log('--> Configure ' + path);
-  await exec.exec('cmake ../ -DCMAKE_BUILD_TYPE=' + btype + ' ' + options);
-  console.log('--> Building ' + path);
-  await exec.exec('cmake --build . --config ' + btype);
-  console.log('--> Install ' + path);
-  await exec.exec('cmake --build . --target install --config ' + btype);
+  return new Promise(resolve => {
+    console.log('--> Cloning ' + path);
+    await exec.exec('git clone --recursive --quiet https://github.com/' + path + ' ' + path)
+    const cwd = process.cwd();
+    io.mkdirP(path + '/build');
+    process.chdir(path + '/build');
+    console.log('--> Configure ' + path);
+    await exec.exec('cmake ../ -DCMAKE_BUILD_TYPE=' + btype + ' ' + options);
+    console.log('--> Building ' + path);
+    await exec.exec('cmake --build . --config ' + btype);
+    console.log('--> Install ' + path);
+    await exec.exec('cmake --build . --target install --config ' + btype);
+  });
 }
 
 async function handle_github(github, btype, options)
 {
-  github
-    .forEach(async function(entry)
-    {
-      ref = "master";
-      if(entry.ref)
+  return new Promise(resolve => {
+    github
+      .forEach(async function(entry)
       {
-        ref = entry.ref;
-      }
-      if(entry.options)
-      {
-        options = options + " " + entry.options;
-      }
-      await build_github_repo(entry.path, ref, btype, options);
-    });
+        ref = "master";
+        if(entry.ref)
+        {
+          ref = entry.ref;
+        }
+        if(entry.options)
+        {
+          options = options + " " + entry.options;
+        }
+        await build_github_repo(entry.path, ref, btype, options);
+      });
+  });
 }
 
 async function run()
