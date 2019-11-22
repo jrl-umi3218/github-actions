@@ -125,6 +125,10 @@ async function run()
       {
         await handle_ppa(input.ppa);
       }
+      else
+      {
+        await exec.exec('sudo apt-get update');
+      }
       if(input.apt)
       {
         await exec.exec('sudo apt-get install -y ' + input.apt);
