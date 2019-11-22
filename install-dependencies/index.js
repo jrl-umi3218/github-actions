@@ -71,7 +71,11 @@ async function run()
       {
         await exec.exec('pip install ' + input.pip);
       }
-      const options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';
+      let options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';
+      if(btype.toLowerCase() == 'debug')
+      {
+        options = options + ' -DPYTHON_BINDING:BOOL=OFF';
+      }
       if(input.github)
       {
         await handle_github(input.github, btype, options, false);
