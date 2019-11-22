@@ -18,6 +18,10 @@ inputs:
     description: 'Compiler for CMake dependencies (Linux only)'
     required: true
     default: 'gcc'
+  github:
+    description: 'GitHub packages (CMake) to fetch and install'
+    required: true
+    default: ''
 runs:
   using: 'node12'
   main: 'index.js'

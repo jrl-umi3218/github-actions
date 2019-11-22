@@ -34,6 +34,7 @@ async function build_github_repo(path, ref, btype, options, sudo)
   {
     await exec.exec('cmake --build . --target install --config ' + btype);
   }
+  process.chdir(cwd);
 }
 
 async function handle_github(github, btype, options, sudo)
@@ -70,11 +71,13 @@ async function run()
       {
         await exec.exec('pip install ' + input.pip);
       }
+      const options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';
       if(input.github)
       {
-        const options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';
         await handle_github(input.github, btype, options, false);
       }
+      const github = core.getInput('github');
+      await handle_github(github, btype, options, false);
     }
     else if(process.platform === 'darwin')
     {
@@ -88,11 +91,13 @@ async function run()
         await exec.exec('sudo pip install ' + input.pip);
         await exec.exec('sudo pip3 install ' + input.pip);
       }
+      const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
       if(input.github)
       {
-        const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
         await handle_github(input.github, btype, options, true);
       }
+      const github = core.getInput('github');
+      await handle_github(github, btype, options, true);
     }
     else
     {
@@ -116,8 +121,6 @@ async function run()
       {
         core.warning('Compiler is set to ' + compiler + ' which is not recognized by this action');
       }
-      console.log('--> ls');
-      await exec.exec('ls');
       if(input.ppa)
       {
         await handle_ppa(input.ppa);
@@ -131,11 +134,13 @@ async function run()
         await exec.exec('sudo pip install ' + input.pip);
         await exec.exec('sudo pip3 install ' + input.pip);
       }
+      const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
       if(input.github)
       {
-        const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
         await handle_github(input.github, btype, options, true);
       }
+      const github = core.getInput('github');
+      await handle_github(github, btype, options, true);
     }
   }
   catch(error)
