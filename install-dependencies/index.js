@@ -58,6 +58,7 @@ async function run()
 {
   try
   {
+    const btype = core.getInput('build-type');
     if(process.platform === 'win32')
     {
       const input = yaml.safeLoad(core.getInput('windows'));
@@ -72,14 +73,12 @@ async function run()
       if(input.github)
       {
         const options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';
-        await handle_github(input.github, 'RelWithDebInfo', options, false);
+        await handle_github(input.github, btype, options, false);
       }
     }
     else if(process.platform === 'darwin')
     {
       const input = yaml.safeLoad(core.getInput('macos'));
-      console.log('--> env');
-      await exec.exec('env');
       if(input.brew)
       {
         await exec.exec('brew install ' + input.brew);
@@ -92,14 +91,33 @@ async function run()
       if(input.github)
       {
         const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
-        await handle_github(input.github, 'RelWithDebInfo', options, true);
+        await handle_github(input.github, btype, options, true);
       }
     }
     else
     {
       const input = yaml.safeLoad(core.getInput('ubuntu'));
-      console.log('--> env');
-      await exec.exec('env');
+      const compiler = core.getInput('compiler');
+      if(compiler == 'clang')
+      {
+        core.exportVariable('CC', 'clang');
+        core.exportVariable('CXX', 'clang++');
+        core.exportVariable('CCC_CXX', 'clang++');
+        if(input.apt)
+        {
+          input.apt += ' clang';
+        }
+        else
+        {
+          input.apt = 'clang';
+        }
+      }
+      else if(compiler != 'gcc')
+      {
+        core.warning('Compiler is set to ' + compiler + ' which is not recognized by this action');
+      }
+      console.log('--> ls');
+      await exec.exec('ls');
       if(input.ppa)
       {
         await handle_ppa(input.ppa);
@@ -116,7 +134,7 @@ async function run()
       if(input.github)
       {
         const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
-        await handle_github(input.github, 'RelWithDebInfo', options, true);
+        await handle_github(input.github, btype, options, true);
       }
     }
   }

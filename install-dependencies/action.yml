@@ -1,5 +1,5 @@
 name: 'Install dependencies'
-description: 'Install dependencies, supports apt, homebrew, git (CMake-based projects) and pip'
+description: 'Install dependencies, supports apt, homebrew, chocolatey, git (CMake-based projects) and pip'
 inputs:
   ubuntu:
     description: 'Required dependencies on Ubuntu'
@@ -9,6 +9,15 @@ inputs:
     required: false
   windows:
     description: 'Required dependencies on Windows'
+    required: false
+  build-type:
+    description: 'Build type for CMake dependencies'
+    required: true
+    default: 'RelWithDebInfo'
+  compiler:
+    description: 'Compiler for CMake dependencies (Linux only)'
+    required: true
+    default: 'gcc'
 runs:
   using: 'node12'
   main: 'index.js'

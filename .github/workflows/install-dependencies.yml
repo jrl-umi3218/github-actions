@@ -10,9 +10,11 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
+    - uses: actions/checkout@v1
     - name: Test install dependencies
       uses: jrl-umi3218/github-actions/install-dependencies@master
       with:
+        compiler: clang
         ubuntu: |
           ppa: pierre-gergondet+ppa/multi-contact-unstable
           apt: libeigen3-dev libspacevecalg-dev
