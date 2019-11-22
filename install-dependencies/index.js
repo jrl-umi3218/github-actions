@@ -7,7 +7,7 @@ const util = require('util');
 async function handle_ppa(ppas)
 {
   ppas.split(' ')
-    .forEach(function(ppa)
+    .forEach(async function(ppa)
     {
       await exec.exec('sudo add-apt-repository -y ppa:' + ppa);
     });
@@ -31,7 +31,7 @@ async function build_github_repo(path, ref, btype, options)
 async function handle_github(github, btype, options)
 {
   github
-    .forEach(function(entry)
+    .forEach(async function(entry)
     {
       ref = "master";
       if(entry.ref)
