@@ -17,6 +17,9 @@ jobs:
           ppa: pierre-gergondet+ppa/multi-contact-unstable
           apt: libeigen3-dev libspacevecalg-dev
           pip: Cython coverage nose numpy
+          github:
+            - path: eigenteam/eigen-git-mirror
+              ref: 3.3.7
         macos: |
           brew: eigen
           pip: Cython coverage nose numpy
