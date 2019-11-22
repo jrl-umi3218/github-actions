@@ -1,0 +1,14 @@
+name: 'Install dependencies'
+description: 'Install dependencies, supports apt, homebrew, git (CMake-based projects) and pip'
+inputs:
+  ubuntu:
+    description: 'Required dependencies on Ubuntu'
+    required: false
+  macos:
+    description: 'Required dependencies on macOS'
+    required: false
+  windows:
+    description: 'Required dependencies on Windows'
+runs:
+  using: 'node12'
+  main: 'index.js'
