@@ -14,7 +14,7 @@ async function handle_ppa(ppas_str)
   }
 }
 
-async function build_github_repo(path, ref, btype, options)
+async function build_github_repo(path, ref, btype, options, sudo)
 {
   console.log('--> Cloning ' + path);
   await exec.exec('git clone --recursive --quiet https://github.com/' + path + ' ' + path)
@@ -26,10 +26,17 @@ async function build_github_repo(path, ref, btype, options)
   console.log('--> Building ' + path);
   await exec.exec('cmake --build . --config ' + btype);
   console.log('--> Install ' + path);
-  await exec.exec('cmake --build . --target install --config ' + btype);
+  if(sudo)
+  {
+    await exec.exec('sudo cmake --build . --target install --config ' + btype);
+  }
+  else
+  {
+    await exec.exec('cmake --build . --target install --config ' + btype);
+  }
 }
 
-async function handle_github(github, btype, options)
+async function handle_github(github, btype, options, sudo)
 {
   for(let i = 0; i < github.length; ++i)
   {
@@ -43,7 +50,7 @@ async function handle_github(github, btype, options)
     {
       options = options + " " + entry.options;
     }
-    await build_github_repo(entry.path, ref, btype, options);
+    await build_github_repo(entry.path, ref, btype, options, sudo);
   }
 }
 
@@ -65,12 +72,14 @@ async function run()
       if(input.github)
       {
         const options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';
-        await handle_github(input.github, 'RelWithDebInfo', options);
+        await handle_github(input.github, 'RelWithDebInfo', options, false);
       }
     }
     else if(process.platform === 'darwin')
     {
       const input = yaml.safeLoad(core.getInput('macos'));
+      console.log('--> env');
+      await exec.exec('env');
       if(input.brew)
       {
         await exec.exec('brew install ' + input.brew);
@@ -83,12 +92,14 @@ async function run()
       if(input.github)
       {
         const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
-        await handle_github(input.github, 'RelWithDebInfo', options);
+        await handle_github(input.github, 'RelWithDebInfo', options, true);
       }
     }
     else
     {
       const input = yaml.safeLoad(core.getInput('ubuntu'));
+      console.log('--> env');
+      await exec.exec('env');
       if(input.ppa)
       {
         await handle_ppa(input.ppa);
@@ -105,7 +116,7 @@ async function run()
       if(input.github)
       {
         const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
-        await handle_github(input.github, 'RelWithDebInfo', options);
+        await handle_github(input.github, 'RelWithDebInfo', options, true);
       }
     }
   }

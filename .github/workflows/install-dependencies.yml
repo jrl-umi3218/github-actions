@@ -1,4 +1,4 @@
-name: Test install-dependencies
+name: Test install-dependencies action
 on: [push,pull_request]
 
 jobs:
