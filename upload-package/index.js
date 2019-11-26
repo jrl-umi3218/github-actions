@@ -1,0 +1,127 @@
+const axios = require('axios').default;
+const core = require('@actions/core');
+const exec = require('@actions/exec');
+const fs = require('fs');
+const io = require('@actions/io');
+const yaml = require('js-yaml');
+
+async function bash(cmd)
+{
+  await exec.exec('bash', ['-c', cmd]);
+}
+
+function validate_package(package)
+{
+  if(!package.name || !package.licenses || !package.vcs_url)
+  {
+    throw new Error("package entry must have: name, licenses and vcs_url");
+  }
+}
+
+async function has_package(packages_api, package)
+{
+  try
+  {
+    await packages_api.get(package.name);
+    return true;
+  }
+  catch(error)
+  {
+    return false;
+  }
+}
+
+async function create_package(packages_api, package)
+{
+  if(!has_package(packages_api, package))
+  {
+    try
+    {
+      await packages_api.post("", package);
+    }
+    catch(error)
+    {
+      throw new Error("Package creation failed: " + error.response.data.message);
+    }
+  }
+}
+
+async function cleanup_package(packages_api, content_api, package, dist, arch, version)
+{
+  files = await packages_api.get(package.name + '/versions/' + version + '/files');
+  for(i = 0; i < files.length; i++)
+  {
+    f = files[i];
+    if(f.version == version && f.path.startsWith(dist + '/' + arch))
+    {
+      await content_api.delete(f.path);
+    }
+  }
+}
+
+async function upload_package(content_api, package, dist, arch, version, deb)
+{
+  const file = fs.readFileSync(deb);
+  const path = package.name + '/' + version + '/' + dist + '/' + arch + '/' + deb;
+  await content_api.put(path + ';deb_distribution=' + dist + ';deb_component=main;deb_architecture=' + arch + ';publish=1', file);
+}
+
+async function run()
+{
+  try
+  {
+    subject = core.getInput("subject");
+    repo = core.getInput("repo");
+    const package = yaml.safeLoad(core.getInput("package"));
+    validate_package(package);
+    version = core.getInput("version");
+    dist = core.getInput("dist");
+    arch = core.getInput("arch");
+    path = core.getInput("path");
+    BINTRAY_API_KEY = core.getInput("BINTRAY_API_KEY");
+    GPG_PASSPHRASE = core.getInput("GPG_PASSPHRASE");
+
+    // Create REST API for Bintray
+    const packages_api = axios.create({
+      baseURL: 'https://api.bintray.com/packages/' + subject + '/' + repo,
+      auth: {
+        username: subject,
+        password: BINTRAY_API_KEY
+      }
+    });
+    const content_api = axios.create({
+      baseURL: 'https://api.bintray.com/content/' + subject + '/' + repo,
+      auth: {
+        username: subject,
+        password: BINTRAY_API_KEY
+      },
+      headers: {
+        'X-GPG-PASSPHRASE': GPG_PASSPHRASE
+      }
+    });
+
+    const cwd = process.cwd();
+
+    // Check that the package exist, create it otherwise
+    await create_package(packages_api, package);
+
+    // Remove old files for this dist/arch/version combination
+    await cleanup_package(packages_api, content_api, package, dist, arch, version);
+
+    // Find all deb and upload them
+    process.chdir(path);
+    debs = fs.readdirSync('.').filter(x => x.endsWith('.deb'));
+    for(i = 0; i < debs.length; i++)
+    {
+      await upload_package(content_api, package, dist, arch, version, debs[i]);
+    }
+
+    process.chdir(cwd);
+  }
+  catch(error)
+  {
+    core.setFailed(error.message);
+  }
+}
+
+run();

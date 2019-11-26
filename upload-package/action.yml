@@ -1,0 +1,33 @@
+name: 'Upload package to Bintray'
+description: 'Uploaded packages in provided path to Bintray'
+inputs:
+  subject:
+    description: 'Bintray subject'
+    required: true
+  repo:
+    description: 'Bintray repository'
+    required: true
+  package:
+    description: 'Bintray package description'
+    required: true
+  version:
+    description: 'Version to upload'
+    required: true
+  dist:
+    description: 'Debian/Ubuntu distribution to target'
+    required: true
+  arch:
+    description: 'Architecture to target'
+    required: true
+  path:
+    description: 'Where to look for packages'
+    required: true
+  BINTRAY_API_KEY:
+    description: 'Bintray API key'
+    required: true
+  GPG_PASSPHRASE:
+    description: 'GPG passphrase for repository signing'
+    required: true
+runs:
+  using: 'node12'
+  main: 'index.js'
