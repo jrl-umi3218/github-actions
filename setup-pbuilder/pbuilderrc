@@ -67,7 +67,7 @@ BUILDRESULT="/var/cache/pbuilder/$NAME/result/"
 APTCACHE="/var/cache/pbuilder/$NAME/aptcache/"
 BUILDPLACE="/var/cache/pbuilder/build/"
 
-EXTRAPACKAGES="software-properties-common apt-utils apt-transport-https dirmngr gpg-agent"
+EXTRAPACKAGES="software-properties-common apt-utils apt-transport-https dirmngr gnupg-agent"
 
 if $(echo ${DEBIAN_SUITES[@]} | grep -q $DIST); then
     # Debian configuration
