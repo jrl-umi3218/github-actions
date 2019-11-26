@@ -4,6 +4,7 @@ const exec = require('@actions/exec');
 const fs = require('fs');
 const io = require('@actions/io');
 const yaml = require('js-yaml');
+const JSON = require('JSON');
 
 async function bash(cmd)
 {
@@ -23,6 +24,7 @@ async function has_package(packages_api, package)
   try
   {
     await packages_api.get(package.name);
+    console.log(package.name + " already exists");
     return true;
   }
   catch(error)
@@ -37,6 +39,7 @@ async function create_package(packages_api, package)
   {
     try
     {
+      console.log("Attempting to create package with:\n" + JSON.stringify(package));
       await packages_api.post("", package);
     }
     catch(error)
@@ -49,11 +52,12 @@ async function create_package(packages_api, package)
 async function cleanup_package(packages_api, content_api, package, dist, arch, version)
 {
   files = await packages_api.get(package.name + '/versions/' + version + '/files');
-  for(i = 0; i < files.length; i++)
+  for(i = 0; i < files.data.length; i++)
   {
-    f = files[i];
+    f = files.data[i];
     if(f.version == version && f.path.startsWith(dist + '/' + arch))
     {
+      console.log("Delete previous package: " + f.path);
       await content_api.delete(f.path);
     }
   }
@@ -61,6 +65,7 @@ async function cleanup_package(packages_api, content_api, package, dist, arch, v
 
 async function upload_package(content_api, package, dist, arch, version, deb)
 {
+  console.log("Uploading " + deb + " for " + dist + "/" + arch + " (version: " + version + ")");
   const file = fs.readFileSync(deb);
   const path = package.name + '/' + version + '/' + dist + '/' + arch + '/' + deb;
   await content_api.put(path + ';deb_distribution=' + dist + ';deb_component=main;deb_architecture=' + arch + ';publish=1', file);
