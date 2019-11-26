@@ -7,7 +7,7 @@ ARCH=$2
 
 sudo apt-get update -qq
 sudo apt-get install -qq \
-        packaging-dev cowbuilder \
+        packaging-dev cowbuilder git-build-recipe \
         debootstrap devscripts \
         git-buildpackage debian-archive-keyring unzip \
         pkg-kde-tools dput python3-setuptools python-pip python3-pip
