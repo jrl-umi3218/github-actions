@@ -1,0 +1,24 @@
+name: 'Setup pbuilder'
+description: 'Setup pbuilder'
+inputs:
+  dist:
+    description: 'Debian/Ubuntu distribution to target'
+    required: true
+  arch:
+    description: 'Architecture to target'
+    required: true
+  ros-distro:
+    description: 'ROS distribution you require to build your package. If empty, no ROS mirror is added'
+    required: true
+    default: ''
+  other-mirrors:
+    description: 'Extra mirrors to setup (space separated)'
+    required: true
+    default: ''
+  other-gpg-keys:
+    description: 'Extra signing keys to accept'
+    required: true
+    default: ''
+runs:
+  using: 'node12'
+  main: 'index.js'
