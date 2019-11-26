@@ -16,8 +16,8 @@ async function run()
     arch = core.getInput("arch");
     recipe = core.getInput("recipe");
     ros_distro = core.getInput("ros-distro");
-    other_gpg_keys = core.getInput("other-gpg-keys").split(' ');
-    other_mirrors = core.getInput("other-mirrors").split(' ');
+    other_gpg_keys = core.getInput("other-gpg-keys").split(' ').filter(x => x.length != 0);
+    other_mirrors = core.getInput("other-mirrors").split(' ').filter(x => x.length != 0);
     const cwd = process.cwd();
     core.startGroup("Setup cowbuilder");
     process.chdir(__dirname);

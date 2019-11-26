@@ -14,8 +14,8 @@ async function run()
     dist = core.getInput("dist");
     arch = core.getInput("arch");
     ros_distro = core.getInput("ros-distro");
-    other_gpg_keys = core.getInput("other-gpg-keys").split(' ');
-    other_mirrors = core.getInput("other-mirrors").split(' ');
+    other_gpg_keys = core.getInput("other-gpg-keys").split(' ').filter(x => x.length != 0);
+    other_mirrors = core.getInput("other-mirrors").split(' ').filter(x => x.length != 0);
     const cwd = process.cwd();
     process.chdir(__dirname);
     if(ros_distro != '')
