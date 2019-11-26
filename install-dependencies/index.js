@@ -14,10 +14,15 @@ async function handle_ppa(ppas_str)
   }
 }
 
+async function bash(cmd)
+{
+  await exec.exec('bash', ['-c', cmd]);
+}
+
 async function build_github_repo(path, ref, btype, options, sudo)
 {
   console.log('--> Cloning ' + path);
-  await exec.exec('git clone --recursive --quiet https://github.com/' + path + ' ' + path)
+  await exec.exec('git clone --recursive https://github.com/' + path + ' ' + path)
   const cwd = process.cwd();
   io.mkdirP(path + '/build');
   process.chdir(path + '/build');
