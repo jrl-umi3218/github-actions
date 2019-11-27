@@ -44,6 +44,10 @@ async function build_github_repo(path, ref, btype, options, sudo)
 
 async function handle_github(github, btype, options, sudo)
 {
+  if(!github)
+  {
+    return;
+  }
   for(let i = 0; i < github.length; ++i)
   {
     const entry = github[i];
