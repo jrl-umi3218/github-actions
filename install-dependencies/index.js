@@ -24,7 +24,7 @@ async function build_github_repo(path, ref, btype, options, sudo)
   console.log('--> Cloning ' + path);
   await exec.exec('git clone --recursive https://github.com/' + path + ' ' + path)
   const cwd = process.cwd();
-  io.mkdirP(path + '/build');
+  await io.mkdirP(path + '/build');
   process.chdir(path + '/build');
   console.log('--> Configure ' + path);
   await exec.exec('cmake ../ -DCMAKE_BUILD_TYPE=' + btype + ' ' + options);

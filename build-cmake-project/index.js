@@ -42,7 +42,7 @@ async function run()
 
     // Take care of the actual build
     const cwd = process.cwd();
-    io.mkdirP('build');
+    await io.mkdirP('build');
     process.chdir('build');
     core.startGroup('Configure');
     await exec.exec('cmake ../ ' + options);

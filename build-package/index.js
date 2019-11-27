@@ -64,7 +64,7 @@ async function run()
     core.endGroup();
     core.startGroup("Move packages");
     out_dir = '/tmp/packages-' + dist + '-' + arch;
-    io.mkdirP(out_dir);
+    await io.mkdirP(out_dir);
     await bash('sudo mv /var/cache/pbuilder/' + dist + '-' + arch + '/result/*.deb ' + out_dir);
     core.endGroup();
     process.chdir(cwd);
