@@ -114,6 +114,8 @@ async function run()
     }
     else
     {
+      core.exportVariable('BOOST_ROOT', '');
+      core.exportVariable('BOOST_ROOT_1_69_0', '');
       const input = yaml.safeLoad(core.getInput('ubuntu'));
       const compiler = core.getInput('compiler');
       if(compiler == 'clang')
