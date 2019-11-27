@@ -85,7 +85,7 @@ async function run()
       {
         await handle_github(input.github, btype, options, false);
       }
-      const github = core.getInput('github');
+      const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, false);
     }
     else if(process.platform === 'darwin')
@@ -105,7 +105,7 @@ async function run()
       {
         await handle_github(input.github, btype, options, true);
       }
-      const github = core.getInput('github');
+      const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, true);
     }
     else
@@ -152,7 +152,7 @@ async function run()
       {
         await handle_github(input.github, btype, options, true);
       }
-      const github = core.getInput('github');
+      const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, true);
     }
   }
