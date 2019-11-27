@@ -1,0 +1,39 @@
+name: Build and upload pbuilder images to Docker hub
+on:
+  push:
+    paths:
+      - 'docker/**'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        dist: [xenial, bionic]
+        arch: [i386, amd64]
+        include:
+          - dist: xenial
+            arch: i386
+            ros-distro: kinetic
+          - dist: xenial
+            arch: amd64
+            ros-distro: kinetic
+          - dist: bionic
+            arch: amd64
+            ros-distro: melodic
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build image
+      run: |
+        set -x
+        export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
+        export ROS_DISTRO="${{ matrix.ros-distro }}"
+        if [ ! -z ${ROS_DISTRO} ]
+        then
+          export TAG="${TAG}-${ROS_DISTRO}"
+        fi
+        cd docker
+        docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PWD }}
+        docker build --build-arg DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG}
+        docker image push gergondet/pbuilder:${TAG}
