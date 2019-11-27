@@ -2,6 +2,7 @@ name: Build and upload pbuilder images to Docker hub
 on:
   push:
     paths:
+      - '.github/workflows/pbuilder-images.yml'
       - 'docker/**'
 
 jobs:
