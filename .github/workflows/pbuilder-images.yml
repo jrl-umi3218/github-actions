@@ -12,7 +12,7 @@ jobs:
       matrix:
         dist: [xenial, bionic]
         arch: [i386, amd64]
-        ros-distro: ~
+        ros-distro: none
         include:
           - dist: xenial
             arch: i386
@@ -31,6 +31,10 @@ jobs:
         set -x
         export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
         export ROS_DISTRO="${{ matrix.ros-distro }}"
+        if [ ${ROS_DISTRO} = "none" ]
+        then
+          export ROS_DISTRO=""
+        fi
         if [ ! -z ${ROS_DISTRO} ]
         then
           export TAG="${TAG}-${ROS_DISTRO}"
