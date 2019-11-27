@@ -1,8 +1,9 @@
+FROM ubuntu:18.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 ARG DIST
 ARG ARCH
 ARG ROS_DISTRO=""
-FROM ubuntu:18.04
 
-COPY pbuilderrc /root/.pbuilderrc
-COPY setup-pbuilder.sh /root/setup-pbuilder.sh
+COPY ["pbuilderrc","setup-pbuilder.sh", "/root/"]
 RUN cd /root && ./setup-pbuilder.sh ${DIST} ${ARCH}

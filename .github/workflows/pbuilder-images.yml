@@ -13,6 +13,8 @@ jobs:
         dist: [xenial, bionic]
         arch: [i386, amd64]
     runs-on: ubuntu-18.04
+    env:
+      DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
     - uses: actions/checkout@v1
     - name: Build image
@@ -35,6 +37,6 @@ jobs:
         then
           export ROS_DISTRO="melodic"
           export TAG="${TAG}-${ROS_DISTRO}"
-          docker build --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+          docker buildx build --allow security.insecure --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
           docker image push gergondet/pbuilder:${TAG}
         fi
