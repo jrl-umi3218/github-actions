@@ -36,5 +36,5 @@ jobs:
         fi
         cd docker
         docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PWD }}
-        docker build --build-arg DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG}
+        docker build --build-arg DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
         docker image push gergondet/pbuilder:${TAG}
