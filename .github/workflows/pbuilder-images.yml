@@ -20,6 +20,13 @@ jobs:
     - name: Build image
       run: |
         set -x
+        docker --version
+        pushd .
+        cd /tmp
+        git clone https://github.com/docker/buildx
+        cd buildx
+        sudo make install
+        popd
         export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
         export ROS_DISTRO=""
         cd docker
