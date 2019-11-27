@@ -5,8 +5,8 @@ set -x
 DIST=$1
 ARCH=$2
 
-sudo apt-get update -qq
-sudo apt-get install -qq \
+apt-get update -qq
+apt-get install -qq \
         packaging-dev cowbuilder \
         debootstrap devscripts \
         git-buildpackage debian-archive-keyring unzip \
@@ -21,14 +21,14 @@ else
   sed -i "s#@ROS_SETUP@##" $HOME/.pbuilderrc
 fi
 
-sudo cowbuilder --create
+cowbuilder --create
 
 # Speed up pbuilder.
 echo "echo \"force-unsafe-io\" > /etc/dpkg/dpkg.cfg.d/02apt-speedup" | \
-    sudo cowbuilder --login --save-after-exec
+    cowbuilder --login --save-after-exec
 
 # Add ROS mirror if ROS_DISTRO is set
 if [ ! -z ${ROS_DISTRO} ]; then
   echo "echo 'deb http://packages.ros.org/ros/ubuntu ${DIST} main' > /etc/apt/sources.list.d/ros-latest.list && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654" | \
-    sudo cowbuilder --login --save-after-exec
+    cowbuilder --login --save-after-exec
 fi
