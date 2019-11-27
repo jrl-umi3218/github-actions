@@ -35,7 +35,7 @@ async function has_package(packages_api, package)
 
 async function create_package(packages_api, package)
 {
-  if(!has_package(packages_api, package))
+  if(!await has_package(packages_api, package))
   {
     try
     {
