@@ -51,15 +51,22 @@ async function create_package(packages_api, package)
 
 async function cleanup_package(packages_api, content_api, package, dist, arch, version)
 {
-  files = await packages_api.get(package.name + '/versions/' + version + '/files');
-  for(i = 0; i < files.data.length; i++)
+  try
   {
-    f = files.data[i];
-    if(f.version == version && f.path.startsWith(dist + '/' + arch))
+    files = await packages_api.get(package.name + '/versions/' + version + '/files');
+    for(i = 0; i < files.data.length; i++)
     {
-      console.log("Delete previous package: " + f.path);
-      await content_api.delete(f.path);
+      f = files.data[i];
+      if(f.version == version && f.path.startsWith(dist + '/' + arch))
+      {
+        console.log("Delete previous package: " + f.path);
+        await content_api.delete(f.path);
+      }
     }
+  }
+  catch(error)
+  {
+    console.log("Nothing to clean");
   }
 }
 
