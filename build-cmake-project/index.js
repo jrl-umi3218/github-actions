@@ -10,14 +10,17 @@ async function run()
     const btype = core.getInput('build-type');
     let options = core.getInput('options');
     let sudo = true;
+    // For projects that use cmake_add_fortran_subdirectory we need to hide sh from the PATH
+    const OLD_PATH = process.env.PATH;
     if(process.platform === 'win32')
     {
-      const PATH = process.env.PATH;
+      PATH = OLD_PATH.replace('Git', 'dummy');
       const BOOST_LIB = process.env.BOOST_ROOT + '\\lib';
       if(PATH.indexOf(BOOST_LIB) == -1)
       {
-        core.exportVariable('PATH', BOOST_LIB + ';' + PATH);
+        PATH = BOOST_LIB + ';' + PATH;
       }
+      core.exportVariable('PATH', PATH);
       options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install ' + options;
       if(btype.toLowerCase() == 'debug')
       {
@@ -67,6 +70,7 @@ async function run()
     core.startGroup('Test')
     await exec.exec('ctest -C ' + btype);
     core.endGroup();
+    core.exportVariable('PATH', OLD_PATH);
   }
   catch(error)
   {

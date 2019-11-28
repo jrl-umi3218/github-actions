@@ -74,7 +74,7 @@ async function run()
     const btype = core.getInput('build-type');
     if(process.platform === 'win32')
     {
-      const PATH = process.env.PATH;
+      PATH = process.env.PATH;
       const BOOST_LIB = process.env.BOOST_ROOT + '\\lib';
       if(PATH.indexOf(BOOST_LIB) == -1)
       {
@@ -98,6 +98,10 @@ async function run()
       {
         options = options + ' -DPYTHON_BINDING:BOOL=OFF';
       }
+      // For projects that use cmake_add_fortran_subdirectory we need to hide sh from the PATH
+      const OLD_PATH = process.env.PATH;
+      PATH = OLD_PATH.replace('Git', 'dummy');
+      core.exportVariable('PATH', PATH);
       if(input.github)
       {
         core.startGroup("Install Windows specific GitHub dependencies");
@@ -106,6 +110,8 @@ async function run()
       }
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, false);
+      // Restore PATH setting
+      core.exportVariable('PATH', OLD_PATH);
     }
     else if(process.platform === 'darwin')
     {
