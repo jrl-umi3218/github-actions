@@ -12,6 +12,12 @@ async function run()
     let sudo = true;
     if(process.platform === 'win32')
     {
+      const PATH = process.env.PATH;
+      const BOOST_LIB = process.env.BOOST_ROOT + '\\lib';
+      if(PATH.indexOf(BOOST_LIB) == -1)
+      {
+        core.exportVariable('PATH', BOOST_LIB + ';' + PATH);
+      }
       options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install ' + options;
       if(btype.toLowerCase() == 'debug')
       {
