@@ -19,15 +19,16 @@ async function bash(cmd)
   await exec.exec('bash', ['-c', cmd]);
 }
 
-async function build_github_repo(path, ref, btype, options, sudo)
+async function build_github_repo(path, ref, btype, options, sudo, build_dir)
 {
   console.log('--> Cloning ' + path);
   await exec.exec('git clone --recursive https://github.com/' + path + ' ' + path)
   const cwd = process.cwd();
-  await io.mkdirP(path + '/build');
-  process.chdir(path + '/build');
+  const project_path = cwd + '/' + path;
+  await io.mkdirP(build_dir);
+  process.chdir(build_dir);
   console.log('--> Configure ' + path);
-  await exec.exec('cmake ../ -DCMAKE_BUILD_TYPE=' + btype + ' ' + options);
+  await exec.exec('cmake ' + project_path + ' -DCMAKE_BUILD_TYPE=' + btype + ' ' + options);
   console.log('--> Building ' + path);
   await exec.exec('cmake --build . --config ' + btype);
   console.log('--> Install ' + path);
@@ -42,7 +43,7 @@ async function build_github_repo(path, ref, btype, options, sudo)
   process.chdir(cwd);
 }
 
-async function handle_github(github, btype, options, sudo)
+async function handle_github(github, btype, options, sudo, linux = false)
 {
   if(!github)
   {
@@ -58,7 +59,8 @@ async function handle_github(github, btype, options, sudo)
     {
       options = options + " " + entry.options;
     }
-    await build_github_repo(entry.path, ref, btype, options, sudo);
+    build_dir = linux ? '/tmp/_ci/build/' + entry.path : entry.path + '/build';
+    await build_github_repo(entry.path, ref, btype, options, sudo, build_dir);
   }
   core.exportVariable('GIT_DEPENDENCIES', GIT_DEPENDENCIES.trim());
 }
@@ -161,10 +163,10 @@ async function run()
       const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
       if(input.github)
       {
-        await handle_github(input.github, btype, options, true);
+        await handle_github(input.github, btype, options, true, true);
       }
       const github = yaml.safeLoad(core.getInput('github'));
-      await handle_github(github, btype, options, true);
+      await handle_github(github, btype, options, true, true);
     }
   }
   catch(error)
