@@ -17,7 +17,7 @@ async function run()
       PATH = OLD_PATH;
       while(PATH.indexOf('Git') != -1)
       {
-        PATH = OLD_PATH.replace('Git', 'dummy');
+        PATH = PATH.replace('Git', 'dummy');
       }
       const BOOST_LIB = process.env.BOOST_ROOT + '\\lib';
       if(PATH.indexOf(BOOST_LIB) == -1)

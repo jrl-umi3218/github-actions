@@ -103,7 +103,7 @@ async function run()
       PATH = OLD_PATH;
       while(PATH.indexOf('Git') != -1)
       {
-        PATH = OLD_PATH.replace('Git', 'dummy');
+        PATH = PATH.replace('Git', 'dummy');
       }
       core.exportVariable('PATH', PATH);
       core.startGroup("Modified PATH variable");
