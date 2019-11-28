@@ -71,6 +71,12 @@ async function run()
     const btype = core.getInput('build-type');
     if(process.platform === 'win32')
     {
+      const PATH = process.env.PATH;
+      const BOOST_LIB = process.env.BOOST_ROOT + '\\lib';
+      if(PATH.indexOf(BOOST_LIB) == -1)
+      {
+        core.exportVariable('PATH', BOOST_LIB + ';' + PATH);
+      }
       const input = yaml.safeLoad(core.getInput('windows'));
       if(input.choco)
       {
