@@ -1,0 +1,19 @@
+{
+  "name": "create-release",
+  "version": "1.0.0",
+  "description": "Create a GitHub release",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Pierre Gergondet",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "@actions/core": "^1.2.0",
+    "@actions/exec": "^1.0.1",
+    "@actions/github": "^1.1.0",
+    "@actions/io": "^1.0.1",
+    "fs": "0.0.1-security"
+  }
+}

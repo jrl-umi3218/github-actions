@@ -1,0 +1,12 @@
+name: 'Create release'
+description: 'Create a release on GitHub and upload a full tarball and zip of the source with submodules'
+inputs:
+  GITHUB_TOKEN:
+    description: 'GitHub token to use for authentification'
+    required: true
+  tag:
+    description: 'Tag used for the release'
+    required: true
+runs:
+  using: 'node12'
+  main: 'index.js'
