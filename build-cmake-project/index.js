@@ -26,6 +26,10 @@ async function run()
       {
         PATH = BOOST_LIB + ';' + PATH;
       }
+      if(PATH.indexOf('C:\\devel\\install\\bin') == -1)
+      {
+        core.exportVariable('PATH', 'C:\\devel\\install\\bin;' + PATH);
+      }
       core.exportVariable('PATH', PATH);
       core.startGroup("Modified PATH variable");
       console.log(PATH);

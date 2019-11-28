@@ -95,6 +95,11 @@ async function run()
       {
         core.exportVariable('PATH', BOOST_LIB + ';' + PATH);
       }
+      PATH = process.env.PATH;
+      if(PATH.indexOf('C:\\devel\\install\\bin') == -1)
+      {
+        core.exportVariable('PATH', 'C:\\devel\\install\\bin;' + PATH);
+      }
       const input = yaml.safeLoad(core.getInput('windows'));
       if(input.choco)
       {
