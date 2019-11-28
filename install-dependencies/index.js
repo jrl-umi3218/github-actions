@@ -48,20 +48,19 @@ async function handle_github(github, btype, options, sudo)
   {
     return;
   }
+  GIT_DEPENDENCIES = process.env.GIT_DEPENDENCIES ? process.env.GIT_DEPENDENCIES : '';
   for(let i = 0; i < github.length; ++i)
   {
     const entry = github[i];
-    ref = "master";
-    if(entry.ref)
-    {
-      ref = entry.ref;
-    }
+    ref = entry.ref ? entry.ref : "master";
+    GIT_DEPENDENCIES += ' ' + entry.path + '#' + ref;
     if(entry.options)
     {
       options = options + " " + entry.options;
     }
     await build_github_repo(entry.path, ref, btype, options, sudo);
   }
+  core.exportVariable('GIT_DEPENDENCIES', GIT_DEPENDENCIES.trim());
 }
 
 async function run()
