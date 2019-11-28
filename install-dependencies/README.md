@@ -36,6 +36,10 @@ This input string is supposed to be a valid yaml object with the following entri
 
 `brew install` the provided packages
 
+#### `cask`
+
+`brew cask install` the provided packages
+
 #### `pip`
 
 `pip install` the provided packages (with `pip` *and* `pip3`)

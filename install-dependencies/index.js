@@ -110,6 +110,12 @@ async function run()
     else if(process.platform === 'darwin')
     {
       const input = yaml.safeLoad(core.getInput('macos'));
+      if(input.cask)
+      {
+        core.startGroup("Install Homebrew cask dependencies");
+        await exec.exec('brew cask install ' + input.cask);
+        core.endGroup();
+      }
       if(input.brew)
       {
         core.startGroup("Install Homebrew dependencies");
