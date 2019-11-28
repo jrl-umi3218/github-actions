@@ -154,9 +154,6 @@ async function run()
     }
     else
     {
-      core.startGroup('Remove broken clang packages');
-      await exec.exec('sudo apt-get -qq remove clang-6.0 libclang1-6.0 libclang-common-6.0-dev libllvm6.0');
-      core.endGroup();
       core.exportVariable('BOOST_ROOT', '');
       core.exportVariable('BOOST_ROOT_1_69_0', '');
       const input = yaml.safeLoad(core.getInput('ubuntu'));
@@ -191,6 +188,9 @@ async function run()
         await exec.exec('sudo apt-get update');
         core.endGroup();
       }
+      core.startGroup('Install gfortran');
+      await exec.exec('sudo apt-get install -y gfortran');
+      core.endGroup();
       if(input.apt)
       {
         core.startGroup("Install APT dependencies");
