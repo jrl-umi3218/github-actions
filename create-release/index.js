@@ -27,12 +27,12 @@ async function run()
     await bash('./make-tar-gz.sh ' + process.env.GITHUB_WORKSPACE + ' ' + repo + ' ' + tag);
     const tar_gz = fs.readFileSync(repo + '.tar.gz');
     const tar_gz_name = repo + '-' + tag + '.tar.gz';
-    await client.repos.uploadReleaseAsset({file: tar_gz, headers: { 'content-length': tar_gz.length, 'content-type': 'application/gzip'}, name: tar_gz_name, url: upload_url});
+    await octokit.repos.uploadReleaseAsset({file: tar_gz, headers: { 'content-length': tar_gz.length, 'content-type': 'application/gzip'}, name: tar_gz_name, url: upload_url});
 
     await bash('./make-zip.sh ' + process.env.GITHUB_WORKSPACE + ' ' + repo + ' ' + tag);
     const zip = fs.readFileSync(repo + '.zip');
     const zip_name = repo + '-' + tag + '.zip';
-    await client.repos.uploadReleaseAsset({file: zip, headers: { 'content-length': zip.length, 'content-type': 'application/zip'}, name: zip_name, url: upload_url});
+    await octokit.repos.uploadReleaseAsset({file: zip, headers: { 'content-length': zip.length, 'content-type': 'application/zip'}, name: zip_name, url: upload_url});
 
     process.chdir(cwd);
   }
