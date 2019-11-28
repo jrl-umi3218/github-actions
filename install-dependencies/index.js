@@ -23,6 +23,17 @@ async function build_github_repo(path, ref, btype, options, sudo, build_dir)
 {
   console.log('--> Cloning ' + path);
   await exec.exec('git clone --recursive https://github.com/' + path + ' ' + path)
+  // For projects that use cmake_add_fortran_subdirectory we need to hide sh from the PATH
+  const OLD_PATH = process.env.PATH;
+  PATH = OLD_PATH;
+  while(PATH.indexOf('Git') != -1)
+  {
+    PATH = PATH.replace('Git', 'dummy');
+  }
+  core.exportVariable('PATH', PATH);
+  core.startGroup("Modified PATH variable");
+  console.log(PATH);
+  core.endGroup();
   const cwd = process.cwd();
   const project_path = cwd + '/' + path;
   await io.mkdirP(build_dir);
@@ -41,6 +52,8 @@ async function build_github_repo(path, ref, btype, options, sudo, build_dir)
     await exec.exec('cmake --build . --target install --config ' + btype);
   }
   process.chdir(cwd);
+  // Restore PATH setting
+  core.exportVariable('PATH', OLD_PATH);
 }
 
 async function handle_github(github, btype, options, sudo, linux = false)
@@ -98,17 +111,6 @@ async function run()
       {
         options = options + ' -DPYTHON_BINDING:BOOL=OFF';
       }
-      // For projects that use cmake_add_fortran_subdirectory we need to hide sh from the PATH
-      const OLD_PATH = process.env.PATH;
-      PATH = OLD_PATH;
-      while(PATH.indexOf('Git') != -1)
-      {
-        PATH = PATH.replace('Git', 'dummy');
-      }
-      core.exportVariable('PATH', PATH);
-      core.startGroup("Modified PATH variable");
-      console.log(PATH);
-      core.endGroup();
       if(input.github)
       {
         core.startGroup("Install Windows specific GitHub dependencies");
@@ -117,8 +119,6 @@ async function run()
       }
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, false);
-      // Restore PATH setting
-      core.exportVariable('PATH', OLD_PATH);
     }
     else if(process.platform === 'darwin')
     {
