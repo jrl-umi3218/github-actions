@@ -14,13 +14,20 @@ async function run()
     const OLD_PATH = process.env.PATH;
     if(process.platform === 'win32')
     {
-      PATH = OLD_PATH.replace('Git', 'dummy');
+      PATH = OLD_PATH;
+      while(PATH.indexOf('Git') != -1)
+      {
+        PATH = OLD_PATH.replace('Git', 'dummy');
+      }
       const BOOST_LIB = process.env.BOOST_ROOT + '\\lib';
       if(PATH.indexOf(BOOST_LIB) == -1)
       {
         PATH = BOOST_LIB + ';' + PATH;
       }
       core.exportVariable('PATH', PATH);
+      core.startGroup("Modified PATH variable");
+      console.log(PATH);
+      core.endGroup();
       options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install ' + options;
       if(btype.toLowerCase() == 'debug')
       {

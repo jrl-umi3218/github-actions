@@ -100,8 +100,15 @@ async function run()
       }
       // For projects that use cmake_add_fortran_subdirectory we need to hide sh from the PATH
       const OLD_PATH = process.env.PATH;
-      PATH = OLD_PATH.replace('Git', 'dummy');
+      PATH = OLD_PATH;
+      while(PATH.indexOf('Git') != -1)
+      {
+        PATH = OLD_PATH.replace('Git', 'dummy');
+      }
       core.exportVariable('PATH', PATH);
+      core.startGroup("Modified PATH variable");
+      console.log(PATH);
+      core.endGroup();
       if(input.github)
       {
         core.startGroup("Install Windows specific GitHub dependencies");
