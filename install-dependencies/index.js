@@ -101,28 +101,31 @@ async function run()
         core.exportVariable('PATH', 'C:\\devel\\install\\bin;' + PATH);
       }
       const input = yaml.safeLoad(core.getInput('windows'));
-      if(input.choco)
-      {
-        core.startGroup("Install chocolatey dependencies");
-        await exec.exec('choco install ' + input.choco + ' -y');
-        core.endGroup();
-      }
-      if(input.pip)
-      {
-        core.startGroup("Install pip dependencies");
-        await exec.exec('pip install ' + input.pip);
-        core.endGroup();
-      }
       let options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';
-      if(btype.toLowerCase() == 'debug')
+      if(input)
       {
-        options = options + ' -DPYTHON_BINDING:BOOL=OFF';
-      }
-      if(input.github)
-      {
-        core.startGroup("Install Windows specific GitHub dependencies");
-        await handle_github(input.github, btype, options, false);
-        core.endGroup();
+        if(input.choco)
+        {
+          core.startGroup("Install chocolatey dependencies");
+          await exec.exec('choco install ' + input.choco + ' -y');
+          core.endGroup();
+        }
+        if(input.pip)
+        {
+          core.startGroup("Install pip dependencies");
+          await exec.exec('pip install ' + input.pip);
+          core.endGroup();
+        }
+        if(btype.toLowerCase() == 'debug')
+        {
+          options = options + ' -DPYTHON_BINDING:BOOL=OFF';
+        }
+        if(input.github)
+        {
+          core.startGroup("Install Windows specific GitHub dependencies");
+          await handle_github(input.github, btype, options, false);
+          core.endGroup();
+        }
       }
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, false);
@@ -130,31 +133,34 @@ async function run()
     else if(process.platform === 'darwin')
     {
       const input = yaml.safeLoad(core.getInput('macos'));
-      if(input.cask)
-      {
-        core.startGroup("Install Homebrew cask dependencies");
-        await exec.exec('brew cask install ' + input.cask);
-        core.endGroup();
-      }
-      if(input.brew)
-      {
-        core.startGroup("Install Homebrew dependencies");
-        await exec.exec('brew install ' + input.brew);
-        core.endGroup();
-      }
-      if(input.pip)
-      {
-        core.startGroup("Install pip dependencies");
-        await exec.exec('sudo pip install ' + input.pip);
-        await exec.exec('sudo pip3 install ' + input.pip);
-        core.endGroup();
-      }
       const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
-      if(input.github)
+      if(input)
       {
-        core.startGroup("Install macOS specific GitHub dependencies");
-        await handle_github(input.github, btype, options, true);
-        core.endGroup();
+        if(input.cask)
+        {
+          core.startGroup("Install Homebrew cask dependencies");
+          await exec.exec('brew cask install ' + input.cask);
+          core.endGroup();
+        }
+        if(input.brew)
+        {
+          core.startGroup("Install Homebrew dependencies");
+          await exec.exec('brew install ' + input.brew);
+          core.endGroup();
+        }
+        if(input.pip)
+        {
+          core.startGroup("Install pip dependencies");
+          await exec.exec('sudo pip install ' + input.pip);
+          await exec.exec('sudo pip3 install ' + input.pip);
+          core.endGroup();
+        }
+        if(input.github)
+        {
+          core.startGroup("Install macOS specific GitHub dependencies");
+          await handle_github(input.github, btype, options, true);
+          core.endGroup();
+        }
       }
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, true);
@@ -163,7 +169,6 @@ async function run()
     {
       core.exportVariable('BOOST_ROOT', '');
       core.exportVariable('BOOST_ROOT_1_69_0', '');
-      const input = yaml.safeLoad(core.getInput('ubuntu'));
       const compiler = core.getInput('compiler');
       if(compiler == 'clang')
       {
@@ -183,40 +188,44 @@ async function run()
       {
         core.warning('Compiler is set to ' + compiler + ' which is not recognized by this action');
       }
-      if(input.ppa)
-      {
-        core.startGroup("Add ppa repositories");
-        await handle_ppa(input.ppa);
-        core.endGroup();
-      }
-      else
-      {
-        core.startGroup("Update APT mirror");
-        await exec.exec('sudo apt-get update');
-        core.endGroup();
-      }
-      core.startGroup('Install gfortran');
-      await exec.exec('sudo apt-get install -y gfortran');
-      core.endGroup();
-      if(input.apt)
-      {
-        core.startGroup("Install APT dependencies");
-        await exec.exec('sudo apt-get install -y ' + input.apt);
-        core.endGroup();
-      }
-      if(input.pip)
-      {
-        core.startGroup("Install pip dependencies");
-        await exec.exec('sudo pip install ' + input.pip);
-        await exec.exec('sudo pip3 install ' + input.pip);
-        core.endGroup();
-      }
+      const input = yaml.safeLoad(core.getInput('ubuntu'));
       const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
-      if(input.github)
+      if(input)
       {
-        core.startGroup("Install Linux specific GitHub dependencies");
-        await handle_github(input.github, btype, options, true, true);
+        if(input.ppa)
+        {
+          core.startGroup("Add ppa repositories");
+          await handle_ppa(input.ppa);
+          core.endGroup();
+        }
+        else
+        {
+          core.startGroup("Update APT mirror");
+          await exec.exec('sudo apt-get update');
+          core.endGroup();
+        }
+        core.startGroup('Install gfortran');
+        await exec.exec('sudo apt-get install -y gfortran');
         core.endGroup();
+        if(input.apt)
+        {
+          core.startGroup("Install APT dependencies");
+          await exec.exec('sudo apt-get install -y ' + input.apt);
+          core.endGroup();
+        }
+        if(input.pip)
+        {
+          core.startGroup("Install pip dependencies");
+          await exec.exec('sudo pip install ' + input.pip);
+          await exec.exec('sudo pip3 install ' + input.pip);
+          core.endGroup();
+        }
+        if(input.github)
+        {
+          core.startGroup("Install Linux specific GitHub dependencies");
+          await handle_github(input.github, btype, options, true, true);
+          core.endGroup();
+        }
       }
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, true, true);
