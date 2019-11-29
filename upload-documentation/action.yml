@@ -1,0 +1,12 @@
+name: 'Upload documentation'
+description: 'Upload HEAD documentation to a repository gh-pages branch'
+inputs:
+  GH_USER:
+    description: 'GitHub user used for identification'
+    required: true
+  GH_PAGES_TOKEN:
+    description: 'GitHub personal token used for identification'
+    required: true
+runs:
+  using: 'node12'
+  main: 'index.js'
