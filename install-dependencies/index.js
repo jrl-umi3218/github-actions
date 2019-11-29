@@ -170,12 +170,13 @@ async function run()
       core.exportVariable('BOOST_ROOT', '');
       core.exportVariable('BOOST_ROOT_1_69_0', '');
       const compiler = core.getInput('compiler');
+      const input = yaml.safeLoad(core.getInput('ubuntu'));
       if(compiler == 'clang')
       {
         core.exportVariable('CC', 'clang');
         core.exportVariable('CXX', 'clang++');
         core.exportVariable('CCC_CXX', 'clang++');
-        if(input.apt)
+        if(input && input.apt)
         {
           input.apt += ' clang';
         }
@@ -188,7 +189,6 @@ async function run()
       {
         core.warning('Compiler is set to ' + compiler + ' which is not recognized by this action');
       }
-      const input = yaml.safeLoad(core.getInput('ubuntu'));
       const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
       if(input)
       {
