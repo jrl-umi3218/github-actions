@@ -17,7 +17,7 @@ async function run()
     const GH_REPOSITORY = github.context.repo.owner + '/' + github.context.repo.repo;
     const cwd = process.cwd();
     process.chdir(__dirname);
-    await bash('./upload-documentation.sh ' + GH_USER + ' ' + GH_TOKEN + ' ' + GH_REPOSITORY);
+    await bash('./upload-documentation.sh ' + GH_USER + ' ' + GH_PAGES_TOKEN + ' ' + GH_REPOSITORY);
     process.chdir(cwd);
   }
   catch(error)
