@@ -28,7 +28,7 @@ async function run()
       }
       if(PATH.indexOf('C:\\devel\\install\\bin') == -1)
       {
-        core.exportVariable('PATH', 'C:\\devel\\install\\bin;' + PATH);
+        PATH = 'C:\\devel\\install\\bin;' + PATH;
       }
       core.exportVariable('PATH', PATH);
       core.startGroup("Modified PATH variable");
@@ -47,6 +47,12 @@ async function run()
     }
     else
     {
+      LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH ? process.env.LD_LIBRARY_PATH : '';
+      if(LD_LIBRARY_PATH.indexOf('/usr/local/lib') == -1)
+      {
+        LD_LIBRARY_PATH = '/usr/local/lib:' + LD_LIBRARY_PATH;
+        core.exportVariable('LD_LIBRARY_PATH', LD_LIBRARY_PATH);
+      }
       options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON ' + options;
       const compiler = core.getInput('compiler');
       if(compiler == 'clang')
