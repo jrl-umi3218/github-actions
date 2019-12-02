@@ -87,7 +87,7 @@ async function run()
     await exec.exec(install_cmd);
     core.endGroup();
     core.startGroup('Test')
-    await exec.exec('ctest -C ' + btype);
+    await exec.exec('ctest -V -C ' + btype);
     core.endGroup();
     core.exportVariable('PATH', OLD_PATH);
   }
