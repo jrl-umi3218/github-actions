@@ -19,7 +19,8 @@ async function run()
     const repo = context.repo.repo;
     const octokit = new github.GitHub(core.getInput('GITHUB_TOKEN'));
     const tag = core.getInput('tag');
-    const release = await octokit.repos.createRelease({owner: owner, repo: repo, tag_name: tag});
+    const release = await octokit.repos.createRelease({owner: owner, repo: repo, tag_name: tag, draft: true});
+    const release_id = release.data.id;
     const upload_url = release.data.upload_url;
     const cwd = process.cwd();
     process.chdir(__dirname);
@@ -33,6 +34,8 @@ async function run()
     const zip = fs.readFileSync(repo + '.zip');
     const zip_name = repo + '-' + tag + '.zip';
     await octokit.repos.uploadReleaseAsset({file: zip, headers: { 'content-length': zip.length, 'content-type': 'application/zip'}, name: zip_name, url: upload_url});
+
+    await octokit.repos.updateRelease({owner: owner, repo: repo, release_id: release_id, draft: false});
 
     process.chdir(cwd);
   }
