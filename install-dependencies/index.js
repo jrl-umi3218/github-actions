@@ -21,7 +21,8 @@ async function bash(cmd)
 
 async function build_github_repo(path, ref, btype, options, sudo, build_dir)
 {
-  console.log('--> Cloning ' + path);
+  core.startGroup('Building ' + path);
+  core.startGroup('--> Cloning ' + path);
   await exec.exec('git clone --recursive https://github.com/' + path + ' ' + path)
   // For projects that use cmake_add_fortran_subdirectory we need to hide sh from the PATH
   const OLD_PATH = process.env.PATH;
@@ -40,11 +41,14 @@ async function build_github_repo(path, ref, btype, options, sudo, build_dir)
   const project_path = cwd + '/' + path;
   await io.mkdirP(build_dir);
   process.chdir(build_dir);
-  console.log('--> Configure ' + path);
+  core.endGroup();
+  core.startGroup('--> Configure ' + path);
   await exec.exec('cmake ' + project_path + ' -DCMAKE_BUILD_TYPE=' + btype + ' ' + options);
-  console.log('--> Building ' + path);
+  core.endGroup();
+  core.startGroup('--> Building ' + path);
   await exec.exec('cmake --build . --config ' + btype);
-  console.log('--> Install ' + path);
+  core.endGroup();
+  core.startGroup('--> Install ' + path);
   if(sudo)
   {
     await exec.exec('sudo cmake --build . --target install --config ' + btype);
@@ -53,9 +57,11 @@ async function build_github_repo(path, ref, btype, options, sudo, build_dir)
   {
     await exec.exec('cmake --build . --target install --config ' + btype);
   }
+  core.endGroup();
   process.chdir(cwd);
   // Restore PATH setting
   core.exportVariable('PATH', OLD_PATH);
+  core.endGroup();
 }
 
 async function handle_github(github, btype, options, sudo, linux = false)
