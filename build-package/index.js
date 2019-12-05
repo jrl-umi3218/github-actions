@@ -18,6 +18,8 @@ async function run()
     // See https://ubuntu.com/blog/statement-on-32-bit-i386-packages-for-ubuntu-19-10-and-20-04-lts
     if(dist == "focal" && arch == "i386")
     {
+      await io.mkdirP('/tmp/packages-focal-i386');
+      await bash('touch /tmp/packages-focal-i386/nothing.txt')
       return;
     }
 
