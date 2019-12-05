@@ -93,6 +93,12 @@ async function run()
     BINTRAY_API_KEY = core.getInput("BINTRAY_API_KEY");
     GPG_PASSPHRASE = core.getInput("GPG_PASSPHRASE");
 
+    // See https://ubuntu.com/blog/statement-on-32-bit-i386-packages-for-ubuntu-19-10-and-20-04-lts
+    if(dist == "focal" && arch == "i386")
+    {
+      return;
+    }
+
     // Create REST API for Bintray
     const packages_api = axios.create({
       baseURL: 'https://api.bintray.com/packages/' + subject + '/' + repo,

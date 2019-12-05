@@ -14,6 +14,13 @@ async function run()
   {
     dist = core.getInput("dist");
     arch = core.getInput("arch");
+
+    // See https://ubuntu.com/blog/statement-on-32-bit-i386-packages-for-ubuntu-19-10-and-20-04-lts
+    if(dist == "focal" && arch == "i386")
+    {
+      return;
+    }
+
     recipe = core.getInput("recipe");
     ros_distro = core.getInput("ros-distro");
     other_gpg_keys = core.getInput("other-gpg-keys").split(' ').filter(x => x.length != 0);
