@@ -35,8 +35,6 @@ async function run()
     const zip_name = repo + '-' + tag + '.zip';
     await octokit.repos.uploadReleaseAsset({file: zip, headers: { 'content-length': zip.length, 'content-type': 'application/zip'}, name: zip_name, url: upload_url});
 
-    await octokit.repos.updateRelease({owner: owner, repo: repo, release_id: release_id, draft: false});
-
     process.chdir(cwd);
   }
   catch(error)
