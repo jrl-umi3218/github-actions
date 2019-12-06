@@ -28,7 +28,7 @@ jobs:
         export ROS_DISTRO=""
         cd docker
         docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PWD }}
-        docker build --build-arg DIST=${{ matrix.dist }}" --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+        docker build --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
         docker run --cidfile pbuilder.cid --privileged -t pbuilder:${TAG} ./setup-pbuilder.sh
         docker commit `cat pbuilder.cid` pbuilder:${TAG}
         docker images
@@ -37,7 +37,7 @@ jobs:
         then
           export ROS_DISTRO="kinetic"
           export TAG="${TAG}-${ROS_DISTRO}"
-          docker build --build-arg DIST=${{ matrix.dist }}" --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+          docker build --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
           docker run --cidfile pbuilder.cid --privileged -t pbuilder:${TAG} ./setup-pbuilder.sh
           docker commit `cat pbuilder.cid` pbuilder:${TAG}
           docker image push gergondet/pbuilder:${TAG}
@@ -46,7 +46,7 @@ jobs:
         then
           export ROS_DISTRO="melodic"
           export TAG="${TAG}-${ROS_DISTRO}"
-          docker build --build-arg DIST=${{ matrix.dist }}" --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+          docker build --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
           docker run --cidfile pbuilder.cid --privileged -t pbuilder:${TAG} ./setup-pbuilder.sh
           docker commit `cat pbuilder.cid` pbuilder:${TAG}
           docker image push gergondet/pbuilder:${TAG}
