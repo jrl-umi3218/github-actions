@@ -10,8 +10,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist: [xenial, bionic, focal]
-        arch: [i386, amd64]
+        #dist: [xenial, bionic, focal]
+        #arch: [i386, amd64]
+        dist: [bionic]
+        arch: [amd64]
         exclude:
           # No more i386 support on focal
           - dist: focal
@@ -36,19 +38,19 @@ jobs:
         export ROS_DISTRO=""
         cd docker
         docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PWD }}
-        docker buildx build --allow security.insecure --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+        sudo docker buildx build --load --allow security.insecure --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
         docker image push gergondet/pbuilder:${TAG}
         if [ "${{ matrix.dist }}" = "xenial" ]
         then
           export ROS_DISTRO="kinetic"
           export TAG="${TAG}-${ROS_DISTRO}"
-          docker buildx build --allow security.insecure --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+          sudo docker buildx build --load --allow security.insecure --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
           docker image push gergondet/pbuilder:${TAG}
         fi
         if [ "${{ matrix.dist }}" = "bionic" -a "${{ matrix.arch }}" = "amd64" ]
         then
           export ROS_DISTRO="melodic"
           export TAG="${TAG}-${ROS_DISTRO}"
-          docker buildx build --allow security.insecure --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+          sudo docker buildx build --load --allow security.insecure --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
           docker image push gergondet/pbuilder:${TAG}
         fi
