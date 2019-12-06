@@ -1,0 +1,19 @@
+{
+  "name": "build-package-native",
+  "version": "1.0.0",
+  "description": "GitHub action to build a native Debian/Ubuntu package",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Pierre Gergondet",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "@actions/core": "^1.2.0",
+    "@actions/exec": "^1.0.1",
+    "@actions/github": "^1.1.0",
+    "@actions/io": "^1.0.1",
+    "path": "^0.12.7"
+  }
+}
