@@ -5,6 +5,7 @@ set -x
 mkdir -p /tmp/package
 mkdir -p /tmp/packages-${DOCKER_TAG}
 sed -i -e"s#@EXTRA_SETUP_COMMANDS@#${EXTRA_SETUP_COMMANDS}#" build-package.sh
+sed -i -e"s#@REPO@#${REPO}#" build-package.sh
 echo "::group::build-package.sh"
 cat build-package.sh
 echo "::endgroup::"
