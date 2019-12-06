@@ -30,19 +30,20 @@ jobs:
         echo "::group::Declare function"
         build-image()
         {
+          sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile
+          sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile
+          sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile.ros
+          sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile.ros
           export ROS_DISTRO=$1
           export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
           if [ ! -z ${ROS_DISTRO} ]; then
             export TAG="${TAG}-${ROS_DISTRO}"
+            mv Dockerfile.ros Dockerfile
           fi
-          echo "::group::Build base image"
-          docker build --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t gergondet/pbuilder:${TAG} .
+          echo "::group::Build image"
+          docker build -t gergondet/pbuilder:${TAG} .
           echo "::endgroup::"
-          echo "::group::Setup pbuilder inside image"
-          docker run --cidfile pbuilder.cid --privileged -t gergondet/pbuilder:${TAG} ./setup-pbuilder.sh
-          echo "::endgroup::"
-          echo "::group::Commit and upload"
-          docker commit `cat pbuilder.cid` gergondet/pbuilder:${TAG}
+          echo "::group::Upload image"
           docker image push gergondet/pbuilder:${TAG}
           echo "::endgroup::"
         }

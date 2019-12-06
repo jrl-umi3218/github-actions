@@ -1,10 +1,5 @@
-FROM ubuntu:18.04
+FROM @ARCH@/ubuntu:@DIST@
 
 ENV DEBIAN_FRONTEND=noninteractive
-ARG DIST
-ARG ARCH
-ARG ROS_DISTRO=""
 
-WORKDIR /root
-COPY ["pbuilderrc","configure-pbuilder.sh", "setup-pbuilder.sh", "/root/"]
-RUN ./configure-pbuilder.sh ${DIST} ${ARCH}
+RUN apt-get update -qq && apt-get install -qq cmake cmake-data cython cython3 dh-python javascript-common libarchive13 libblas3 libeigen3-dev libexpat1-dev libgfortran4 libjs-jquery libjs-jquery-isonscreen libjs-jquery-metadata libjs-jquery-tablesorter libjs-jquery-throttle-debounce libjsoncpp1 liblapack3 liblzo2-2 libpython-dev libpython-stdlib libpython2.7 libpython2.7-dev libpython2.7-minimal libpython2.7-stdlib libpython3-dev libpython3.6 libpython3.6-dev librhash0 libuv1 pkg-config python python-all python-coverage python-dev python-minimal python-nose python-numpy python-pkg-resources python-setuptools python2.7 python2.7-dev python2.7-minimal python3-all python3-coverage python3-dev python3-distutils python3-lib2to3 python3-nose python3-numpy python3-setuptools python3.6-dev devscripts build-essential equivs gfortran
