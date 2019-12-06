@@ -25,29 +25,36 @@ jobs:
       run: |
         set -x
         export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
-        export ROS_DISTRO=""
+        echo "::group::Login to Docker Hub"
         cd docker
         docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PWD }}
-        docker build --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
-        docker run --cidfile pbuilder.cid --privileged -t pbuilder:${TAG} ./setup-pbuilder.sh
-        docker commit `cat pbuilder.cid` pbuilder:${TAG}
-        docker images
-        docker image push gergondet/pbuilder:${TAG}
+        echo "::endgroup::"
+        echo "::group::Declare function"
+        build-image()
+        {
+          export ROS_DISTRO=$1
+          export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
+          if [ ! -z ${ROS_DISTRO} ]; then
+            export TAG="${TAG}-${ROS_DISTRO}"
+          fi
+          echo "::group::Build base image"
+          docker build --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t gergondet/pbuilder:${TAG} .
+          echo "::endgroup::"
+          echo "::group::Setup pbuilder inside image"
+          docker run --cidfile pbuilder.cid --privileged -t gergondet/pbuilder:${TAG} ./setup-pbuilder.sh
+          echo "::endgroup::"
+          echo "::group::Commit and upload"
+          docker commit `cat pbuilder.cid` gergondet/pbuilder:${TAG}
+          docker image push gergondet/pbuilder:${TAG}
+          echo "::endgroup::"
+        }
+        echo "::endgroup::"
+        build-image ""
         if [ "${{ matrix.dist }}" = "xenial" ]
         then
-          export ROS_DISTRO="kinetic"
-          export TAG="${TAG}-${ROS_DISTRO}"
-          docker build --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
-          docker run --cidfile pbuilder.cid --privileged -t pbuilder:${TAG} ./setup-pbuilder.sh
-          docker commit `cat pbuilder.cid` pbuilder:${TAG}
-          docker image push gergondet/pbuilder:${TAG}
+          build-image "kinetic"
         fi
         if [ "${{ matrix.dist }}" = "bionic" -a "${{ matrix.arch }}" = "amd64" ]
         then
-          export ROS_DISTRO="melodic"
-          export TAG="${TAG}-${ROS_DISTRO}"
-          docker build --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
-          docker run --cidfile pbuilder.cid --privileged -t pbuilder:${TAG} ./setup-pbuilder.sh
-          docker commit `cat pbuilder.cid` pbuilder:${TAG}
-          docker image push gergondet/pbuilder:${TAG}
+          build-image "melodic"
         fi
