@@ -20,6 +20,7 @@ async function run()
     other_gpg_keys = core.getInput("other-gpg-keys").split(' ').filter(x => x.length != 0);
     other_mirrors = core.getInput("other-mirrors").split(' ').filter(x => x.length != 0);
 
+    const context = github.context;
     const repo = context.repo.repo;
     core.exportVariable('REPO', repo);
 
