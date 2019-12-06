@@ -10,23 +10,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist: [xenial, bionic]
+        dist: [xenial, bionic, focal]
         arch: [i386, amd64]
+        exclude:
+          # No more i386 support on focal
+          - dist: focal
+            arch: i386
     runs-on: ubuntu-18.04
-    env:
-      DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
     - uses: actions/checkout@v1
+    - name: Setup docker buildx
+      run: |
+        wget -O docker-buildx https://github.com/docker/buildx/releases/download/v0.3.1/buildx-v0.3.1.linux-amd64
+        chmod a+x docker-buildx
+        mkdir -p ~/.docker/cli-plugins/docker-buildx
+        mv docker-buildx ~/.docker/cli-plugins/docker-buildx
+        docker buildx create --buildkitd-flags '--allow-insecure-entitlement security.insecure' --use
     - name: Build image
       run: |
         set -x
-        docker --version
-        pushd .
-        cd /tmp
-        git clone https://github.com/docker/buildx
-        cd buildx
-        sudo make install
-        popd
         export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
         export ROS_DISTRO=""
         cd docker
