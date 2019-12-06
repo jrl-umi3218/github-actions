@@ -24,8 +24,8 @@ jobs:
         set -x
         wget --quiet -O docker-buildx https://github.com/docker/buildx/releases/download/v0.3.1/buildx-v0.3.1.linux-amd64
         chmod a+x docker-buildx
-        mkdir -p ~/.docker/cli-plugins/docker-buildx
-        mv docker-buildx ~/.docker/cli-plugins/docker-buildx
+        mkdir -p ~/.docker/cli-plugins
+        mv docker-buildx ~/.docker/cli-plugins/
         docker buildx --help
         docker buildx create --help
         docker buildx create --buildkitd-flags '--allow-insecure-entitlement security.insecure' --use
