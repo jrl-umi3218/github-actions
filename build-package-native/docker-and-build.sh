@@ -10,6 +10,8 @@ echo "::group::build-package.sh"
 cat build-package.sh
 echo "::endgroup::"
 cp build-package.sh /tmp/package
-cp -r $GITHUB_WORKSPACE /tmp/package/
+cd $GITHUB_WORKSPACE && cd ../
+cp -r $REPO /tmp/package/
+ls /tmp/package
 docker run -v /tmp/package:/package --privileged -t gergondet/pbuilder:${DOCKER_TAG} /bin/bash -c "/package/build-package.sh"
 mv /tmp/package/*.deb /tmp/packages-${DOCKER_TAG}
