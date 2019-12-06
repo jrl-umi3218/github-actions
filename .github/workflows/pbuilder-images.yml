@@ -10,10 +10,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #dist: [xenial, bionic, focal]
-        #arch: [i386, amd64]
-        dist: [bionic]
-        arch: [amd64]
+        dist: [xenial, bionic, focal]
+        arch: [i386, amd64]
         exclude:
           # No more i386 support on focal
           - dist: focal
