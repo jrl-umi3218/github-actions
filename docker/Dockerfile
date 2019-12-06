@@ -5,5 +5,6 @@ ARG DIST
 ARG ARCH
 ARG ROS_DISTRO=""
 
-COPY ["pbuilderrc","setup-pbuilder.sh", "/root/"]
-RUN cd /root && ./setup-pbuilder.sh ${DIST} ${ARCH}
+WORKDIR /root
+COPY ["pbuilderrc","configure-pbuilder.sh", "setup-pbuilder.sh", "/root/"]
+RUN ./configure-pbuilder.sh ${DIST} ${ARCH}

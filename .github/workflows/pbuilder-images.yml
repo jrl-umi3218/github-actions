@@ -21,16 +21,6 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v1
-    - name: Setup docker buildx
-      run: |
-        set -x
-        wget --quiet -O docker-buildx https://github.com/docker/buildx/releases/download/v0.3.1/buildx-v0.3.1.linux-amd64
-        chmod a+x docker-buildx
-        mkdir -p ~/.docker/cli-plugins
-        mv docker-buildx ~/.docker/cli-plugins/
-        docker buildx --help
-        docker buildx create --help
-        docker buildx create --buildkitd-flags '--allow-insecure-entitlement security.insecure' --use
     - name: Build image
       run: |
         set -x
@@ -38,19 +28,26 @@ jobs:
         export ROS_DISTRO=""
         cd docker
         docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PWD }}
-        sudo docker buildx build --load --allow security.insecure --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+        docker build --build-arg DIST=${{ matrix.dist }}" --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+        docker run --cidfile pbuilder.cid --privileged -t pbuilder:${TAG} ./setup-pbuilder.sh
+        docker commit `cat pbuilder.cid` pbuilder:${TAG}
+        docker images
         docker image push gergondet/pbuilder:${TAG}
         if [ "${{ matrix.dist }}" = "xenial" ]
         then
           export ROS_DISTRO="kinetic"
           export TAG="${TAG}-${ROS_DISTRO}"
-          sudo docker buildx build --load --allow security.insecure --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+          docker build --build-arg DIST=${{ matrix.dist }}" --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+          docker run --cidfile pbuilder.cid --privileged -t pbuilder:${TAG} ./setup-pbuilder.sh
+          docker commit `cat pbuilder.cid` pbuilder:${TAG}
           docker image push gergondet/pbuilder:${TAG}
         fi
         if [ "${{ matrix.dist }}" = "bionic" -a "${{ matrix.arch }}" = "amd64" ]
         then
           export ROS_DISTRO="melodic"
           export TAG="${TAG}-${ROS_DISTRO}"
-          sudo docker buildx build --load --allow security.insecure --build-arg DIST=${{ matrix.dist }} --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+          docker build --build-arg DIST=${{ matrix.dist }}" --build-arg ARCH=${{ matrix.arch }} --build-arg ROS_DISTRO=${ROS_DISTRO} -t pbuilder:${TAG} .
+          docker run --cidfile pbuilder.cid --privileged -t pbuilder:${TAG} ./setup-pbuilder.sh
+          docker commit `cat pbuilder.cid` pbuilder:${TAG}
           docker image push gergondet/pbuilder:${TAG}
         fi
