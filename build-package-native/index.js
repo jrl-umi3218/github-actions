@@ -35,8 +35,8 @@ async function run()
     core.exportVariable('DOCKER_TAG', tag);
 
     commands = [
-      other_gpg_keys.map(x => 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key ' + x).join(' && '),
-      other_mirrors.map(x => "echo 'deb " + x + " " + dist + " main' | tee -a /etc/apt/sources.list").join(' && ')
+      other_gpg_keys.map(x => 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key ' + x).join(' \\&\\& '),
+      other_mirrors.map(x => "echo 'deb " + x + " " + dist + " main' | tee -a /etc/apt/sources.list").join(' \\&\\& ')
     ].filter(x => x.length != 0).join(' && ');
     if(commands.length != 0)
     {
