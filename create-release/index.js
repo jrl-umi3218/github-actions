@@ -9,6 +9,19 @@ async function bash(cmd)
   await exec.exec('bash', ['-c', cmd]);
 }
 
+async function bash_output(cmd)
+{
+  let out = '';
+  const options = {};
+  options.listeners = {
+    stdout: data => {
+      out += data.toString();
+    }
+  };
+  await exec.exec('bash', ['-c', cmd], options)
+  return out;
+}
+
 async function run()
 {
   try
@@ -19,6 +32,8 @@ async function run()
     const repo = context.repo.repo;
     const octokit = new github.GitHub(core.getInput('GITHUB_TOKEN'));
     const tag = core.getInput('tag');
+    const name = 'Release v' + tag;
+    const body = await bash_output('git log -1 --pretty=%B | tail -n +2');
     const release = await octokit.repos.createRelease({owner: owner, repo: repo, tag_name: tag, draft: true});
     const release_id = release.data.id;
     const upload_url = release.data.upload_url;
