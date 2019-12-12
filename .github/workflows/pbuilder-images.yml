@@ -37,6 +37,7 @@ jobs:
           export ROS_DISTRO=$1
           export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
           if [ ! -z ${ROS_DISTRO} ]; then
+            sed -i -e "s/@ROS_DISTRO@/${ROS_DISTRO}/" Dockerfile.ros
             export TAG="${TAG}-${ROS_DISTRO}"
             mv Dockerfile.ros Dockerfile
           fi
