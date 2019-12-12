@@ -24,6 +24,9 @@ async function build_github_repo(path, ref, btype, options, sudo, build_dir)
   core.startGroup('Building ' + path);
   core.startGroup('--> Cloning ' + path);
   await exec.exec('git clone --recursive https://github.com/' + path + ' ' + path)
+  await exec.exec('git checkout ' + ref)
+  await exec.exec('git submodule sync')
+  await exec.exec('git submodule update')
   // For projects that use cmake_add_fortran_subdirectory we need to hide sh from the PATH
   const OLD_PATH = process.env.PATH;
   PATH = OLD_PATH;
