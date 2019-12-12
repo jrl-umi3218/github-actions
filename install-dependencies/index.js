@@ -95,6 +95,7 @@ async function run()
 {
   try
   {
+    core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', 2);
     const btype = core.getInput('build-type');
     if(process.platform === 'win32')
     {

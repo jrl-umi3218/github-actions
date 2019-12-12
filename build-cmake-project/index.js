@@ -69,6 +69,7 @@ async function run()
     options = options + ' -DCMAKE_BUILD_TYPE=' + btype;
 
     // Take care of the actual build
+    core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', 2);
     const cwd = process.cwd();
     await io.mkdirP('build');
     process.chdir('build');
