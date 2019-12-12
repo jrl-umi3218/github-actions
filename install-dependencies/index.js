@@ -115,7 +115,7 @@ async function run()
       PKG_CONFIG_PATH = process.env.PKG_CONFIG_PATH ? process.env.PKG_CONFIG_PATH : "";
       if(PKG_CONFIG_PATH.indexOf('C:\\devel\\install\\lib\\pkgconfig') == -1)
       {
-        core.exportVariable('C:\\devel\\install\\lib\\pkgconfig:' + PKG_CONFIG_PATH);
+        core.exportVariable('C:\\devel\\install\\lib\\pkgconfig;' + PKG_CONFIG_PATH);
       }
       const input = yaml.safeLoad(core.getInput('windows'));
       let options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';
