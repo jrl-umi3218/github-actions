@@ -13,6 +13,18 @@ inputs:
     description: 'Extra CMake options'
     required: true
     default: ''
+  windows-options:
+    description: 'Extra CMake options (Windows only)'
+    required: true
+    default: ''
+  macos-options:
+    description: 'Extra CMake options (macOS only)'
+    required: true
+    default: ''
+  linux-options:
+    description: 'Extra CMake options (Linux only)'
+    required: true
+    default: ''
 runs:
   using: 'node12'
   main: 'index.js'

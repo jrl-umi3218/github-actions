@@ -39,11 +39,13 @@ async function run()
       {
         options = options + ' -DPYTHON_BINDING:BOOL=OFF';
       }
+      options = options + ' ' + core.getInput('windows-options');
       sudo = false;
     }
     else if(process.platform === 'darwin')
     {
       options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON ' + options;
+      options = options + ' ' + core.getInput('macos-options');
     }
     else
     {
@@ -54,6 +56,7 @@ async function run()
         core.exportVariable('LD_LIBRARY_PATH', LD_LIBRARY_PATH);
       }
       options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON ' + options;
+      options = options + ' ' + core.getInput('linux-options');
       const compiler = core.getInput('compiler');
       if(compiler == 'clang')
       {

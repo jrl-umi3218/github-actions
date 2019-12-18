@@ -86,6 +86,18 @@ async function handle_github(github, btype, options, sudo, linux = false)
     {
       options = options + " " + entry.options;
     }
+    if(process.platform === 'win32' && entry['windows-options'])
+    {
+      options = options + ' ' + entry['windows-options'];
+    }
+    if(process.platform === 'darwin' && entry['macos-options'])
+    {
+      options = options + ' ' + entry['macos-options'];
+    }
+    if(process.platform === 'linux' && entry['linux-options'])
+    {
+      options = options + ' ' + entry['linux-options'];
+    }
     build_dir = linux ? '/tmp/_ci/build/' + entry.path : entry.path + '/build';
     await build_github_repo(entry.path, ref, btype, options, sudo, build_dir);
   }
