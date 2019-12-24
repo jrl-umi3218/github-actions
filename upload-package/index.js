@@ -115,7 +115,9 @@ async function run()
       },
       headers: {
         'X-GPG-PASSPHRASE': GPG_PASSPHRASE
-      }
+      },
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity
     });
 
     const cwd = process.cwd();
