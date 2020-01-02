@@ -125,8 +125,11 @@ async function run()
     // Check that the package exist, create it otherwise
     await create_package(packages_api, package);
 
-    // Remove old files for this dist/arch/version combination
-    await cleanup_package(packages_api, content_api, package, dist, arch, version);
+    if(version === 'HEAD')
+    {
+      // Remove old files for this dist/arch/version combination
+      await cleanup_package(packages_api, content_api, package, dist, arch, version);
+    }
 
     // Find all deb and upload them
     process.chdir(path);
