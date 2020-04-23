@@ -25,6 +25,10 @@ inputs:
     description: 'Extra CMake options (Linux only)'
     required: true
     default: ''
+  project-dir:
+    description: 'Directory where the cmake project is located within the repository'
+    required: true
+    default: ''
 runs:
   using: 'node12'
   main: 'index.js'

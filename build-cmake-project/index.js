@@ -73,7 +73,11 @@ async function run()
 
     // Take care of the actual build
     core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', 2);
-    const cwd = process.cwd();
+    const project_dir = core.getInput('project-dir');
+    if(project_dir.length)
+    {
+      process.chdir(project_dir);
+    }
     await io.mkdirP('build');
     process.chdir('build');
     core.startGroup('Configure');
