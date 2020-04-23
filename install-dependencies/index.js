@@ -114,7 +114,13 @@ async function run()
     if(process.platform === 'win32')
     {
       PATH = process.env.PATH;
-      const BOOST_LIB = process.env.BOOST_ROOT + '\\lib';
+      let BOOST_ROOT = process.env.BOOST_ROOT ? process.env.BOOST_ROOT : "";
+      if(!BOOST_ROOT.length)
+      {
+        BOOST_ROOT = process.env.BOOST_ROOT_1_69_0
+        core.exportVariable('BOOST_ROOT', BOOST_ROOT);
+      }
+      const BOOST_LIB = BOOST_ROOT + '\\lib';
       if(PATH.indexOf(BOOST_LIB) == -1)
       {
         core.exportVariable('PATH', BOOST_LIB + ';' + PATH);
@@ -127,7 +133,7 @@ async function run()
       PKG_CONFIG_PATH = process.env.PKG_CONFIG_PATH ? process.env.PKG_CONFIG_PATH : "";
       if(PKG_CONFIG_PATH.indexOf('C:\\devel\\install\\lib\\pkgconfig') == -1)
       {
-        core.exportVariable('C:\\devel\\install\\lib\\pkgconfig;' + PKG_CONFIG_PATH);
+        core.exportVariable('PKG_CONFIG_PATH', 'C:\\devel\\install\\lib\\pkgconfig;' + PKG_CONFIG_PATH);
       }
       const input = yaml.safeLoad(core.getInput('windows'));
       let options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';

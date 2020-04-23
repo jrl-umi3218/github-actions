@@ -21,7 +21,13 @@ async function run()
       }
       // Undo this otherwise gfortran libs are hidden
       PATH.replace('C:\Program Files\dummy\mingw64\bin', 'C:\Program Files\Git\mingw64\bin');
-      const BOOST_LIB = process.env.BOOST_ROOT + '\\lib';
+      let BOOST_ROOT = process.env.BOOST_ROOT ? process.env.BOOST_ROOT : "";
+      if(!BOOST_ROOT.length)
+      {
+        BOOST_ROOT = process.env.BOOST_ROOT_1_69_0
+        core.exportVariable('BOOST_ROOT', BOOST_ROOT);
+      }
+      const BOOST_LIB = BOOST_ROOT + '\\lib';
       if(PATH.indexOf(BOOST_LIB) == -1)
       {
         PATH = BOOST_LIB + ';' + PATH;
