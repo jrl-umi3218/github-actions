@@ -22,6 +22,10 @@ Adds the provided ppa to the machine
 
 `pip install` the provided packages (with `pip` *and* `pip3`)
 
+#### `options`
+
+Extra CMake options passed to all GitHub dependencies
+
 #### `github`
 
 See `github` input
@@ -44,6 +48,10 @@ This input string is supposed to be a valid yaml object with the following entri
 
 `pip install` the provided packages (with `pip` *and* `pip3`)
 
+#### `options`
+
+Extra CMake options passed to all GitHub dependencies
+
 #### `github`
 
 See `github` input
@@ -61,6 +69,10 @@ This input string is supposed to be a valid yaml object with the following entri
 #### `pip`
 
 `pip install` the provided packages (only use `pip`)
+
+#### `options`
+
+Extra CMake options passed to all GitHub dependencies
 
 #### `github`
 
@@ -84,6 +96,18 @@ The git reference to fetch (defaults to `master`)
 
 Extra CMake options for the build
 
+#### `linux-options`
+
+Pass extra CMake options in Linux host. Those are passed after `options`
+
+#### `macos-options`
+
+Pass extra CMake options in macOS host. Those are passed after `options`
+
+#### `windows-options`
+
+Pass extra CMake options in Windows host. Those are passed after `options`
+
 ### `build-type`
 
 The build type for CMake dependencies (default: `RelWithDebInfo`)
@@ -91,6 +115,17 @@ The build type for CMake dependencies (default: `RelWithDebInfo`)
 ### `compiler` (Linux only)
 
 If `compiler` is set to clang, all CMake dependencies will be built with clang. Otherwise it has no effect. (default: `gcc`)
+### `linux-options`
+
+Pass extra CMake options in Linux host. Those are passed after `options`
+
+### `macos-options`
+
+Pass extra CMake options in macOS host. Those are passed after `options`
+
+### `windows-options`
+
+Pass extra CMake options in Windows host. Those are passed after `options`
 
 ## Example usage
 

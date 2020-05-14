@@ -16,6 +16,18 @@ If `compiler` is set to clang, all CMake dependencies will be built with clang. 
 
 Pass extra CMake options
 
+### `linux-options`
+
+Pass extra CMake options in Linux host. Those are passed after `options`
+
+### `macos-options`
+
+Pass extra CMake options in macOS host. Those are passed after `options`
+
+### `windows-options`
+
+Pass extra CMake options in Windows host. Those are passed after `options`
+
 ## Example usage
 
 ```yaml

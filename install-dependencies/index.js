@@ -139,6 +139,10 @@ async function run()
       let options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';
       if(input)
       {
+        if(input.options)
+        {
+          options += ' ' + input.options;
+        }
         if(input.choco)
         {
           core.startGroup("Install chocolatey dependencies");
@@ -168,9 +172,13 @@ async function run()
     else if(process.platform === 'darwin')
     {
       const input = yaml.safeLoad(core.getInput('macos'));
-      const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
+      let options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
       if(input)
       {
+        if(input.options)
+        {
+          options += ' ' + input.options;
+        }
         if(input.cask)
         {
           core.startGroup("Install Homebrew cask dependencies");
@@ -215,7 +223,7 @@ async function run()
         {
           input.apt += ' clang';
         }
-        else
+        else if(input)
         {
           input.apt = 'clang';
         }
@@ -224,9 +232,13 @@ async function run()
       {
         core.warning('Compiler is set to ' + compiler + ' which is not recognized by this action');
       }
-      const options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
+      let options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
       if(input)
       {
+        if(input.options)
+        {
+          options += ' ' + input.options;
+        }
         if(input.ppa)
         {
           core.startGroup("Add ppa repositories");
