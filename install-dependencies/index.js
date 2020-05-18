@@ -137,6 +137,7 @@ async function run()
       }
       const input = yaml.safeLoad(core.getInput('windows'));
       let options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF';
+      options += ' ' + core.getInput('options') + ' ' + core.getInput('windows-options');
       if(input)
       {
         if(input.options)
@@ -173,6 +174,7 @@ async function run()
     {
       const input = yaml.safeLoad(core.getInput('macos'));
       let options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
+      options += ' ' + core.getInput('options') + ' ' + core.getInput('macos-options');
       if(input)
       {
         if(input.options)
@@ -233,6 +235,7 @@ async function run()
         core.warning('Compiler is set to ' + compiler + ' which is not recognized by this action');
       }
       let options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
+      options += ' ' + core.getInput('options') + ' ' + core.getInput('linux-options');
       if(input)
       {
         if(input.options)

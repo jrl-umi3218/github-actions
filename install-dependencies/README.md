@@ -115,6 +115,11 @@ The build type for CMake dependencies (default: `RelWithDebInfo`)
 ### `compiler` (Linux only)
 
 If `compiler` is set to clang, all CMake dependencies will be built with clang. Otherwise it has no effect. (default: `gcc`)
+
+### `options`
+
+Pass extra CMake options.
+
 ### `linux-options`
 
 Pass extra CMake options in Linux host. Those are passed after `options`
@@ -148,3 +153,12 @@ with:
   github:
     - path: jrl-umi3218/Eigen3ToPython
 ```
+
+## Passing of CMake options
+
+For a given `github` entry, CMake options are passed in the following order:
+1. Global `options`
+2. Platform-specific global options (e.g. `linux-options`)
+3. Host-level options (e.g. `linux: options`) -- This does not apply to the common GitHub dependencies
+4. Project `options`
+5. Project platform-specific options
