@@ -13,7 +13,7 @@ async function bash_out(cmd)
   const options = {};
   options.listeners = {
     stdout: (data) => {
-      myOutput += data.toString();
+      output += data.toString();
     }
   };
   await exec.exec('bash', ['-c', cmd], options);
@@ -59,7 +59,7 @@ async function run()
     if(linux)
     {
       await bash('conan profile new default --detect');
-      await bash('conan profile pdate settings.compiler.libcxx=libstdc++11 default');
+      await bash('conan profile update settings.compiler.libcxx=libstdc++11 default');
     }
     core.endGroup();
     // Determine build and upload parameters
