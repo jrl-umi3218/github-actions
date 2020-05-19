@@ -83,7 +83,7 @@ async function run()
       package_stable = run_on_tag;
       package_upload = run_on_tag || context.ref == 'refs/heads/master';
     }
-    const package_version = await bash_out(`${sed} -E -e's/^    version = "(.*)"$/\1/;t;d' conanfile.py`)
+    const package_version = await bash_out(`${sed} -E -e's/^    version = "(.*)"$/\\1/;t;d' conanfile.py`)
     let package_channel = dev_channel;
     if(package_stable)
     {
