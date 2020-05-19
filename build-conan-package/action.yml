@@ -1,0 +1,26 @@
+name: 'Build conan package'
+description: 'Build a conan package and upload it'
+inputs:
+  package:
+    description: 'Package name (e.g. MyPackage)'
+    required: true
+  user:
+    description: 'Bintray user'
+    required: true
+  repository:
+    description: 'Bintray repository'
+    required: true
+  stable-channel:
+    description: 'Stable channel for uploads'
+    required: true
+    default: 'stable'
+  dev-channel:
+    description: 'Development channel for uploads'
+    required: true
+    default: 'dev'
+  BINTRAY_API_KEY:
+    description: 'Bintray API key'
+    required: true
+runs:
+  using: 'node12'
+  main: 'index.js'

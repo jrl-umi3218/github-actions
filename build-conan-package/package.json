@@ -1,0 +1,16 @@
+{
+  "name": "build-conan-package",
+  "version": "1.0.0",
+  "description": "GitHub action to build and upload a conan package",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Pierre Gergondet",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "@actions/core": "^1.2.4",
+    "@actions/exec": "^1.0.4",
+    "@actions/github": "^2.2.0"
+  }
+}
