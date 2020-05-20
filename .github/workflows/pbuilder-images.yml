@@ -43,6 +43,10 @@ jobs:
             export TAG="${TAG}-${ROS_DISTRO}"
             mv Dockerfile.ros Dockerfile
           fi
+          if [ "${{ matrix.dist }}" = "focal" ]
+          then
+            mv Dockerfile.focal Dockerfile
+          fi
           echo "::group::Build image"
           docker build -t gergondet/pbuilder:${TAG} .
           echo "::endgroup::"
