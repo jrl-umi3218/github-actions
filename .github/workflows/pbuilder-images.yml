@@ -1,5 +1,7 @@
 name: Build and upload pbuilder images to Docker hub
 on:
+  schedule:
+    - cron: '0 22 * * *'
   push:
     paths:
       - '.github/workflows/pbuilder-images.yml'
