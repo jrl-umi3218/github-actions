@@ -17,7 +17,7 @@ async function bash_out(cmd)
     }
   };
   await exec.exec('bash', ['-c', cmd], options);
-  return output;
+  return output.trim();
 }
 
 async function run()
@@ -89,18 +89,24 @@ async function run()
     {
       package_channel = stable_channel;
     }
+    await bash(`sed -i -e's@${repository}/${dev_channel}@${repository}/${package_channel}' conanfile.py`);
+    await bash(`sed -i -e's@${repository}/${dev_channel}@${repository}/${package_channel}' conanfile.py`);
+    await bash('conan info .');
     core.info(`Package channel: ${package_channel}`);
     core.info(`Package upload: ${package_upload}`);
     core.info(`Package version: ${package_version}`);
     core.endGroup();
-    // FIXME Replace ${repository}/${dev_channel} with ${repository}/${stable_channel} in conanfile.py
+    core.startGroup('Create conan package');
     await bash(`conan create . ${repository}/${package_channel}`);
+    core.endGroup();
     if(package_upload)
     {
+      core.startGroup('Upload conan package');
       await bash(`conan user -p ${BINTRAY_API_KEY} -r ${repository} ${user}`);
       await bash(`conan alias ${package}/latest@${repository}/${package_channel} ${package}/${package_version}@${repository}/${package_channel}`);
       await bash(`conan upload ${package}/${package_version}@${repository}/${package_channel} --all -r=${repository}`);
       await bash(`conan upload ${package}/latest@${repository}/${package_channel} --all -r=${repository}`);
+      core.endGroup();
     }
   }
   catch(error)
