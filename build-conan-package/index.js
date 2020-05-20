@@ -89,8 +89,8 @@ async function run()
     {
       package_channel = stable_channel;
     }
-    await bash(`sed -i -e's@${repository}/${dev_channel}@${repository}/${package_channel}' conanfile.py`);
-    await bash(`sed -i -e's@${repository}/${dev_channel}@${repository}/${package_channel}' conanfile.py`);
+    await bash(`sed -i -e's@${repository}/${dev_channel}@${repository}/${package_channel}@' conanfile.py`);
+    await bash(`sed -i -e's@${repository}/${dev_channel}@${repository}/${package_channel}@' conanfile.py`);
     await bash('conan info .');
     core.info(`Package channel: ${package_channel}`);
     core.info(`Package upload: ${package_upload}`);
