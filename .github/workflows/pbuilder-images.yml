@@ -32,6 +32,10 @@ jobs:
         echo "::group::Declare function"
         build-image()
         {
+          if [ "${{ matrix.dist }}" = "focal" ]
+          then
+            mv Dockerfile.focal Dockerfile
+          fi
           sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile
           sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile
           sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile.ros
@@ -42,10 +46,6 @@ jobs:
             sed -i -e "s/@ROS_DISTRO@/${ROS_DISTRO}/" Dockerfile.ros
             export TAG="${TAG}-${ROS_DISTRO}"
             mv Dockerfile.ros Dockerfile
-          fi
-          if [ "${{ matrix.dist }}" = "focal" ]
-          then
-            mv Dockerfile.focal Dockerfile
           fi
           echo "::group::Build image"
           docker build -t gergondet/pbuilder:${TAG} .
