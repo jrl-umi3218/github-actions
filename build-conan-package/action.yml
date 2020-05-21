@@ -18,6 +18,10 @@ inputs:
     description: 'Development channel for uploads'
     required: true
     default: 'dev'
+  with-build-type:
+    description: 'True if the recipe supports build_type then build Debug and Release'
+    required: true
+    default: false
   BINTRAY_API_KEY:
     description: 'Bintray API key'
     required: true

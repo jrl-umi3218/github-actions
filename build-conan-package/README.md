@@ -28,6 +28,10 @@ Channel used for stable releases
 
 Channel used for development releases
 
+### `with-build-type`
+
+If true the action will build one package with `build_type=Debug` and one with `build_type=Release`
+
 ### `BINTRAY_API_KEY`
 
 API key used to upload packages

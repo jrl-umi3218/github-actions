@@ -31,6 +31,7 @@ async function run()
     const remote = `https://api.bintray.com/conan/${user}/${repository}`
     const stable_channel = core.getInput('stable-channel');
     const dev_channel = core.getInput('dev-channel');
+    const with_build_type = core.getInput('with-build-type');
     const BINTRAY_API_KEY = core.getInput('BINTRAY_API_KEY');
     // Get GitHub context
     const context = github.context;
@@ -97,7 +98,15 @@ async function run()
     core.info(`Package version: ${package_version}`);
     core.endGroup();
     core.startGroup('Create conan package');
-    await bash(`conan create . ${repository}/${package_channel}`);
+    if(with_build_type)
+    {
+      await bash(`conan create . ${repository}/${package_channel} -s build_type=Release`);
+      await bash(`conan create . ${repository}/${package_channel} -s build_type=Debug`);
+    }
+    else
+    {
+      await bash(`conan create . ${repository}/${package_channel}`);
+    }
     core.endGroup();
     if(package_upload)
     {
