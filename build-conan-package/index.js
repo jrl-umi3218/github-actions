@@ -36,6 +36,7 @@ async function run()
     const force_upload = core.getInput('force-upload');
     const working_directory = core.getInput('working-directory');
     const BINTRAY_API_KEY = core.getInput('BINTRAY_API_KEY');
+    let package_version = core.getInput('version');
     // Get GitHub context
     const context = github.context;
     // Check if this action is running on a tag
@@ -98,7 +99,10 @@ async function run()
     {
       package_upload = true;
     }
-    const package_version = await bash_out(`${sed} -E -e's/^    version = "(.*)"$/\\1/;t;d' conanfile.py`)
+    if(package_version == '')
+    {
+      package_version = await bash_out(`${sed} -E -e's/^    version = "(.*)"$/\\1/;t;d' conanfile.py`)
+    }
     let package_channel = dev_channel;
     if(package_stable)
     {

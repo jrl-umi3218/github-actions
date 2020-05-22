@@ -30,6 +30,10 @@ inputs:
     description: 'Change working directory'
     required: true
     default: ''
+  version:
+    description: 'Force a version (otherwise extract it from conanfile.py'
+    required: true
+    default: ''
   BINTRAY_API_KEY:
     description: 'Bintray API key'
     required: true
