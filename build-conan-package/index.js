@@ -41,6 +41,16 @@ async function run()
     const context = github.context;
     // Check if this action is running on a tag
     const run_on_tag = context.ref.startsWith('refs/tags/');
+    // Handle sed on macOS
+    let sed = 'sed';
+    if(darwin)
+    {
+      if(!command_exists('gsed'))
+      {
+        await bash('brew install gnu-sed');
+      }
+      sed = 'gsed';
+    }
     // Install conan
     if(!command_exists('conan'))
     {
@@ -49,17 +59,11 @@ async function run()
       const linux = process.platform == 'linux';
       const darwin = process.platform == 'darwin';
       const win32 = process.platform == 'win32';
-      let sed = 'sed';
       if(linux)
       {
         await bash('sudo apt install python3-setuptools');
         await bash('sudo apt remove python3-jwt python3-jinja2');
         sudo = 'sudo';
-      }
-      if(darwin)
-      {
-        await bash('brew install gnu-sed');
-        sed = 'gsed';
       }
       await bash(`${sudo} pip3 install conan`);
       await bash(`conan remote add ${repository} ${remote}`)
