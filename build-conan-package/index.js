@@ -1,7 +1,6 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const github = require('@actions/github');
-const command_exists = require('command-exists');
 
 async function bash(cmd)
 {
@@ -49,34 +48,26 @@ async function run()
     let sed = 'sed';
     if(darwin)
     {
-      let has_gsed = await command_exists('gsed');
-      if(!has_gsed)
-      {
-        await bash('brew install gnu-sed');
-      }
+      await bash('brew install gnu-sed');
       sed = 'gsed';
     }
     // Install conan
-    let has_conan = await command_exists('conan');
-    if(!has_conan)
+    core.startGroup('Install and setup conan');
+    let sudo = '';
+    if(linux)
     {
-      core.startGroup('Install and setup conan');
-      let sudo = '';
-      if(linux)
-      {
-        await bash('sudo apt install python3-setuptools');
-        await bash('sudo apt remove python3-jwt python3-jinja2');
-        sudo = 'sudo';
-      }
-      await bash(`${sudo} pip3 install conan`);
-      await bash(`conan remote add ${repository} ${remote}`)
-      if(linux)
-      {
-        await bash('conan profile new default --detect');
-        await bash('conan profile update settings.compiler.libcxx=libstdc++11 default');
-      }
-      core.endGroup();
+      await bash('sudo apt install python3-setuptools');
+      await bash('sudo apt remove python3-jwt python3-jinja2');
+      sudo = 'sudo';
     }
+    await bash(`${sudo} pip3 install conan`);
+    await bash(`conan remote add ${repository} ${remote}`)
+    if(linux)
+    {
+      await bash('conan profile new default --detect');
+      await bash('conan profile update settings.compiler.libcxx=libstdc++11 default');
+    }
+    core.endGroup();
     if(working_directory != '')
     {
       process.chdir(working_directory);
