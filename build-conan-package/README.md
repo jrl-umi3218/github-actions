@@ -32,6 +32,10 @@ Channel used for development releases
 
 If true the action will build one package with `build_type=Debug` and one with `build_type=Release`
 
+### `force-upload`
+
+Upload the package regardless of the branch
+
 ### `BINTRAY_API_KEY`
 
 API key used to upload packages

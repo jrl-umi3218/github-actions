@@ -22,6 +22,10 @@ inputs:
     description: 'True if the recipe supports build_type then build Debug and Release'
     required: true
     default: false
+  force-upload:
+    description: 'Upload the package regardless of the branch'
+    required: true
+    default: false
   BINTRAY_API_KEY:
     description: 'Bintray API key'
     required: true

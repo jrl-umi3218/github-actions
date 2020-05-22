@@ -32,6 +32,7 @@ async function run()
     const stable_channel = core.getInput('stable-channel');
     const dev_channel = core.getInput('dev-channel');
     const with_build_type = core.getInput('with-build-type');
+    const force_upload = core.getInput('force-upload');
     const BINTRAY_API_KEY = core.getInput('BINTRAY_API_KEY');
     // Get GitHub context
     const context = github.context;
@@ -83,6 +84,10 @@ async function run()
     {
       package_stable = run_on_tag;
       package_upload = run_on_tag || context.ref == 'refs/heads/master';
+    }
+    if(force_upload)
+    {
+      package_upload = true;
     }
     const package_version = await bash_out(`${sed} -E -e's/^    version = "(.*)"$/\\1/;t;d' conanfile.py`)
     let package_channel = dev_channel;
