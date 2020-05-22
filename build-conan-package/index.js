@@ -1,6 +1,7 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const github = require('@actions/github');
+const command_exists = require('command-exists').sync;
 
 async function bash(cmd)
 {
@@ -33,37 +34,45 @@ async function run()
     const dev_channel = core.getInput('dev-channel');
     const with_build_type = core.getInput('with-build-type');
     const force_upload = core.getInput('force-upload');
+    const working_directory = core.getInput('working-directory');
     const BINTRAY_API_KEY = core.getInput('BINTRAY_API_KEY');
     // Get GitHub context
     const context = github.context;
     // Check if this action is running on a tag
     const run_on_tag = context.ref.startsWith('refs/tags/');
     // Install conan
-    core.startGroup('Install and setup conan');
-    let sudo = '';
-    const linux = process.platform == 'linux';
-    const darwin = process.platform == 'darwin';
-    const win32 = process.platform == 'win32';
-    let sed = 'sed';
-    if(linux)
+    if(!command_exists('conan'))
     {
-      await bash('sudo apt install python3-setuptools');
-      await bash('sudo apt remove python3-jwt python3-jinja2');
-      sudo = 'sudo';
+      core.startGroup('Install and setup conan');
+      let sudo = '';
+      const linux = process.platform == 'linux';
+      const darwin = process.platform == 'darwin';
+      const win32 = process.platform == 'win32';
+      let sed = 'sed';
+      if(linux)
+      {
+        await bash('sudo apt install python3-setuptools');
+        await bash('sudo apt remove python3-jwt python3-jinja2');
+        sudo = 'sudo';
+      }
+      if(darwin)
+      {
+        await bash('brew install gnu-sed');
+        sed = 'gsed';
+      }
+      await bash(`${sudo} pip3 install conan`);
+      await bash(`conan remote add ${repository} ${remote}`)
+      if(linux)
+      {
+        await bash('conan profile new default --detect');
+        await bash('conan profile update settings.compiler.libcxx=libstdc++11 default');
+      }
+      core.endGroup();
     }
-    if(darwin)
+    if(working_directory != '')
     {
-      await bash('brew install gnu-sed');
-      sed = 'gsed';
+      process.chdir(working_directory);
     }
-    await bash(`${sudo} pip3 install conan`);
-    await bash(`conan remote add ${repository} ${remote}`)
-    if(linux)
-    {
-      await bash('conan profile new default --detect');
-      await bash('conan profile update settings.compiler.libcxx=libstdc++11 default');
-    }
-    core.endGroup();
     // Determine build and upload parameters
     core.startGroup('Set build and upload parameters');
     let package_stable = false;

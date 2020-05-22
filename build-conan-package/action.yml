@@ -26,6 +26,10 @@ inputs:
     description: 'Upload the package regardless of the branch'
     required: true
     default: false
+  working-directory:
+    description: 'Change working directory'
+    required: true
+    default: ''
   BINTRAY_API_KEY:
     description: 'Bintray API key'
     required: true
