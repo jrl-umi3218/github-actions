@@ -41,6 +41,10 @@ async function run()
     const context = github.context;
     // Check if this action is running on a tag
     const run_on_tag = context.ref.startsWith('refs/tags/');
+    // Identify platforms
+    const linux = process.platform == 'linux';
+    const darwin = process.platform == 'darwin';
+    const win32 = process.platform == 'win32';
     // Handle sed on macOS
     let sed = 'sed';
     if(darwin)
@@ -56,9 +60,6 @@ async function run()
     {
       core.startGroup('Install and setup conan');
       let sudo = '';
-      const linux = process.platform == 'linux';
-      const darwin = process.platform == 'darwin';
-      const win32 = process.platform == 'win32';
       if(linux)
       {
         await bash('sudo apt install python3-setuptools');
