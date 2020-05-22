@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const github = require('@actions/github');
-const command_exists = require('command-exists').sync;
+const command_exists = require('command-exists');
 
 async function bash(cmd)
 {
@@ -49,14 +49,16 @@ async function run()
     let sed = 'sed';
     if(darwin)
     {
-      if(!command_exists('gsed'))
+      let has_gsed = await command_exists('gsed');
+      if(!has_gsed)
       {
         await bash('brew install gnu-sed');
       }
       sed = 'gsed';
     }
     // Install conan
-    if(!command_exists('conan'))
+    let has_conan = await command_exists('conan');
+    if(!has_conan)
     {
       core.startGroup('Install and setup conan');
       let sudo = '';
