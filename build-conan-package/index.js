@@ -61,10 +61,10 @@ async function run()
       sudo = 'sudo';
     }
     await bash(`${sudo} pip3 install conan`);
-    await bash(`conan remote add ${repository} ${remote}`)
+    await bash(`conan remote add ${repository} ${remote} || true`)
     if(linux)
     {
-      await bash('conan profile new default --detect');
+      await bash('conan profile new default --detect || true');
       await bash('conan profile update settings.compiler.libcxx=libstdc++11 default');
     }
     core.endGroup();
