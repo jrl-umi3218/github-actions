@@ -2,7 +2,7 @@
 
 install-project-dependencies()
 {
-  apt-get update -qq
+  apt-get update
   mk-build-deps -i -r -t "apt-get -y" /package/@REPO@/debian/control
 }
 
