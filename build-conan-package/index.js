@@ -1,3 +1,4 @@
+const { boolean } = require('boolean');
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const github = require('@actions/github');
@@ -31,8 +32,8 @@ async function run()
     const remote = `https://api.bintray.com/conan/${user}/${repository}`
     const stable_channel = core.getInput('stable-channel');
     const dev_channel = core.getInput('dev-channel');
-    const with_build_type = core.getInput('with-build-type');
-    const force_upload = core.getInput('force-upload');
+    const with_build_type = boolean(core.getInput('with-build-type'));
+    const force_upload = boolean(core.getInput('force-upload'));
     const working_directory = core.getInput('working-directory');
     const BINTRAY_API_KEY = core.getInput('BINTRAY_API_KEY');
     let package_version = core.getInput('version');
