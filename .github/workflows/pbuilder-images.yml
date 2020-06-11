@@ -64,3 +64,7 @@ jobs:
         then
           build-image "melodic"
         fi
+        if [ "${{ matrix.dist }}" = "focal" -a "${{ matrix.arch }}" = "amd64" ]
+        then
+          build-image "noetic"
+        fi
