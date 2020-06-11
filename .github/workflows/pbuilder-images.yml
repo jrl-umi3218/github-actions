@@ -34,7 +34,7 @@ jobs:
         {
           if [ "${{ matrix.dist }}" = "focal" ]
           then
-            mv Dockerfile.focal Dockerfile
+            cp Dockerfile.focal Dockerfile
           fi
           sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile
           sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile
@@ -45,7 +45,7 @@ jobs:
           if [ ! -z ${ROS_DISTRO} ]; then
             sed -i -e "s/@ROS_DISTRO@/${ROS_DISTRO}/" Dockerfile.ros
             export TAG="${TAG}-${ROS_DISTRO}"
-            mv Dockerfile.ros Dockerfile
+            cp Dockerfile.ros Dockerfile
           fi
           echo "::group::Build image"
           docker build -t gergondet/pbuilder:${TAG} .
