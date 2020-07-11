@@ -21,4 +21,4 @@ echo "::endgroup::"
 cd $GITHUB_WORKSPACE && cd ../
 cp -r $WORKING_REPO/ /tmp/package
 ls /tmp/package
-docker run -v /tmp/package:/package --privileged -t ${IMAGE} /bin/bash -c "cd /package/`basename $WORKING_REPO` && ../.build-package.sh" || exit 1
+docker run -v /tmp/package:/package --privileged -t ${IMAGE} /bin/bash -c "cd /package/`basename $WORKING_REPO` && .././build-package.sh" || exit 1
