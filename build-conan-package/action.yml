@@ -34,6 +34,14 @@ inputs:
     description: 'Force a version (otherwise extract it from conanfile.py'
     required: true
     default: ''
+  with-docker:
+    description: 'If true this action will also build the package in the requested docker-images'
+    required: true
+    default: false
+  docker-images:
+    description: 'If with-docker is true then extra packages are built for these images'
+    required: true
+    default: ''
   BINTRAY_API_KEY:
     description: 'Bintray API key'
     required: true

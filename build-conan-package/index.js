@@ -2,6 +2,7 @@ const { boolean } = require('boolean');
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const github = require('@actions/github');
+const yaml = require('js-yaml');
 
 async function bash(cmd)
 {
@@ -37,6 +38,8 @@ async function run()
     const working_directory = core.getInput('working-directory');
     const BINTRAY_API_KEY = core.getInput('BINTRAY_API_KEY');
     let package_version = core.getInput('version');
+    const with_docker = core.getInput('with-docker');
+    const docker_images = yaml.safeLoad(core.getInput('docker-images')) || [];
     // Get GitHub context
     const context = github.context;
     // Check if this action is running on a tag
@@ -145,6 +148,22 @@ async function run()
     else
     {
       core.setOutput('dispatch', '');
+    }
+    if(with_docker)
+    {
+      const repo = context.repo.repo;
+      core.exportVariable('REPO', repo);
+      core.exportVariable('CONAN_REPOSITORY', repository);
+      core.exportVariable('CONAN_REMOTE', remote);
+      core.exportVariable('CONAN_PACKAGE', package);
+      core.exportVariable('CONAN_PACKAGE_VERSION', package_version);
+      core.exportVariable('CONAN_CHANNEL', package_channel);
+      core.exportVariable('BINTRAY_API_KEY', BINTRAY_API_KEY);
+      docker_images.forEach(function(image) {
+        core.startGroup(`Build conan package on ${image}`);
+        await bash(`./docker-and-build.sh ${image}`);
+        core.endGroup();
+      });
     }
   }
   catch(error)
