@@ -19,6 +19,6 @@ cat /tmp/package/build-package.sh
 echo "::endgroup::"
 
 cd $GITHUB_WORKSPACE && cd ../
-cp -r $REPO/ /tmp/package
+cp -r $WORKING_REPO/ /tmp/package
 ls /tmp/package
-docker run -v /tmp/package:/package --privileged -t ${IMAGE} /bin/bash -c "cd /package && ./build-package.sh"
+docker run -v /tmp/package:/package --privileged -t ${IMAGE} /bin/bash -c "cd /package/$REPO && ../.build-package.sh" || exit 1

@@ -153,17 +153,20 @@ async function run()
     {
       const cwd = process.cwd();
       process.chdir(__dirname);
-      let repo = context.repo.repo;
+      const repo = context.repo.repo;
+      let working = repo;
       if(working_directory != '')
       {
-        repo = repo + '/' + working_directory;
+        working = working + '/' + working_directory;
       }
       core.exportVariable('REPO', repo);
+      core.exportVariable('WORKING_REPO', working);
       core.exportVariable('CONAN_REPOSITORY', repository);
       core.exportVariable('CONAN_REMOTE', remote);
       core.exportVariable('CONAN_PACKAGE', package);
       core.exportVariable('CONAN_PACKAGE_VERSION', package_version);
       core.exportVariable('CONAN_CHANNEL', package_channel);
+      core.exportVariable('CONAN_UPLOAD', package_upload);
       core.exportVariable('BINTRAY_API_KEY', BINTRAY_API_KEY);
       for(const image of docker_images)
       {
