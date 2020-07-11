@@ -38,7 +38,7 @@ async function run()
     const working_directory = core.getInput('working-directory');
     const BINTRAY_API_KEY = core.getInput('BINTRAY_API_KEY');
     let package_version = core.getInput('version');
-    const with_docker = core.getInput('with-docker');
+    const with_docker = boolean(core.getInput('with-docker'));
     const docker_images = yaml.safeLoad(core.getInput('docker-images')) || [];
     // Get GitHub context
     const context = github.context;
