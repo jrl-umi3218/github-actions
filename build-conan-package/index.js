@@ -153,7 +153,11 @@ async function run()
     {
       const cwd = process.cwd();
       process.chdir(__dirname);
-      const repo = context.repo.repo;
+      let repo = context.repo.repo;
+      if(working_directory != '')
+      {
+        repo = repo + '/' + working_directory;
+      }
       core.exportVariable('REPO', repo);
       core.exportVariable('CONAN_REPOSITORY', repository);
       core.exportVariable('CONAN_REMOTE', remote);
