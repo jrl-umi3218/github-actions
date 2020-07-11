@@ -151,6 +151,8 @@ async function run()
     }
     if(with_docker)
     {
+      const cwd = process.cwd();
+      process.chdir(__dirname);
       const repo = context.repo.repo;
       core.exportVariable('REPO', repo);
       core.exportVariable('CONAN_REPOSITORY', repository);
@@ -165,6 +167,7 @@ async function run()
         await bash(`./docker-and-build.sh ${image}`);
         core.endGroup();
       }
+      process.chdir(cwd);
     }
   }
   catch(error)
