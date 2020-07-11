@@ -159,11 +159,12 @@ async function run()
       core.exportVariable('CONAN_PACKAGE_VERSION', package_version);
       core.exportVariable('CONAN_CHANNEL', package_channel);
       core.exportVariable('BINTRAY_API_KEY', BINTRAY_API_KEY);
-      docker_images.forEach(function(image) {
+      for(const image of docker_images)
+      {
         core.startGroup(`Build conan package on ${image}`);
         await bash(`./docker-and-build.sh ${image}`);
         core.endGroup();
-      });
+      }
     }
   }
   catch(error)
