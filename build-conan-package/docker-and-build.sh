@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -x
+set -e
 
 export IMAGE=$1
 
@@ -13,10 +14,9 @@ sed -i -e"s#@CONAN_REMOTE@#${CONAN_REMOTE}#g" /tmp/package/build-package.sh
 sed -i -e"s#@CONAN_PACKAGE@#${CONAN_PACKAGE}#g" /tmp/package/build-package.sh
 sed -i -e"s#@CONAN_PACKAGE_VERSION@#${CONAN_PACKAGE_VERSION}#g" /tmp/package/build-package.sh
 sed -i -e"s#@CONAN_CHANNEL@#${CONAN_CHANNEL}#g" /tmp/package/build-package.sh
+sed -i -e"s#@CONAN_UPLOAD@#${CONAN_UPLOAD}#g" /tmp/package/build-package.sh
 sed -i -e"s#@BINTRAY_API_KEY@#${BINTRAY_API_KEY}#g" /tmp/package/build-package.sh
-echo "::group::build-package.sh"
 cat /tmp/package/build-package.sh
-echo "::endgroup::"
 
 cd $GITHUB_WORKSPACE && cd ../
 cp -r $WORKING_REPO/ /tmp/package
