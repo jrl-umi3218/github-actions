@@ -167,6 +167,7 @@ async function run()
       core.exportVariable('CONAN_PACKAGE_VERSION', package_version);
       core.exportVariable('CONAN_CHANNEL', package_channel);
       core.exportVariable('CONAN_UPLOAD', package_upload);
+      core.exportVariable('CONAN_USER', package_upload);
       core.exportVariable('BINTRAY_API_KEY', BINTRAY_API_KEY);
       for(const image of docker_images)
       {

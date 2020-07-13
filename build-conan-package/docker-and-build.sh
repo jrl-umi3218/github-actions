@@ -15,6 +15,7 @@ sed -i -e"s#@CONAN_PACKAGE@#${CONAN_PACKAGE}#g" /tmp/package/build-package.sh
 sed -i -e"s#@CONAN_PACKAGE_VERSION@#${CONAN_PACKAGE_VERSION}#g" /tmp/package/build-package.sh
 sed -i -e"s#@CONAN_CHANNEL@#${CONAN_CHANNEL}#g" /tmp/package/build-package.sh
 sed -i -e"s#@CONAN_UPLOAD@#${CONAN_UPLOAD}#g" /tmp/package/build-package.sh
+sed -i -e"s#@CONAN_USER@#${CONAN_USER}#g" /tmp/package/build-package.sh
 sed -i -e"s#@BINTRAY_API_KEY@#${BINTRAY_API_KEY}#g" /tmp/package/build-package.sh
 cat /tmp/package/build-package.sh
 
