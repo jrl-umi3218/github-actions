@@ -5,7 +5,7 @@ set -e
 
 export IMAGE=$1
 
-rm -rf /tmp/package
+sudo rm -rf /tmp/package
 mkdir -p /tmp/package
 
 cp build-package.sh /tmp/package
