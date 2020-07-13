@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 set -x
 
 export DEBIAN_FRONTEND=noninteractive
@@ -7,7 +8,7 @@ export DEBIAN_FRONTEND=noninteractive
 setup-conan()
 {
   apt-get update -qq
-  apt-get install -qq python3-setuptools python3-pip
+  apt-get install -qq python3-setuptools python3-pip build-essential cmake git gfortran
   pip3 install conan
   conan remote add @CONAN_REPOSITORY@ @CONAN_REMOTE@
   conan profile new default --detect || true
