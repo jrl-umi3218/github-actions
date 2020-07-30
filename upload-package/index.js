@@ -73,7 +73,8 @@ async function cleanup_package(packages_api, content_api, package, dist, arch, v
 function sleep(s) {
   return new Promise((resolve) => {
     setTimeout(resolve, 1000 * s);
-});
+  });
+}
 
 async function upload_package(content_api, package, dist, arch, version, deb)
 {
@@ -91,6 +92,11 @@ async function upload_package(content_api, package, dist, arch, version, deb)
       console.log(`Upload failed (try ${retry}/${max_retry}): ${error}`);
       await sleep(10);
     }
+  }
+  if(retry == max_retry)
+  {
+    console.log("Final try");
+    await content_api.put(path + ';deb_distribution=' + dist + ';deb_component=main;deb_architecture=' + arch + ';publish=1', file);
   }
 }
 
