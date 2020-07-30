@@ -133,8 +133,8 @@ async function run()
       core.startGroup('Upload conan package');
       await bash(`conan user -p ${BINTRAY_API_KEY} -r ${repository} ${user}`);
       await bash(`conan alias ${package}/latest@${repository}/${package_channel} ${package}/${package_version}@${repository}/${package_channel}`);
-      await bash(`conan upload ${package}/${package_version}@${repository}/${package_channel} --all -r=${repository}`);
-      await bash(`conan upload ${package}/latest@${repository}/${package_channel} --all -r=${repository}`);
+      await bash(`conan upload ${package}/${package_version}@${repository}/${package_channel} --all -r=${repository} --retry 10`);
+      await bash(`conan upload ${package}/latest@${repository}/${package_channel} --all -r=${repository} --retry 10`);
       if(package_stable)
       {
         core.setOutput('dispatch', 'conan-release');
