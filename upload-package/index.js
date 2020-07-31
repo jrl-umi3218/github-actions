@@ -87,9 +87,11 @@ async function upload_package(content_api, package, dist, arch, version, deb)
   {
     try {
       await content_api.put(path + ';deb_distribution=' + dist + ';deb_component=main;deb_architecture=' + arch + ';publish=1', file);
+      retry = max_retry + 1;
+      break;
     } catch(error) {
       retry = retry + 1;
-      console.log(`Upload failed (try ${retry}/${max_retry}): ${error}`);
+      console.log(`Upload failed (try ${retry}/${max_retry}): ${error}\n${error.response.data.message}`);
       await sleep(10);
     }
   }
