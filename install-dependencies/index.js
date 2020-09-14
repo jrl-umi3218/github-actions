@@ -82,24 +82,25 @@ async function handle_github(github, btype, options, sudo, linux = false)
     const entry = github[i];
     ref = entry.ref ? entry.ref : "master";
     GIT_DEPENDENCIES += ' ' + entry.path + '#' + ref;
+    let entry_options = options;
     if(entry.options)
     {
-      options = options + " " + entry.options;
+      entry_options = entry_options + " " + entry.options;
     }
     if(process.platform === 'win32' && entry['windows-options'])
     {
-      options = options + ' ' + entry['windows-options'];
+      entry_options = entry_options + ' ' + entry['windows-options'];
     }
     if(process.platform === 'darwin' && entry['macos-options'])
     {
-      options = options + ' ' + entry['macos-options'];
+      entry_options = entry_options + ' ' + entry['macos-options'];
     }
     if(process.platform === 'linux' && entry['linux-options'])
     {
-      options = options + ' ' + entry['linux-options'];
+      entry_options = entry_options + ' ' + entry['linux-options'];
     }
     build_dir = linux ? '/tmp/_ci/build/' + entry.path : entry.path + '/build';
-    await build_github_repo(entry.path, ref, btype, options, sudo, build_dir);
+    await build_github_repo(entry.path, ref, btype, entry_options, sudo, build_dir);
   }
   core.exportVariable('GIT_DEPENDENCIES', GIT_DEPENDENCIES.trim());
   core.endGroup();
