@@ -69,7 +69,7 @@ async function handle_vcpkg(vcpkg, compiler)
     }
   core.endGroup();
   core.startGroup('Setup NuGet');
-    await bash(`${mono} \`./vcpkg fetch nuget | tail -n 1\` sources add -source "${vcpkg_org}" -name "GitHub" -storepasswordincleartext -username "${vcpkg.user}" -password "${vcpkg.token}"`);
+    await bash(`${mono} \`./vcpkg fetch nuget | tail -n 1\` sources add -source "https://nuget.pkg.github.com/${vcpkg_org}/index.json" -name "GitHub" -storepasswordincleartext -username "${vcpkg.user}" -password "${vcpkg.token}"`);
   core.endGroup();
   core.startGroup('Install dependencies');
     process.chdir(cwd);
