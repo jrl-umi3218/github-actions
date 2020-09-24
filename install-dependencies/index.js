@@ -25,7 +25,7 @@ async function handle_vcpkg(vcpkg)
   {
     return;
   }
-  if(!vcpkg.repo || !vcpkg.user || !vcpk.token)
+  if(!vcpkg.repo || !vcpkg.user || !vcpkg.token)
   {
     throw new Error('vcpkg object must have three members: repo, user and token');
   }
