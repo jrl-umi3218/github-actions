@@ -30,7 +30,7 @@ async function handle_vcpkg(vcpkg)
     throw new Error('vcpkg object must have three members: repo, user and token');
   }
   core.startGroup("Bootstrap vcpkg");
-    core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;nuget,GitHub,read');
+    core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;nuget,GitHub,readwrite');
     await exec.exec('git clone --recursive https://github.com/' + vcpkg.repo);
     const cwd = process.cwd();
     let mono = '';
