@@ -301,6 +301,7 @@ async function run()
           core.startGroup('Add required packages to setup mirrors');
           await exec.exec('sudo apt-get install -y apt-transport-https lsb-release ca-certificates gnupg wget');
           core.endGroup();
+          core.startGroup('Add mirrors');
           mirrors = input['apt-mirrors'];
           for(const mname in mirrors)
           {
@@ -315,6 +316,7 @@ async function run()
             }
             await bash(`sudo sh -c 'echo "deb ${mirror.mirror} $(lsb_release -sc) main" > /etc/apt/sources.list.d/${mname}.list'`);
           }
+          core.endGroup();
           core.startGroup("Update APT mirror");
           await exec.exec('sudo apt-get update');
           core.endGroup();
