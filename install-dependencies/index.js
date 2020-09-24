@@ -56,10 +56,6 @@ async function handle_vcpkg(vcpkg)
   core.startGroup('Setup NuGet');
     await bash(`${mono} \`./vcpkg fetch nuget | tail -n 1\` sources add -source "${vcpkg_org}" -name "GitHub" -storepasswordincleartext -username "${vcpkg.user}" -password "${vcpkg.token}"`);
   core.endGroup();
-  core.startGroup('Install vcpkg dependencies');
-    process.chdir(cwd);
-    await bash(`${vcpkg_exe} install --debug`);
-  core.endGroup();
 }
 
 async function build_github_repo(path, ref, btype, options, sudo, build_dir)
