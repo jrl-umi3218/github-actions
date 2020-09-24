@@ -49,6 +49,10 @@ Extra CMake options passed to all GitHub dependencies
 
 See `github` input
 
+#### `vcpkg`
+
+See `vcpkg` input
+
 ### `macos`
 
 Handle dependencies specific to macOS
@@ -75,6 +79,10 @@ Extra CMake options passed to all GitHub dependencies
 
 See `github` input
 
+#### `vcpkg`
+
+See `vcpkg` input
+
 ### `windows`
 
 Handle dependencies specific to Windows
@@ -96,6 +104,10 @@ Extra CMake options passed to all GitHub dependencies
 #### `github`
 
 See `github` input
+
+#### `vcpkg`
+
+See `vcpkg` input
 
 ### `github`
 
@@ -150,6 +162,31 @@ Pass extra CMake options in macOS host. Those are passed after `options`
 ### `windows-options`
 
 Pass extra CMake options in Windows host. Those are passed after `options`
+
+### `vcpkg`
+
+If non-empty install vcpk on the host and use a manifest to install required dependencies. Set the VCPK\_TOOLCHAIN environment variable for the remainder of the build. It should be a valid yaml object with the following entries.
+
+#### `repo`
+
+The repository that should be cloned as vcpkg
+
+#### `user`
+
+GitHub user for authentification
+
+#### `token`
+
+GitHub access token for authentification. This token needs to grant `read:packages` authorization.
+
+**Example**
+
+```yaml
+vcpkg:
+  repo: jrl-umi3218/vcpkg
+  user: ${{ github.actor }}
+  token: ${{ github.token }}
+```
 
 ## Example usage
 

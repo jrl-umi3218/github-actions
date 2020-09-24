@@ -22,6 +22,10 @@ inputs:
     description: 'GitHub packages (CMake) to fetch and install'
     required: true
     default: ''
+  vcpkg:
+    description: 'Install vcpkg and use the project manifest to install dependencies'
+    required: true
+    default: ''
 runs:
   using: 'node12'
   main: 'index.js'

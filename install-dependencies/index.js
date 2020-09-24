@@ -19,6 +19,46 @@ async function bash(cmd)
   await exec.exec('bash', ['-c', cmd]);
 }
 
+async function handle_vcpkg(vcpkg)
+{
+  if(!vcpkg)
+  {
+    return;
+  }
+  if(!vcpkg.repo || !vcpkg.user || !vcpk.token)
+  {
+    throw new Error('vcpkg object must have three members: repo, user and token');
+  }
+  core.startGroup("Bootstrap vcpkg");
+    core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;nuget,GitHub,read');
+    await exec.exec('git clone --recursive https://github.com/' + vcpkg.repo);
+    const cwd = process.cwd();
+    let mono = '';
+    const vcpkg_org = vcpkg.repo.split('/')[0];
+    const vcpkg_dir = vcpkg.repo.split('/')[1];
+    const vcpkg_exe = `./${vcpkg_dir}/vcpkg`;
+    process.chdir(vcpkg_dir);
+    core.exportVariable('VCPKG_TOOLCHAIN', `${process.cwd()}/scripts/buildsystems/vcpkg.cmake`);
+    if(process.platform == 'win32')
+    {
+      await bash('./bootstrap-vcpkg.bat');
+      core.exportVariable('VCPKG_DEFAULT_TRIPLET', 'x64-windows');
+    }
+    else
+    {
+      mono = 'mono';
+      await bash('./bootstrap-vcpkg.sh');
+    }
+  core.endGroup();
+  core.startGroup('Setup NuGet');
+    await bash(`${mono} \`./vcpkg fetch nuget | tail -n 1\` sources add -source "${vcpkg_org}" -name "GitHub" -storepasswordincleartext -username "${vcpkg.user}" -password "${vcpkg.token}"`);
+  core.endGroup();
+  core.startGroup('Install vcpkg dependencies');
+    process.chdir(cwd);
+    await bash(`${vcpkg_exe} install --debug`);
+  core.endGroup();
+}
+
 async function build_github_repo(path, ref, btype, options, sudo, build_dir)
 {
   core.startGroup('Building ' + path);
@@ -168,6 +208,8 @@ async function run()
           core.endGroup();
         }
       }
+      const vcpkg = (input && input.vcpkg && yaml.safeLoad(input.vcpkg)) || yaml.safeLoad(core.getInput('vcpkg'));
+      await handle_vcpkg(vcpkg);
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, false);
     }
@@ -208,6 +250,8 @@ async function run()
           core.endGroup();
         }
       }
+      const vcpkg = (input && input.vcpkg && yaml.safeLoad(input.vcpkg)) || yaml.safeLoad(core.getInput('vcpkg'));
+      await handle_vcpkg(vcpkg);
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, true);
     }
@@ -298,6 +342,8 @@ async function run()
           core.endGroup();
         }
       }
+      const vcpkg = (input && input.vcpkg && yaml.safeLoad(input.vcpkg)) || yaml.safeLoad(core.getInput('vcpkg'));
+      await handle_vcpkg(vcpkg);
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, true, true);
     }
