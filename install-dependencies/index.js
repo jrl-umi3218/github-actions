@@ -307,13 +307,13 @@ async function run()
             const mirror = mirrors[mname];
             if(mirror.key)
             {
-              await exec.exec(`sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key ${mirror.key}`);
+              await bash(`sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key ${mirror.key}`);
             }
             else if(mirror['key-uri'])
             {
               await bash(`wget ${mirror['key-uri']} -O - | sudo apt-key add -`);
             }
-            await exec.exec(`sudo sh -c 'echo "${mirror.mirror}" $(lsb_release -sc) main" > /etc/apt/sources.list.d/${mname}.list'`);
+            await bash(`sudo sh -c 'echo "${mirror.mirror} $(lsb_release -sc) main" > /etc/apt/sources.list.d/${mname}.list'`);
           }
           core.startGroup("Update APT mirror");
           await exec.exec('sudo apt-get update');
