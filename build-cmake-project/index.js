@@ -76,6 +76,11 @@ async function run()
       }
     }
     options = options + ' -DCMAKE_BUILD_TYPE=' + btype;
+    if(process.env.VCPKG_TOOLCHAIN)
+    {
+      core.info(`Using vcpkg toolchain file: ${process.env.VCPKG_TOOLCHAIN}`);
+      options = `-DCMAKE_TOOLCHAIN_FILE=${process.env.VCPKG_TOOLCHAIN} ${options}`;
+    }
 
     // Take care of the actual build
     core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', 2);
