@@ -29,6 +29,9 @@ async function handle_vcpkg(vcpkg)
   {
     throw new Error('vcpkg object must have three members: repo, user and token');
   }
+  core.startGroup("Remove existing installation in GitHub environment");
+    await bash('rm -rf "$VCPKG_INSTALLATION_ROOT" || sudo rm -rf "$VCPKG_INSTALLATION_ROOT"');
+  core.endGroup();
   core.startGroup("Bootstrap vcpkg");
     core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;nuget,GitHub,readwrite');
     await exec.exec('git clone --recursive https://github.com/' + vcpkg.repo);
