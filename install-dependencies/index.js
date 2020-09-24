@@ -27,7 +27,7 @@ async function handle_vcpkg(vcpkg, compiler)
   }
   if(!vcpkg.repo || !vcpkg.user || !vcpkg.token)
   {
-    throw new Error('vcpkg object must have three members: repo, user and token');
+    throw new Error(`vcpkg object must have three members: repo, user and token\nGot:\n${vcpkg}\n`);
   }
   core.startGroup("Remove existing installation in GitHub environment");
     await bash('rm -rf "$VCPKG_INSTALLATION_ROOT" || sudo rm -rf "$VCPKG_INSTALLATION_ROOT"');
