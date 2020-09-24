@@ -313,7 +313,7 @@ async function run()
             {
               await bash(`wget ${mirror['key-uri']} -O - | sudo apt-key add -`);
             }
-            await bash(`sudo sh -c 'echo "${mirror.mirror} $(lsb_release -sc) main" > /etc/apt/sources.list.d/${mname}.list'`);
+            await bash(`sudo sh -c 'echo "deb ${mirror.mirror} $(lsb_release -sc) main" > /etc/apt/sources.list.d/${mname}.list'`);
           }
           core.startGroup("Update APT mirror");
           await exec.exec('sudo apt-get update');
