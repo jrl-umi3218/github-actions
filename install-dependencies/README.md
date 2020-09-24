@@ -18,6 +18,25 @@ Adds the provided ppa to the machine
 
 `apt install` the provided packages
 
+#### `apt-mirrors`
+
+Add apt mirrors to the machine, each entry must be a valid yaml object with the following properties:
+- `mirror`: the mirror URI
+- `key`: the GPG key used to sign packages on the mirror; OR
+- `key-uri`: an URI to get the GPG key used to sign packages on the mirror
+
+**Example**
+
+```yaml
+apt-mirrors:
+  multi-contact:
+    mirror: https://dl.bintray.com/gergondet/multi-contact-head
+    key: 892EA6EE273707C6495A6FB6220D644C64666806
+  ros:
+    mirror: http://packages.ros.org/ros/ubuntu
+    key-uri: http://packages.ros.org/ros.key
+```
+
 #### `pip`
 
 `pip install` the provided packages (with `pip` *and* `pip3`)

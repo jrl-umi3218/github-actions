@@ -249,8 +249,28 @@ async function run()
           await handle_ppa(input.ppa);
           core.endGroup();
         }
-        else
+        core.startGroup("Update APT mirror");
+        await exec.exec('sudo apt-get update');
+        core.endGroup();
+        if(input['apt-mirrors'])
         {
+          core.startGroup('Add required packages to setup mirrors');
+          await exec.exec('sudo apt-get install -y apt-transport-https lsb-release ca-certificates gnupg wget');
+          core.endGroup();
+          mirrors = input['apt-mirrors'];
+          for(const mname in mirrors)
+          {
+            const mirror = mirrors[mname];
+            if(mirror.key)
+            {
+              await exec.exec(`sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key ${mirror.key}`);
+            }
+            else if(mirror['key-uri'])
+            {
+              await bash(`wget ${mirror['key-uri']} -O - | sudo apt-key add -`);
+            }
+            await exec.exec(`sudo sh -c 'echo "${mirror.mirror}" $(lsb_release -sc) main" > /etc/apt/sources.list.d/${mname}.list'`);
+          }
           core.startGroup("Update APT mirror");
           await exec.exec('sudo apt-get update');
           core.endGroup();
