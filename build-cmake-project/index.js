@@ -106,7 +106,14 @@ async function run()
     await exec.exec(install_cmd);
     core.endGroup();
     core.startGroup('Test')
-    await exec.exec('ctest -V -C ' + btype);
+    if(process.platform === 'win32')
+    {
+      await exec.exec('cmake -E env CTEST_OUTPUT_ON_FAILURE=1 cmake --build . -- target RUN_TESTS --config ' + btype);
+    }
+    else
+    {
+      await exec.exec('ctest -V -C ' + btype);
+    }
     core.endGroup();
     core.exportVariable('PATH', OLD_PATH);
   }
