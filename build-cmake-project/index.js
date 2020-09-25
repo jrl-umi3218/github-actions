@@ -108,7 +108,7 @@ async function run()
     core.startGroup('Test')
     if(process.platform === 'win32')
     {
-      await exec.exec('cmake -E env CTEST_OUTPUT_ON_FAILURE=1 cmake --build . -- target RUN_TESTS --config ' + btype);
+      await exec.exec('cmake -E env CTEST_OUTPUT_ON_FAILURE=1 cmake --build . --target RUN_TESTS --config ' + btype);
     }
     else
     {
