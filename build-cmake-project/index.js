@@ -24,7 +24,7 @@ async function run()
       let BOOST_ROOT = process.env.BOOST_ROOT ? process.env.BOOST_ROOT : "";
       if(!BOOST_ROOT.length)
       {
-        BOOST_ROOT = process.env.BOOST_ROOT_1_69_0
+        BOOST_ROOT = process.env.BOOST_ROOT_1_72_0;
         core.exportVariable('BOOST_ROOT', BOOST_ROOT);
       }
       const BOOST_LIB = BOOST_ROOT + '\\lib';
