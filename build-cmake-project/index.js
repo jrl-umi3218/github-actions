@@ -40,7 +40,7 @@ async function run()
       core.startGroup("Modified PATH variable");
       console.log(PATH);
       core.endGroup();
-      options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install ' + options;
+      options = '-DCMAKE_INSTALL_PREFIX=C:/devel/install -DBoost_USE_STATIC_LIBS=OFF' + options;
       if(btype.toLowerCase() == 'debug')
       {
         options = options + ' -DPYTHON_BINDING:BOOL=OFF';
