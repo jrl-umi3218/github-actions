@@ -55,6 +55,11 @@ async function run()
       await bash('brew install gnu-sed');
       sed = 'gsed';
     }
+    // Enforce XCode 11.7 selection on macOS (for now)
+    if(darwin)
+    {
+      await bash('sudo xcode-select -switch /Applications/Xcode_11.7.app');
+    }
     // Install conan
     core.startGroup('Install and setup conan');
     let sudo = '';
