@@ -313,7 +313,7 @@ async function run()
           core.endGroup();
         }
         core.startGroup("Update APT mirror");
-        await exec.exec('sudo apt-get update');
+        await bash('sudo apt-get update || true');
         core.endGroup();
         if(input['apt-mirrors'])
         {
@@ -337,7 +337,7 @@ async function run()
           }
           core.endGroup();
           core.startGroup("Update APT mirror");
-          await exec.exec('sudo apt-get update');
+          await bash('sudo apt-get update || true');
           core.endGroup();
         }
         core.startGroup('Install gfortran');
