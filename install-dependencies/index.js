@@ -276,6 +276,7 @@ async function run()
     }
     else
     {
+      await bash('sudo rm -f /etc/apt/sources.list.d/dotnetdev.list /etc/apt/sources.list.d/microsoft-prod.list || true');
       core.exportVariable('BOOST_ROOT', '');
       core.exportVariable('BOOST_ROOT_1_69_0', '');
       const compiler = core.getInput('compiler');

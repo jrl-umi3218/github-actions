@@ -65,6 +65,7 @@ async function run()
     let sudo = '';
     if(linux)
     {
+      await bash('sudo rm -f /etc/apt/sources.list.d/dotnetdev.list /etc/apt/sources.list.d/microsoft-prod.list || true');
       await bash('sudo apt install python3-setuptools');
       await bash('sudo apt remove python3-jwt python3-jinja2');
       sudo = 'sudo';
