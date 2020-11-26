@@ -74,7 +74,7 @@ async function handle_vcpkg(vcpkg, compiler)
   core.startGroup('Install dependencies');
     process.chdir(cwd);
     await io.mkdirP('build');
-    await bash(`VCPKG_FEATURE_FLAGS="manifests,binary-caching" ${vcpkg_exe} install --debug --x-install-root=build/vcpkg_installed`);
+    await bash(`VCPKG_FEATURE_FLAGS="manifests,binarycaching" ${vcpkg_exe} install --debug --x-install-root=build/vcpkg_installed`);
   core.endGroup();
 }
 
