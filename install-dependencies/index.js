@@ -252,15 +252,15 @@ async function run()
         if(input.cask)
         {
           core.startGroup("Install Homebrew cask dependencies");
-          await exec.exec('brew install --cask ' + input.cask);
-          await exec.exec('brew upgrade --cask ' + input.cask);
+          await bash('brew install --cask ' + input.cask + ' || true');
+          await bash('brew upgrade --cask ' + input.cask + ' || true');
           core.endGroup();
         }
         if(input.brew)
         {
           core.startGroup("Install Homebrew dependencies");
-          await exec.exec('brew install ' + input.brew);
-          await exec.exec('brew upgrade ' + input.brew);
+          await bash('brew install ' + input.brew + ' || true');
+          await bash('brew upgrade ' + input.brew + ' || true');
           core.endGroup();
         }
         if(input.pip)
