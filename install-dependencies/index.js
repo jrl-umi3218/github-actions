@@ -243,6 +243,12 @@ async function run()
         {
           options += ' ' + input.options;
         }
+        if(input.cask || input.brew)
+        {
+          core.startGroup("Run Homebrew update");
+          await exec.exec('brew update');
+          core.endGroup();
+        }
         if(input.cask)
         {
           core.startGroup("Install Homebrew cask dependencies");
