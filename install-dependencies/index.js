@@ -254,7 +254,7 @@ async function run()
         {
           core.startGroup("Install Homebrew dependencies");
           await exec.exec('brew install ' + input.brew);
-          await exec.exec('brew upgrade ' + input.cask);
+          await exec.exec('brew upgrade ' + input.brew);
           core.endGroup();
         }
         if(input.pip)
