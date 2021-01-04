@@ -246,7 +246,7 @@ async function run()
         if(input.cask)
         {
           core.startGroup("Install Homebrew cask dependencies");
-          await exec.exec('brew cask install ' + input.cask);
+          await exec.exec('brew install --cask ' + input.cask);
           core.endGroup();
         }
         if(input.brew)
