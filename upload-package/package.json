@@ -14,7 +14,7 @@
     "@actions/exec": "^1.0.4",
     "@actions/io": "^1.0.2",
     "JSON": "^1.0.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "fs": "0.0.1-security",
     "js-yaml": "^3.14.0"
   }
