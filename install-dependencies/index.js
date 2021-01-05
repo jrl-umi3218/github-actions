@@ -235,7 +235,7 @@ async function run()
     else if(process.platform === 'darwin')
     {
       const input = yaml.safeLoad(core.getInput('macos'));
-      let options = '-DBUILD_TESTING:BOOL=OFF';
+      let options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
       options += ' ' + core.getInput('options') + ' ' + core.getInput('macos-options');
       if(input)
       {

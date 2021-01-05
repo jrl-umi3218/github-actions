@@ -50,6 +50,7 @@ async function run()
     }
     else if(process.platform === 'darwin')
     {
+      options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON ' + options;
       options = options + ' ' + core.getInput('macos-options');
     }
     else
