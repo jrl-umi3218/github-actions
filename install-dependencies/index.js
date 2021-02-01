@@ -80,9 +80,22 @@ async function handle_vcpkg(vcpkg, compiler)
 
 async function build_github_repo(path, ref, btype, options, sudo, build_dir)
 {
+  if(path.startsWith('https://'))
+  {
+    url = path;
+    while(url.length > 1 && url[url.length - 1] == '/')
+    {
+      url = url.substr(0, url.length - 1);
+    }
+    path = url.split('/').pop();
+  }
+  else
+  {
+    url = 'https://github.com/' + path;
+  }
   core.startGroup('Building ' + path);
   core.startGroup('--> Cloning ' + path);
-  await exec.exec('git clone --recursive https://github.com/' + path + ' ' + path)
+  await exec.exec('git clone --recursive ' + url + ' ' + path)
   const cwd = process.cwd();
   const project_path = cwd + '/' + path;
   process.chdir(project_path);
