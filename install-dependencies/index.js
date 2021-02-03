@@ -276,6 +276,9 @@ async function run()
           await bash('brew upgrade ' + input.brew + ' || true');
           core.endGroup();
         }
+        core.startGroup("Relink gcc from Homebrew");
+        await bash('(brew unlink gcc && brew link gcc) || true');
+        core.endGroup();
         if(input.pip)
         {
           core.startGroup("Install pip dependencies");
