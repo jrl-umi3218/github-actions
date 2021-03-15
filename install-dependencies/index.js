@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const exec = require('@actions/exec');
 const io = require('@actions/io');
 const yaml = require('js-yaml');
-const util = require('util');
+const utils = require('../utils');
 
 async function handle_ppa(ppas_str)
 {
@@ -186,18 +186,7 @@ async function run()
     const btype = core.getInput('build-type');
     if(process.platform === 'win32')
     {
-      PATH = process.env.PATH;
-      let BOOST_ROOT = process.env.BOOST_ROOT ? process.env.BOOST_ROOT : "";
-      if(!BOOST_ROOT.length)
-      {
-        BOOST_ROOT = process.env.BOOST_ROOT_1_72_0;
-        core.exportVariable('BOOST_ROOT', BOOST_ROOT);
-      }
-      const BOOST_LIB = BOOST_ROOT + '\\lib';
-      if(PATH.indexOf(BOOST_LIB) == -1)
-      {
-        core.exportVariable('PATH', BOOST_LIB + ';' + PATH);
-      }
+      await utils.setup_boost();
       PATH = process.env.PATH;
       if(PATH.indexOf('C:\\devel\\install\\bin') == -1)
       {

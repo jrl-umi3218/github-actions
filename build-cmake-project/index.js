@@ -1,6 +1,7 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const io = require('@actions/io');
+const utils = require('../utils');
 
 async function run()
 {
@@ -10,6 +11,7 @@ async function run()
     const btype = core.getInput('build-type');
     let options = core.getInput('options');
     let sudo = true;
+    await utils.setup_boost();
     // For projects that use cmake_add_fortran_subdirectory we need to hide sh from the PATH
     const OLD_PATH = process.env.PATH;
     if(process.platform === 'win32')
@@ -21,17 +23,6 @@ async function run()
       }
       // Undo this otherwise gfortran libs are hidden
       PATH.replace('C:\Program Files\dummy\mingw64\bin', 'C:\Program Files\Git\mingw64\bin');
-      let BOOST_ROOT = process.env.BOOST_ROOT ? process.env.BOOST_ROOT : "";
-      if(!BOOST_ROOT.length)
-      {
-        BOOST_ROOT = process.env.BOOST_ROOT_1_72_0;
-        core.exportVariable('BOOST_ROOT', BOOST_ROOT);
-      }
-      const BOOST_LIB = BOOST_ROOT + '\\lib';
-      if(PATH.indexOf(BOOST_LIB) == -1)
-      {
-        PATH = BOOST_LIB + ';' + PATH;
-      }
       if(PATH.indexOf('C:\\devel\\install\\bin') == -1)
       {
         PATH = 'C:\\devel\\install\\bin;' + PATH;
