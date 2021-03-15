@@ -12,5 +12,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Test build-cmake-project
+      uses: ./build-cmake-project
       with:
         project-dir: tests/boost-project
