@@ -10,7 +10,7 @@ async function setup_boost()
   let BOOST_ROOT = process.env.BOOST_ROOT ? process.env.BOOST_ROOT : "";
   if(!BOOST_ROOT.length)
   {
-    await exec.exec('powershell.exe', ['./get-boost.ps1']);
+    await exec.exec('powershell.exe', [`${__dirname}\\get-boost.ps1`]);
     BOOST_ROOT = "C:\\hostedtoolcache\\windows\\Boost\\1.72.0\\x86_64";
     core.exportVariable('BOOST_ROOT', BOOST_ROOT);
   }
