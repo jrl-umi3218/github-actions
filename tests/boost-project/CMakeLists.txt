@@ -6,6 +6,6 @@ enable_testing()
 find_package(Boost REQUIRED COMPONENTS filesystem)
 
 add_executable(main main.cpp)
-target_link_libraries(main PUBLIC Boost::filesystem)
+target_link_libraries(main PUBLIC Boost::filesystem Boost::disable_autolinking)
 
 add_test(main main)
