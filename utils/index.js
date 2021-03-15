@@ -15,7 +15,7 @@ async function setup_boost()
     core.exportVariable('BOOST_ROOT', BOOST_ROOT);
   }
   PATH = process.env.PATH;
-  const BOOST_LIB = BOOST_ROOT + '\\lib';
+  const BOOST_LIB = BOOST_ROOT + '\\lib64-msvc-14.2';
   if(PATH.indexOf(BOOST_LIB) == -1)
   {
     core.exportVariable('PATH', BOOST_LIB + ';' + PATH);
