@@ -8,4 +8,6 @@ find_package(Boost REQUIRED COMPONENTS filesystem)
 add_executable(main main.cpp)
 target_link_libraries(main PUBLIC Boost::filesystem Boost::disable_autolinking)
 
+install(TARGETS main DESTINATION bin)
+
 add_test(main main)
