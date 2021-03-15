@@ -22,6 +22,4 @@ async function setup_boost()
   }
 }
 
-exports = {
-  setup_boost
-};
+exports.setup_boost = setup_boost;
