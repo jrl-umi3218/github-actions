@@ -1,0 +1,15 @@
+name: Test build-project action
+on:
+  push:
+    paths:
+      - '.github/workflows/build-cmake-project.yml'
+      - 'build-cmake-project/**'
+      - 'tests/boost-project/**'
+
+jobs:
+  runs-on: windows-latest
+  steps:
+  - uses: actions/checkout@v1
+  - name: Test build-cmake-project
+    with:
+      project-dir: tests/boost-project
