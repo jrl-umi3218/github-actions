@@ -5,6 +5,7 @@ on:
       - '.github/workflows/build-cmake-project.yml'
       - 'build-cmake-project/**'
       - 'tests/boost-project/**'
+      - 'utils/**'
 
 jobs:
   build:
