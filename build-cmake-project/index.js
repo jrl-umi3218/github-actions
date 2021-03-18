@@ -88,7 +88,12 @@ async function run()
     await exec.exec('cmake ../ ' + options);
     core.endGroup();
     core.startGroup('Build');
-    await exec.exec('cmake --build . --config ' + btype);
+    let build_cmd = 'cmake --build . --config ' + btype;
+    if(process.platform === 'win32')
+    {
+      build_cmd = build_cmd + ` -- /p:CL_MPcount=${os.cpus().length}`;
+    }
+    await exec.exec(build_cmd);
     core.endGroup();
     core.startGroup('Install');
     let install_cmd = 'cmake --build . --target install --config ' + btype;

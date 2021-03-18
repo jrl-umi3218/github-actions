@@ -125,7 +125,12 @@ async function build_github_repo(path, ref, btype, options, sudo, build_dir)
   await exec.exec('cmake ' + project_path + ' -DCMAKE_BUILD_TYPE=' + btype + ' ' + options);
   core.endGroup();
   core.startGroup('--> Building ' + path);
-  await exec.exec('cmake --build . --config ' + btype);
+  let build_cmd = 'cmake --build . --config ' + btype;
+  if(process.platform === 'win32')
+  {
+    build_cmd = build_cmd + ` -- /p:CL_MPcount=${os.cpus().length}`;
+  }
+  await exec.exec(build_cmd);
   core.endGroup();
   core.startGroup('--> Install ' + path);
   if(sudo)
