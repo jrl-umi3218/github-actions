@@ -1,7 +1,9 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const io = require('@actions/io');
+const os = require('os');
 const yaml = require('js-yaml');
+
 const utils = require('../utils');
 
 async function handle_ppa(ppas_str)
@@ -182,7 +184,7 @@ async function run()
 {
   try
   {
-    core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', 2);
+    core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', os.cpus().length);
     const btype = core.getInput('build-type');
     if(process.platform === 'win32')
     {

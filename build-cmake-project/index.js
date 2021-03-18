@@ -1,6 +1,8 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const io = require('@actions/io');
+const os = require('os');
+
 const utils = require('../utils');
 
 async function run()
@@ -74,7 +76,7 @@ async function run()
     }
 
     // Take care of the actual build
-    core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', 2);
+    core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', os.cpus().length);
     const project_dir = core.getInput('project-dir');
     if(project_dir.length)
     {
