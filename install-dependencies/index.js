@@ -205,7 +205,7 @@ async function run()
         core.exportVariable('PKG_CONFIG_PATH', 'C:\\devel\\install\\lib\\pkgconfig;' + PKG_CONFIG_PATH);
       }
       const input = yaml.safeLoad(core.getInput('windows'));
-      let options = '-DCMAKE_CXX_FLAGS=\'/MP\' -DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF -DBoost_USE_STATIC_LIBS=OFF';
+      let options = '-DCMAKE_CXX_FLAGS_INIT=\'/MP\' -DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF -DBoost_USE_STATIC_LIBS=OFF';
       options += ' ' + core.getInput('options') + ' ' + core.getInput('windows-options');
       if(input)
       {
