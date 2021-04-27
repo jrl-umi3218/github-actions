@@ -15,8 +15,8 @@ async function run()
   {
     dist = core.getInput("dist");
     arch = core.getInput("arch");
-    recipe = core.getInput("recipe");
     ros_distro = core.getInput("ros-distro");
+    cloudsmith_repo = core.getInput("cloudsmith-repo");
     other_gpg_keys = core.getInput("other-gpg-keys").split(' ').filter(x => x.length != 0);
     other_mirrors = core.getInput("other-mirrors").split(' ').filter(x => x.length != 0);
 
@@ -34,7 +34,13 @@ async function run()
     }
     core.exportVariable('DOCKER_TAG', tag);
 
+    if(cloudsmith_repo.length)
+    {
+      cloudsmith_repo = `curl -1sLf 'https://dl.cloudsmith.io/public/${cloudsmith_repo}/setup.deb.sh' | bash`
+    }
+
     commands = [
+      cloudsmith_repo,
       other_gpg_keys.map(x => 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key ' + x).join(' \\&\\& '),
       other_mirrors.map(x => "echo 'deb " + x + " " + dist + " main' | tee -a /etc/apt/sources.list").join(' \\&\\& ')
     ].filter(x => x.length != 0).join(' \\&\\& ');

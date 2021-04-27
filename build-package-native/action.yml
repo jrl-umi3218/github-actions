@@ -11,6 +11,9 @@ inputs:
     description: 'ROS distribution you require to build your package. If empty, no ROS mirror is added'
     required: true
     default: ''
+  cloudsmith-repo:
+    required: true
+    default: ''
   other-mirrors:
     description: 'Extra mirrors to setup (space separated)'
     required: true
