@@ -24,6 +24,7 @@ async function run()
 
     // Install cloudsmith cli
     await bash('pip3 install --upgrade setuptools');
+    await bash('pip3 install --upgrade wheel');
     await bash('pip3 install --upgrade cloudsmith-cli');
 
     // Find all deb and upload them
