@@ -28,6 +28,7 @@ async function run()
     process.chdir(__dirname);
 
     tag = dist + '-' + arch
+    core.exportVariable('PACKAGES_TAG', tag);
     if(ros_distro != '')
     {
       tag += '-' + ros_distro;
