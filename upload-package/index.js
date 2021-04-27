@@ -27,6 +27,7 @@ async function run()
     await bash('pip3 install --upgrade cloudsmith-cli');
 
     // Find all deb and upload them
+    const cwd = process.cwd();
     process.chdir(path);
     debs = fs.readdirSync('.').filter(x => x.endsWith('.deb'));
     for(i = 0; i < debs.length; i++)
