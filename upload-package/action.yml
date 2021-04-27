@@ -1,32 +1,17 @@
-name: 'Upload package to Bintray'
-description: 'Uploaded packages in provided path to Bintray'
+name: 'Upload package to Cloudsmith'
+description: 'Uploaded packages in provided path to Cloudsmith'
 inputs:
-  subject:
-    description: 'Bintray subject'
-    required: true
   repo:
-    description: 'Bintray repository'
-    required: true
-  package:
-    description: 'Bintray package description'
-    required: true
-  version:
-    description: 'Version to upload'
+    description: 'Cloudsmith repository'
     required: true
   dist:
-    description: 'Debian/Ubuntu distribution to target'
-    required: true
-  arch:
-    description: 'Architecture to target'
+    description: 'Distribution to target (as shown in cloudsmith list distros deb)'
     required: true
   path:
     description: 'Where to look for packages'
     required: true
-  BINTRAY_API_KEY:
-    description: 'Bintray API key'
-    required: true
-  GPG_PASSPHRASE:
-    description: 'GPG passphrase for repository signing'
+  CLOUDSMITH_API_KEY:
+    description: 'Cloudsmith API key'
     required: true
 runs:
   using: 'node12'
