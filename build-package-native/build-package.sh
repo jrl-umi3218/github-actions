@@ -8,7 +8,7 @@ install-project-dependencies()
 
 @EXTRA_SETUP_COMMANDS@
 apt-get update
-apt-get upgrade
+apt-get -y upgrade
 install-project-dependencies
 while [ $? -ne 0 ]
 do
