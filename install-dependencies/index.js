@@ -258,6 +258,15 @@ async function run()
           await exec.exec('brew update');
           core.endGroup();
         }
+        if(input['brew-taps'])
+        {
+          const taps = input['brew-taps'].split(' ');
+          for(let i = 0; i < taps.length; i++)
+          {
+            const tap = taps[i];
+            await exec.exec(`brew tap ${tap}`);
+          }
+        }
         if(input.cask)
         {
           core.startGroup("Install Homebrew cask dependencies");

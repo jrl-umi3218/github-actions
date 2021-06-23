@@ -59,6 +59,10 @@ Handle dependencies specific to macOS
 
 This input string is supposed to be a valid yaml object with the following entries. None are required.
 
+#### `brew-taps`
+
+Add the provided taps to homebrew
+
 #### `brew`
 
 `brew install` the provided packages
