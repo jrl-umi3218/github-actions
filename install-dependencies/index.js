@@ -75,9 +75,10 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     const cwd = process.cwd();
     const vcpkg_org = vcpkg.repo.split('/')[0];
     const vcpkg_dir = `${cwd}/${vcpkg.repo.split('/')[1]}`;
+    core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;nuget,GitHub,readwrite');
     core.exportVariable('VCPKG_ROOT', `${vcpkg_dir}`);
     core.exportVariable('VCPKG_TOOLCHAIN', `${vcpkg_dir}/scripts/buildsystems/vcpkg.cmake`);
-    core.exportVariable('VCPKG_FEATURE_FLAGS', 'manifests,registries');
+    core.exportVariable('VCPKG_FEATURE_FLAGS', 'manifests,registries,binarycaching');
     if(process.platform === 'win32')
     {
       core.exportVariable('VCPKG_DEFAULT_TRIPLET', 'x64-windows');
@@ -141,6 +142,20 @@ async function bootstrap_vcpkg(vcpkg, compiler)
   process.chdir(cwd);
 }
 
+async function setup_binary_caching_vcpkg()
+{
+  const github = require('@actions/github');
+  const context = github.context;
+  const owner = context.repo.owner;
+  const token = context.token;
+  let mono = 'mono';
+  if(process.platform == 'win32')
+  {
+    mono = '';
+  }
+  await bash(`${mono} \`./vcpkg/vcpkg fetch nuget | tail -n 1\` sources add -source "https://nuget.pkg.github.com/${owner}/index.json" -storepasswordincleartext -name "GitHub" -username "${owner}" -password "${token}"`);
+}
+
 async function handle_vcpkg(vcpkg, compiler)
 {
   if(!vcpkg)
@@ -148,6 +163,7 @@ async function handle_vcpkg(vcpkg, compiler)
     return;
   }
   await bootstrap_vcpkg(vcpkg, compiler);
+  await setup_binary_caching_vcpkg();
   core.startGroup('Install vcpkg dependencies');
     await io.mkdirP('build');
     await bash('./vcpkg/vcpkg install --debug --x-install-root=build/vcpkg_installed');
