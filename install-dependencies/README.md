@@ -24,6 +24,7 @@ Add apt mirrors to the machine, each entry must be a valid yaml object with the 
 - `mirror`: the mirror URI
 - `key`: the GPG key used to sign packages on the mirror; OR
 - `key-uri`: an URI to get the GPG key used to sign packages on the mirror
+- `cloudsmith`: a cloudsmith stub to setup a cloudsmith mirror (e.g `mc-rtc/head`)
 
 **Example**
 
@@ -35,6 +36,8 @@ apt-mirrors:
   ros:
     mirror: http://packages.ros.org/ros/ubuntu
     key-uri: http://packages.ros.org/ros.key
+  mc-rtc:
+    cloudsmith: mc-rtc/head
 ```
 
 #### `pip`

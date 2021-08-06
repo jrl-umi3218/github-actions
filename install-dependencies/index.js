@@ -348,7 +348,7 @@ async function run()
         if(input['apt-mirrors'])
         {
           core.startGroup('Add required packages to setup mirrors');
-          await exec.exec('sudo apt-get install -y apt-transport-https lsb-release ca-certificates gnupg wget');
+          await exec.exec('sudo apt-get install -y apt-transport-https lsb-release ca-certificates gnupg wget curl');
           core.endGroup();
           core.startGroup('Add mirrors');
           mirrors = input['apt-mirrors'];
@@ -363,7 +363,18 @@ async function run()
             {
               await bash(`wget ${mirror['key-uri']} -O - | sudo apt-key add -`);
             }
-            await bash(`sudo sh -c 'echo "deb ${mirror.mirror} $(lsb_release -sc) main" > /etc/apt/sources.list.d/${mname}.list'`);
+            if(mirror.mirror)
+            {
+              await bash(`sudo sh -c 'echo "deb ${mirror.mirror} $(lsb_release -sc) main" > /etc/apt/sources.list.d/${mname}.list'`);
+            }
+            else if(mirror.cloudsmith)
+            {
+              await bash(`curl -1sLf 'https://dl.cloudsmith.io/public/${mirror.cloudsmith}/setup.deb.sh' | sudo -E bash`);
+            }
+            else
+            {
+              throw new Error(`mirror object must have either a mirror or cloudsmith key`);
+            }
           }
           core.endGroup();
           core.startGroup("Update APT mirror");
