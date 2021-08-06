@@ -172,27 +172,18 @@ Pass extra CMake options in Windows host. Those are passed after `options`
 
 ### `vcpkg`
 
-If non-empty install vcpk on the host and use a manifest to install required dependencies. Set the VCPK\_TOOLCHAIN environment variable for the remainder of the build. It should be a valid yaml object with the following entries.
+If non-empty install vcpk on the host and use a manifest to install required dependencies. Set the VCPK\_TOOLCHAIN environment variable for the remainder of the build. It should be a valid yaml object with the following entries. The action automatically creates a cache for vcpkg packages.
 
 #### `repo`
 
 The repository that should be cloned as vcpkg
 
-#### `user`
-
-GitHub user for authentification
-
-#### `token`
-
-GitHub access token for authentification. This token needs to grant `read:packages` authorization.
 
 **Example**
 
 ```yaml
 vcpkg:
-  repo: jrl-umi3218/vcpkg
-  user: ${{ github.actor }}
-  token: ${{ github.token }}
+  repo: microsoft/vcpkg
 ```
 
 ## Example usage

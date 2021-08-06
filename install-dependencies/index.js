@@ -27,56 +27,9 @@ async function handle_vcpkg(vcpkg, compiler)
   {
     return;
   }
-  if(!vcpkg.repo || !vcpkg.user || !vcpkg.token)
-  {
-    throw new Error(`vcpkg object must have three members: repo, user and token\nGot:\n${vcpkg}\n`);
-  }
-  core.startGroup("Remove existing installation in GitHub environment");
-    await bash('rm -rf "$VCPKG_INSTALLATION_ROOT" || sudo rm -rf "$VCPKG_INSTALLATION_ROOT"');
-  core.endGroup();
-  core.startGroup("Bootstrap vcpkg");
-    core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;nuget,GitHub,readwrite');
-    await exec.exec('git clone --recursive https://github.com/' + vcpkg.repo);
-    const cwd = process.cwd();
-    let mono = '';
-    const vcpkg_org = vcpkg.repo.split('/')[0];
-    const vcpkg_dir = vcpkg.repo.split('/')[1];
-    const vcpkg_exe = `./${vcpkg_dir}/vcpkg`;
-    process.chdir(vcpkg_dir);
-    core.exportVariable('VCPKG_TOOLCHAIN', `${process.cwd()}/scripts/buildsystems/vcpkg.cmake`);
-    if(process.platform === 'win32')
-    {
-      await bash('./bootstrap-vcpkg.bat');
-      core.exportVariable('VCPKG_DEFAULT_TRIPLET', 'x64-windows');
-    }
-    else
-    {
-      mono = 'mono';
-      if(process.platform === 'linux')
-      {
-        if(compiler === 'gcc')
-        {
-          core.exportVariable('CXX', 'g++');
-        }
-        else
-        {
-          core.exportVariable('CXX', 'clang++');
-        }
-        await bash('./bootstrap-vcpkg.sh');
-      }
-      else
-      {
-        await bash('./bootstrap-vcpkg.sh -allowAppleClang');
-      }
-    }
-  core.endGroup();
-  core.startGroup('Setup NuGet');
-    await bash(`${mono} \`./vcpkg fetch nuget | tail -n 1\` sources add -source "https://nuget.pkg.github.com/${vcpkg_org}/index.json" -name "GitHub" -storepasswordincleartext -username "${vcpkg.user}" -password "${vcpkg.token}"`);
-  core.endGroup();
-  core.startGroup('Install dependencies');
-    process.chdir(cwd);
+  core.startGroup('Install vcpkg dependencies');
     await io.mkdirP('build');
-    await bash(`VCPKG_FEATURE_FLAGS="manifests,binarycaching" ${vcpkg_exe} install --debug --x-install-root=build/vcpkg_installed`);
+    await bash(`${process.env.VCPKG_EXE} install --debug --x-install-root=build/vcpkg_installed`);
   core.endGroup();
 }
 

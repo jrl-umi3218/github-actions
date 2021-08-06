@@ -28,4 +28,7 @@ inputs:
     default: ''
 runs:
   using: 'node12'
+  pre: 'load-vcpkg-cache.js'
   main: 'index.js'
+  post: 'save-vcpkg-cache.js'
+  post-if: 'sucess()'
