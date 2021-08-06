@@ -139,9 +139,6 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     core.endGroup();
   }
   process.chdir(cwd);
-  core.startGroup('Remove outdated packages');
-    await bash('./vcpkg/vcpkg remove --outdated --recurse');
-  core.endGroup();
 }
 
 async function handle_vcpkg(vcpkg, compiler)
