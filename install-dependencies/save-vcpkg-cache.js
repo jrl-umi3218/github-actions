@@ -6,7 +6,7 @@ async function bash(cmd)
   await exec.exec('bash', ['-c', cmd]);
 }
 
-try
+async function run()
 {
   if(process.env.VCPKG_CACHE_KEY)
   {
@@ -16,6 +16,11 @@ try
     const cache_paths = [process.env.VCPKG_ROOT, 'build/vcpkg_installed'];
     const cacheId = await cache.saveCache(cache_paths, process.env.VCPKG_CACHE_KEY);
   }
+}
+
+try
+{
+  run();
 }
 catch(error)
 {
