@@ -61,15 +61,16 @@ async function handle_vcpkg(vcpkg, compiler)
     const cwd = process.cwd();
     const vcpkg_org = vcpkg.repo.split('/')[0];
     const vcpkg_dir = vcpkg.repo.split('/')[1];
-    const vcpkg_exe = `./${vcpkg_dir}/vcpkg`;
+    let vcpkg_exe = `./${vcpkg_dir}/vcpkg`;
+    if(process.platform === 'win32')
+    {
+      core.exportVariable('VCPKG_DEFAULT_TRIPLET', 'x64-windows');
+      vcpkg_exe = `${vcpkg_exe}.exe`;
+    }
     core.exportVariable('VCPKG_EXE', `${vcpkg_exe}`);
     core.exportVariable('VCPKG_ROOT', `${vcpkg_dir}`);
     core.exportVariable('VCPKG_TOOLCHAIN', `${process.cwd()}/scripts/buildsystems/vcpkg.cmake`);
     core.exportVariable('VCPKG_FEATURE_FLAGS', 'manifests,registries');
-    if(process.platform === 'win32')
-    {
-      core.exportVariable('VCPKG_DEFAULT_TRIPLET', 'x64-windows');
-    }
     process.chdir(vcpkg_dir);
     let vcpkg_hash = '';
     const options = {};
