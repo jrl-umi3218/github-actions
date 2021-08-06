@@ -31,4 +31,4 @@ runs:
   pre: 'load-vcpkg-cache.js'
   main: 'index.js'
   post: 'save-vcpkg-cache.js'
-  post-if: 'sucess()'
+  post-if: 'success()'
