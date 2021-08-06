@@ -75,8 +75,6 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     const cwd = process.cwd();
     const vcpkg_org = vcpkg.repo.split('/')[0];
     const vcpkg_dir = `${cwd}/${vcpkg.repo.split('/')[1]}`;
-    const vcpkg_exe = `${vcpkg_dir}/vcpkg`;
-    core.exportVariable('VCPKG_EXE', `${vcpkg_exe}`);
     core.exportVariable('VCPKG_ROOT', `${vcpkg_dir}`);
     core.exportVariable('VCPKG_TOOLCHAIN', `${process.cwd()}/scripts/buildsystems/vcpkg.cmake`);
     core.exportVariable('VCPKG_FEATURE_FLAGS', 'manifests,registries');
@@ -142,7 +140,7 @@ async function bootstrap_vcpkg(vcpkg, compiler)
   }
   process.chdir(cwd);
   core.startGroup('Remove outdated packages');
-    await bash(`${vcpkg_exe} remove --outdated --recurse`);
+    await bash('./vcpkg/vcpkg remove --outdated --recurse');
   core.endGroup();
 }
 
@@ -152,10 +150,10 @@ async function handle_vcpkg(vcpkg, compiler)
   {
     return;
   }
-  bootstrap_vcpkg(vcpkg, compiler);
+  await bootstrap_vcpkg(vcpkg, compiler);
   core.startGroup('Install vcpkg dependencies');
     await io.mkdirP('build');
-    await bash(`${process.env.VCPKG_EXE} install --debug --x-install-root=build/vcpkg_installed`);
+    await bash('./vcpkg/vcpkg install --debug --x-install-root=build/vcpkg_installed');
   core.endGroup();
 }
 
