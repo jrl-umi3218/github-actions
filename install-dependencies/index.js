@@ -76,7 +76,7 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     const vcpkg_org = vcpkg.repo.split('/')[0];
     const vcpkg_dir = `${cwd}/${vcpkg.repo.split('/')[1]}`;
     core.exportVariable('VCPKG_ROOT', `${vcpkg_dir}`);
-    core.exportVariable('VCPKG_TOOLCHAIN', `${process.cwd()}/scripts/buildsystems/vcpkg.cmake`);
+    core.exportVariable('VCPKG_TOOLCHAIN', `${vcpkg_dir}/scripts/buildsystems/vcpkg.cmake`);
     core.exportVariable('VCPKG_FEATURE_FLAGS', 'manifests,registries');
     if(process.platform === 'win32')
     {
