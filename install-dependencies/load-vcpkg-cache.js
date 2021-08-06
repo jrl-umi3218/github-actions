@@ -43,7 +43,7 @@ async function bash(cmd)
   await exec.exec('bash', ['-c', cmd]);
 }
 
-async function bootstrap_vcpkg(vcpkg, compiler)
+async function handle_vcpkg(vcpkg, compiler)
 {
   if(!vcpkg)
   {
