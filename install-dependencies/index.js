@@ -281,7 +281,7 @@ async function run()
   {
     core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', os.cpus().length);
     const btype = core.getInput('build-type');
-    const vcpkg_global = yaml.safeLoad(core.getInput('vcpkg');
+    const vcpkg_global = yaml.safeLoad(core.getInput('vcpkg'));
     if(process.platform === 'win32')
     {
       const input = yaml.safeLoad(core.getInput('windows'));
