@@ -184,7 +184,7 @@ The repository that should be cloned as vcpkg
 
 ### `token`
 
-(optional) GitHub authentification token. Should have write access to the `owner` organization to update binary packages.
+GitHub authentification token. Should have write access to the `owner` organization to update binary packages.
 
 
 **Example**

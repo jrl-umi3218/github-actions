@@ -68,11 +68,18 @@ async function bootstrap_vcpkg(vcpkg, compiler)
   {
     throw new Error(`vcpkg object must have a repo member!\nGot:\n${vcpkg}\n`);
   }
+  if(!vcpkg.token)
+  {
+    throw new Error(`vcpkg object must have a token member!\nGot:\n${vcpkg}\n`);
+  }
   core.startGroup('Restore vcpkg cache');
-    await exec.exec('git clone --recursive https://github.com/' + vcpkg.repo);
+    const octokit = github.getOctokit(vcpkg.token);
     const cwd = process.cwd();
     const vcpkg_org = vcpkg.repo.split('/')[0];
-    const vcpkg_dir = `${cwd}/${vcpkg.repo.split('/')[1]}`;
+    const vcpkg_repo = vcpkg.repo.split('/')[1];
+    const vcpkg_dir = `${cwd}/${vcpkg_repo}`;
+    const sha_data = await octokit.rest.repos.listCommits({owner: vcpkg_org, repo: vcpkg_repo, per_page: 1});
+    const vcpkg_hash = sha_data[0].sha;
     const context = github.context;
     // See https://github.com/microsoft/vcpkg/issues/16579
     core.exportVariable('X_VCPKG_NUGET_ID_PREFIX', context.repo.repo);
@@ -84,22 +91,15 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     {
       core.exportVariable('VCPKG_DEFAULT_TRIPLET', 'x64-windows');
     }
-    process.chdir(vcpkg_dir);
-    let vcpkg_hash = '';
-    const options = {};
-    options.listeners = {
-      stdout: (data) => {
-        vcpkg_hash += data.toString();
-      }
-    };
-    await exec.exec('git', ['rev-parse', 'HEAD'], options);
-    vcpkg_hash = vcpkg_hash.trim();
-    process.chdir(cwd);
     const cache_key = `vcpkg_1_${await get_os_name()}-${vcpkg_hash}-${hash('vcpkg.json')}-${hash('vcpkg-configuration.json')}`;
     const cache_paths = [vcpkg_dir, 'build/vcpkg_installed'];
     const cache_restore_keys = ['vcpkg-'];
     const cache_hit = await cache.restoreCache(cache_paths, cache_key, cache_restore_keys);
     console.log(`Got cache entry ${cache_hit} when restoring ${cache_key}`);
+    if(!cache_hit)
+    {
+      await exec.exec('git clone --recursive https://github.com/' + vcpkg.repo);
+    }
   core.endGroup();
   if(cache_hit == cache_key)
   {
