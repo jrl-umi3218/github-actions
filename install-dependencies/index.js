@@ -3,6 +3,7 @@ const core = require('@actions/core');
 const crypto = require('crypto');
 const exec = require('@actions/exec');
 const fs = require('fs');
+const github = require('@actions/github');
 const io = require('@actions/io');
 const os = require('os');
 const yaml = require('js-yaml');
@@ -75,6 +76,9 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     const cwd = process.cwd();
     const vcpkg_org = vcpkg.repo.split('/')[0];
     const vcpkg_dir = `${cwd}/${vcpkg.repo.split('/')[1]}`;
+    const context = github.context;
+    // See https://github.com/microsoft/vcpkg/issues/16579
+    core.exportVariable('X_VCPKG_NUGET_ID_PREFIX', context.repo.repo);
     core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;nuget,GitHub,readwrite');
     core.exportVariable('VCPKG_ROOT', `${vcpkg_dir}`);
     core.exportVariable('VCPKG_TOOLCHAIN', `${vcpkg_dir}/scripts/buildsystems/vcpkg.cmake`);
@@ -144,7 +148,6 @@ async function bootstrap_vcpkg(vcpkg, compiler)
 
 async function setup_binary_caching_vcpkg(vcpkg)
 {
-  const github = require('@actions/github');
   const context = github.context;
   const owner = vcpkg.owner || context.repo.owner;
   const token = vcpkg.token;
