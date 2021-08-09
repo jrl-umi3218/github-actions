@@ -13,12 +13,12 @@ async function run()
   {
     console.log(`Creating cache from folder: ${process.cwd()}`);
     console.log(`Remove extraneous stuff in ${process.env.VCPKG_ROOT}`);
-    await bash(`rm -rf ${process.env.VCPKG_ROOT}/buildtrees`);
-    await bash(`rm -rf ${process.env.VCPKG_ROOT}/packages`);
-    await bash(`rm -rf ${process.env.VCPKG_ROOT}/downloads`);
-    console.log(`Content after cleanup`);
-    await bash(`ls -lR ${process.env.VCPKG_ROOT}`);
-    await bash('ls -lR build/vcpkg_installed');
+    const cwd = process.cwd();
+    process.chdir(process.env.VCPKG_ROOT);
+    await bash(`rm -rf buildtrees`);
+    await bash(`rm -rf packages`);
+    await bash(`rm -rf downloads`);
+    process.chdir(cwd);
     const cache_paths = [process.env.VCPKG_ROOT, 'build/vcpkg_installed'];
     const cacheId = await cache.saveCache(cache_paths, process.env.VCPKG_CACHE_KEY);
   }
