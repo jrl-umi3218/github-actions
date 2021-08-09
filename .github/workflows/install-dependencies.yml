@@ -15,14 +15,17 @@ jobs:
       with:
         compiler: clang
         ubuntu: |
-          ppa: pierre-gergondet+ppa/multi-contact-unstable
           apt: libeigen3-dev libspacevecalg-dev
+          apt-mirrors:
+            mc-rtc:
+              cloudsmith: mc-rtc/head
           pip: Cython coverage nose numpy
           github:
             - path: eigenteam/eigen-git-mirror
               ref: 3.3.7
         macos: |
-          brew: eigen
+          brew-taps: mc-rtc/mc-rtc
+          brew: eigen spacevecalg
           pip: Cython coverage nose numpy
         windows: |
           pip: Cython coverage nose numpy

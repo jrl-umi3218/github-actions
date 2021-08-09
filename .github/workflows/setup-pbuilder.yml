@@ -11,5 +11,3 @@ jobs:
         dist: xenial
         arch: amd64
         ros-distro: kinetic
-        other-mirrors: https://dl.bintray.com/gergondet/multi-contact-head
-        other-gpg-keys: "0x892EA6EE273707C6495A6FB6220D644C64666806"
