@@ -103,8 +103,8 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     else
     {
       core.endGroup();
-      core.startGroup('Show build/installed_packages content');
-        await bash('ls -lR build/installed_packages');
+      core.startGroup('Show build/vcpkg_installed content');
+        await bash('ls -lR build/vcpkg_installed');
     }
   core.endGroup();
   if(cache_hit == cache_key)
