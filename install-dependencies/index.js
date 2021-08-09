@@ -142,12 +142,12 @@ async function bootstrap_vcpkg(vcpkg, compiler)
   process.chdir(cwd);
 }
 
-async function setup_binary_caching_vcpkg()
+async function setup_binary_caching_vcpkg(vcpkg)
 {
   const github = require('@actions/github');
   const context = github.context;
-  const owner = context.repo.owner;
-  const token = context.token;
+  const owner = vcpkg.owner || context.repo.owner;
+  const token = vcpkg.token;
   let mono = 'mono';
   if(process.platform == 'win32')
   {
@@ -163,7 +163,7 @@ async function handle_vcpkg(vcpkg, compiler)
     return;
   }
   await bootstrap_vcpkg(vcpkg, compiler);
-  await setup_binary_caching_vcpkg();
+  await setup_binary_caching_vcpkg(vcpkg);
   core.startGroup('Install vcpkg dependencies');
     await io.mkdirP('build');
     await bash('./vcpkg/vcpkg install --debug --x-install-root=build/vcpkg_installed');
