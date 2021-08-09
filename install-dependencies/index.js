@@ -114,6 +114,7 @@ async function bootstrap_vcpkg(vcpkg, compiler)
   process.chdir(vcpkg_dir);
   if(vcpkg_prev_hash != vcpkg_hash)
   {
+    await bash('git pull');
     core.startGroup('Bootstrap vcpkg');
     if(process.platform === 'win32')
     {
