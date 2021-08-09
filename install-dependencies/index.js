@@ -79,7 +79,7 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     const vcpkg_repo = vcpkg.repo.split('/')[1];
     const vcpkg_dir = `${cwd}/${vcpkg_repo}`;
     const sha_data = await octokit.rest.repos.listCommits({owner: vcpkg_org, repo: vcpkg_repo, per_page: 1});
-    const vcpkg_hash = sha_data[0].sha;
+    const vcpkg_hash = sha_data.data[0].sha;
     const context = github.context;
     // See https://github.com/microsoft/vcpkg/issues/16579
     core.exportVariable('X_VCPKG_NUGET_ID_PREFIX', context.repo.repo);
