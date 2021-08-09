@@ -392,7 +392,7 @@ async function run()
           core.endGroup();
         }
       }
-      const vcpkg = (input && input.vcpkg) || vcpkg_global);
+      const vcpkg = (input && input.vcpkg) || vcpkg_global;
       await handle_vcpkg(vcpkg, '');
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, true);
