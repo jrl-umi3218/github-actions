@@ -55,7 +55,7 @@ function hash(file)
 
 async function bash(cmd)
 {
-  await exec.exec('bash', ['-c', cmd]);
+  exec.exec('bash', ['-c', cmd]);
 }
 
 async function bootstrap_vcpkg(vcpkg, compiler)
