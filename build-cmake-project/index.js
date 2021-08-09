@@ -13,7 +13,10 @@ async function run()
     const btype = core.getInput('build-type');
     let options = core.getInput('options');
     let sudo = true;
-    await utils.setup_boost();
+    if(!process.env.VCPKG_TOOLCHAIN)
+    {
+      await utils.setup_boost();
+    }
     // For projects that use cmake_add_fortran_subdirectory we need to hide sh from the PATH
     const OLD_PATH = process.env.PATH;
     if(process.platform === 'win32')
