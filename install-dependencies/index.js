@@ -94,7 +94,7 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     await exec.exec('git', ['rev-parse', 'HEAD'], options);
     vcpkg_hash = vcpkg_hash.trim();
     process.chdir(cwd);
-    const cache_key = `vcpkg_${await get_os_name()}-${vcpkg_hash}-${hash('vcpkg.json')}-${hash('vcpkg-configuration.json')}`;
+    const cache_key = `vcpkg_1_${await get_os_name()}-${vcpkg_hash}-${hash('vcpkg.json')}-${hash('vcpkg-configuration.json')}`;
     const cache_paths = [vcpkg_dir, 'build/vcpkg_installed'];
     const cache_restore_keys = ['vcpkg-'];
     const cache_hit = await cache.restoreCache(cache_paths, cache_key, cache_restore_keys);
