@@ -164,9 +164,10 @@ async function handle_vcpkg(vcpkg, compiler)
   }
   await bootstrap_vcpkg(vcpkg, compiler);
   await setup_binary_caching_vcpkg(vcpkg);
+  const debug_opt = vcpkg.debug ? '--debug' : '';
   core.startGroup('Install vcpkg dependencies');
     await io.mkdirP('build');
-    await bash('./vcpkg/vcpkg install --debug --x-install-root=build/vcpkg_installed');
+    await bash(`./vcpkg/vcpkg install ${debug_opt} --x-install-root=build/vcpkg_installed`);
   core.endGroup();
 }
 

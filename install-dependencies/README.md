@@ -178,20 +178,24 @@ If non-empty install vcpk on the host and use a manifest to install required dep
 
 The repository that should be cloned as vcpkg
 
-### `owner`
-
-(optional) Package owner. Defaults to `github.repo.owner`
-
 ### `token`
 
 GitHub authentification token. Should have write access to the `owner` organization to update binary packages.
 
+### `owner`
+
+(optional) Package owner. Defaults to `github.repo.owner`
+
+### `debug`
+
+(optional) If set to `true` will install with the `--debug` flag.
 
 **Example**
 
 ```yaml
 vcpkg:
   repo: microsoft/vcpkg
+  token: "${{ secrets.GITHUB_TOKEN }}"
 ```
 
 ## Example usage
