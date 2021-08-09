@@ -69,7 +69,7 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     throw new Error(`vcpkg object must have a repo member!\nGot:\n${vcpkg}\n`);
   }
   core.startGroup("Remove existing installation in GitHub environment");
-    await bash('rm -rf "$VCPKG_INSTALLATION_ROOT" || sudo rm -rf "$VCPKG_INSTALLATION_ROOT"');
+    bash('rm -rf "$VCPKG_INSTALLATION_ROOT" || sudo rm -rf "$VCPKG_INSTALLATION_ROOT"');
   core.endGroup();
   core.startGroup('Restore vcpkg cache');
     await exec.exec('git clone --recursive https://github.com/' + vcpkg.repo);
