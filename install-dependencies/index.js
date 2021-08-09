@@ -100,6 +100,12 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     {
       await exec.exec('git clone --recursive https://github.com/' + vcpkg.repo);
     }
+    else
+    {
+      core.endGroup();
+      core.startGroup('Show build/installed_packages content');
+        await bash('ls -lR build/installed_packages');
+    }
   core.endGroup();
   if(cache_hit == cache_key)
   {
