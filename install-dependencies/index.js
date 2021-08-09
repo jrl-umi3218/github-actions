@@ -281,9 +281,14 @@ async function run()
   {
     core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', os.cpus().length);
     const btype = core.getInput('build-type');
+    const vcpkg_global = yaml.safeLoad(core.getInput('vcpkg');
     if(process.platform === 'win32')
     {
-      await utils.setup_boost();
+      const input = yaml.safeLoad(core.getInput('windows'));
+      if(!( (input && input.vcpkg) || vcpkg_global ))
+      {
+        await utils.setup_boost();
+      }
       PATH = process.env.PATH;
       if(PATH.indexOf('C:\\devel\\install\\bin') == -1)
       {
@@ -294,7 +299,6 @@ async function run()
       {
         core.exportVariable('PKG_CONFIG_PATH', 'C:\\devel\\install\\lib\\pkgconfig;' + PKG_CONFIG_PATH);
       }
-      const input = yaml.safeLoad(core.getInput('windows'));
       let options = '-DCMAKE_CXX_FLAGS_INIT=\'/MP\' -DCMAKE_INSTALL_PREFIX=C:/devel/install -DBUILD_TESTING:BOOL=OFF -DBoost_USE_STATIC_LIBS=OFF';
       options += ' ' + core.getInput('options') + ' ' + core.getInput('windows-options');
       if(input)
@@ -326,7 +330,7 @@ async function run()
           core.endGroup();
         }
       }
-      const vcpkg = (input && input.vcpkg) || yaml.safeLoad(core.getInput('vcpkg'));
+      const vcpkg = (input && input.vcpkg) || vcpkg_global;
       await handle_vcpkg(vcpkg, '');
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, false);
@@ -388,7 +392,7 @@ async function run()
           core.endGroup();
         }
       }
-      const vcpkg = (input && input.vcpkg) || yaml.safeLoad(core.getInput('vcpkg'));
+      const vcpkg = (input && input.vcpkg) || vcpkg_global);
       await handle_vcpkg(vcpkg, '');
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, true);
@@ -494,7 +498,7 @@ async function run()
           core.endGroup();
         }
       }
-      const vcpkg = (input && input.vcpkg) || yaml.safeLoad(core.getInput('vcpkg'));
+      const vcpkg = (input && input.vcpkg) || vcpkg_global;
       await handle_vcpkg(vcpkg, compiler);
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, true, true);
