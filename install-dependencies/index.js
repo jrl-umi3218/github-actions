@@ -199,7 +199,7 @@ async function handle_vcpkg(vcpkg, compiler)
     }
     catch(error)
     {
-      await bash('for f in `ls vcpkg/buildtrees/*/*.log`; do; echo "======"; echo "$f"; echo "======"; cat $f; done;');
+      await bash('for f in `ls vcpkg/buildtrees/*/*.log`; do echo "======"; echo "$f"; echo "======"; cat $f; done;');
       core.setFailed(`vcpkg install dependencies failed: ${error.message}`);
     }
   core.endGroup();
