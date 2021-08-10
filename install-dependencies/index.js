@@ -115,9 +115,10 @@ async function bootstrap_vcpkg(vcpkg, compiler)
       console.log(`Use vcpkg-configuration.json:\n${vcpkg_config_str}`);
       fs.writeFileSync('vcpkg-configuration.json', vcpkg_config_str);
     }
-    const cache_key = `vcpkg_1_${await get_os_name()}-${vcpkg_hash}-${hash('vcpkg.json')}-${hash('vcpkg-configuration.json')}`;
+    const cache_key_common = `vcpkg_1_${await get_os_name()}-`;
+    const cache_key = `${cache_key_common}${vcpkg_hash}-${hash('vcpkg.json')}-${hash('vcpkg-configuration.json')}`;
     const cache_paths = [vcpkg_dir, 'build/vcpkg_installed'];
-    const cache_restore_keys = ['vcpkg-'];
+    const cache_restore_keys = [cache_key_common];
     const cache_hit = await cache.restoreCache(cache_paths, cache_key, cache_restore_keys);
     console.log(`Got cache entry ${cache_hit} when restoring ${cache_key}`);
     if(!cache_hit)
