@@ -193,7 +193,15 @@ async function handle_vcpkg(vcpkg, compiler)
   const debug_opt = vcpkg.debug ? '--debug' : '';
   core.startGroup('Install vcpkg dependencies');
     await io.mkdirP('build');
-    await bash(`./vcpkg/vcpkg install ${debug_opt} --x-install-root=build/vcpkg_installed`);
+    try
+    {
+      await bash(`./vcpkg/vcpkg install ${debug_opt} --x-install-root=build/vcpkg_installed`);
+    }
+    catch(error)
+    {
+      await bash('for f in `ls vcpkg/buildtrees/*/*.log`; do; echo "======"; echo "$f"; echo "======"; cat $f; done;');
+      core.setFailed(`vcpkg install dependencies failed: ${error.message}`);
+    }
   core.endGroup();
 }
 
