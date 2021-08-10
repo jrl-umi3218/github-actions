@@ -194,6 +194,10 @@ GitHub authentification token. Should have write access to the `owner` organizat
 
 (optional) Array of registries to be used with vcpkg, the baseline is obtained from the latest commit on each registry main branch. If you wish to use a specific baseline you can provide a `vcpkg-configuration.json` in your repository. If a `vcpkg-configuration.json` already exists in the repository, the registries will be merged.
 
+### `cache_id`
+
+(optional) Defaults to 1, can be incremented to reset cache
+
 **Example**
 
 ```yaml

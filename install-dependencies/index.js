@@ -115,7 +115,7 @@ async function bootstrap_vcpkg(vcpkg, compiler)
       console.log(`Use vcpkg-configuration.json:\n${vcpkg_config_str}`);
       fs.writeFileSync('vcpkg-configuration.json', vcpkg_config_str);
     }
-    const cache_key_common = `vcpkg_1_${await get_os_name()}-`;
+    const cache_key_common = `vcpkg_${vcpkg.cache_id || 1}_${await get_os_name()}-`;
     const cache_key = `${cache_key_common}${vcpkg_hash}-${hash('vcpkg.json')}-${hash('vcpkg-configuration.json')}`;
     const cache_paths = [vcpkg_dir, 'build/vcpkg_installed'];
     const cache_restore_keys = [cache_key_common];
@@ -124,12 +124,6 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     if(!cache_hit)
     {
       await exec.exec('git clone --recursive https://github.com/' + vcpkg.repo);
-    }
-    else
-    {
-      core.endGroup();
-      core.startGroup('Show build/vcpkg_installed content');
-        await bash('ls -lR build/vcpkg_installed');
     }
   core.endGroup();
   if(cache_hit == cache_key)
