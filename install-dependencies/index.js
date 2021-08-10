@@ -91,6 +91,30 @@ async function bootstrap_vcpkg(vcpkg, compiler)
     {
       core.exportVariable('VCPKG_DEFAULT_TRIPLET', 'x64-windows');
     }
+    if(vcpkg.registries)
+    {
+      let vcpkg_config = {};
+      if(fs.existsSync('vcpkg-configuration.json'))
+      {
+        vcpkg_config = JSON.parse(fs.readFileSync('vcpkg-configuration.json'));
+      }
+      if(!vcpkg_config.registries)
+      {
+        vcpkg_config.registries = [];
+      }
+      for(const reg of vcpkg.registries)
+      {
+        let vcpkg_registry = { repository: `https://github.com/${reg.repo}`, kind: "git", packages: reg.packages };
+        const vcpkg_org = reg.repo.split('/')[0];
+        const vcpkg_repo = reg.repo.split('/')[1];
+        const sha_data = await octokit.rest.repos.listCommits({owner: vcpkg_org, repo: vcpkg_repo, per_page: 1});
+        vcpkg_registry.baseline = sha_data.data[0].sha;
+        vcpkg_config.registries.push(vcpkg_registry);
+      }
+      let vcpkg_config_str = JSON.stringify(vcpkg_config, null, 2);
+      console.log(`Use vcpkg-configuration.json:\n${vcpkg_config_str}`);
+      fs.writeFileSync('vcpkg-configuration.json', vcpkg_config_str);
+    }
     const cache_key = `vcpkg_1_${await get_os_name()}-${vcpkg_hash}-${hash('vcpkg.json')}-${hash('vcpkg-configuration.json')}`;
     const cache_paths = [vcpkg_dir, 'build/vcpkg_installed'];
     const cache_restore_keys = ['vcpkg-'];

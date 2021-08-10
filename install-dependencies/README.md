@@ -190,12 +190,19 @@ GitHub authentification token. Should have write access to the `owner` organizat
 
 (optional) If set to `true` will install with the `--debug` flag.
 
+### `registries`
+
+(optional) Array of registries to be used with vcpkg, the baseline is obtained from the latest commit on each registry main branch. If you wish to use a specific baseline you can provide a `vcpkg-configuration.json` in your repository. If a `vcpkg-configuration.json` already exists in the repository, the registries will be merged.
+
 **Example**
 
 ```yaml
 vcpkg:
   repo: microsoft/vcpkg
   token: "${{ secrets.GITHUB_TOKEN }}"
+  registries:
+  - repo: mc-rtc/vcpkg-registry
+    packages: [ spacevecalg, rbdyn, eigen-qld, sch-core, tasks, mc-rbdyn-urdf, mc-rtc-data, eigen-quadprog, state-observation, hpp-spline, mc-rtc ]
 ```
 
 ## Example usage
