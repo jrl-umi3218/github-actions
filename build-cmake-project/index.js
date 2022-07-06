@@ -21,6 +21,12 @@ async function run()
     const OLD_PATH = process.env.PATH;
     if(process.platform === 'win32')
     {
+      // Work-around https://answers.microsoft.com/en-us/windows/forum/all/i-am-getting-0xc0000135-error-when-opening-any/c80f6cd2-dcb1-4475-9e76-3edc80f86d29
+      core.startGroup('Work-around Windows update issue');
+      await exec.exec('dism /online /enable-feature /featurename:netfx3 /all');
+      await exec.exec('dism /online /enable-feature /featurename:WCF-HTTP-Activation');
+      await exec.exec('dism /online /enable-feature /featurename:WCF-NonHTTP-Activation');
+      core.endGroup();
       PATH = OLD_PATH;
       while(PATH.indexOf('Git') != -1)
       {
