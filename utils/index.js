@@ -11,7 +11,7 @@ async function setup_boost()
   if(!BOOST_ROOT.length)
   {
     await exec.exec('powershell.exe', [`${__dirname}\\get-boost.ps1`]);
-    BOOST_ROOT = "C:\\hostedtoolcache\\windows\\Boost\\1.72.0\\x86_64";
+    BOOST_ROOT = "C:\\hostedtoolcache\\windows\\Boost\\1.77.0\\x86_64";
     core.exportVariable('BOOST_ROOT', BOOST_ROOT);
   }
   PATH = process.env.PATH;
