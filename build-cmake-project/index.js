@@ -34,6 +34,10 @@ async function run()
       }
       // Undo this otherwise gfortran libs are hidden
       PATH = PATH.replace('C:\\Program Files\\dummy\\mingw64\\bin', 'C:\\Program Files\\Git\\mingw64\\bin');
+      if(PATH.indexOf('C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw64\\bin') == -1)
+      {
+        PATH = 'C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw64\\bin;' + PATH;
+      }
       if(PATH.indexOf('C:\\devel\\install\\bin') == -1)
       {
         PATH = 'C:\\devel\\install\\bin;' + PATH;

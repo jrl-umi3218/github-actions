@@ -325,9 +325,15 @@ async function run()
         await utils.setup_boost();
       }
       PATH = process.env.PATH;
+      if(PATH.indexOf('C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw64\\bin') == -1)
+      {
+        core.exportVariable('PATH', 'C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw64\\bin;' + PATH);
+        PATH = process.env.PATH;
+      }
       if(PATH.indexOf('C:\\devel\\install\\bin') == -1)
       {
         core.exportVariable('PATH', 'C:\\devel\\install\\bin;' + PATH);
+        PATH = process.env.PATH;
       }
       PKG_CONFIG_PATH = process.env.PKG_CONFIG_PATH ? process.env.PKG_CONFIG_PATH : "";
       if(PKG_CONFIG_PATH.indexOf('C:\\devel\\install\\lib\\pkgconfig') == -1)
