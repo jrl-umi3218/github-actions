@@ -238,7 +238,7 @@ async function build_github_repo(path, ref, btype, options, sudo, build_dir)
     PATH = PATH.replace('Git', 'dummy');
   }
   // Undo this otherwise gfortran libs are hidden
-  PATH.replace('C:\Program Files\dummy\mingw64\bin', 'C:\Program Files\Git\mingw64\bin');
+  PATH = PATH.replace('C:\\Program Files\\dummy\\mingw64\\bin', 'C:\\Program Files\\Git\\mingw64\\bin');
   core.exportVariable('PATH', PATH);
   core.startGroup("Modified PATH variable");
   console.log(PATH);

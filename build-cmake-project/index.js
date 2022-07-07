@@ -33,7 +33,7 @@ async function run()
         PATH = PATH.replace('Git', 'dummy');
       }
       // Undo this otherwise gfortran libs are hidden
-      PATH.replace('C:\Program Files\dummy\mingw64\bin', 'C:\Program Files\Git\mingw64\bin');
+      PATH = PATH.replace('C:\\Program Files\\dummy\\mingw64\\bin', 'C:\\Program Files\\Git\\mingw64\\bin');
       if(PATH.indexOf('C:\\devel\\install\\bin') == -1)
       {
         PATH = 'C:\\devel\\install\\bin;' + PATH;
