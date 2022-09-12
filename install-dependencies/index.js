@@ -207,7 +207,7 @@ async function handle_vcpkg(vcpkg, compiler)
 
 async function build_github_repo(path, ref, btype, options, sudo, build_dir)
 {
-  if(path.startsWith('https://'))
+  if(path.startsWith('https://') || path.startsWith('git@'))
   {
     url = path;
     while(url.length > 1 && url[url.length - 1] == '/')
