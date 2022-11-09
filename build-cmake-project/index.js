@@ -56,6 +56,12 @@ async function run()
     }
     else if(process.platform === 'darwin')
     {
+      LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH ? process.env.LD_LIBRARY_PATH : '';
+      if(LD_LIBRARY_PATH.indexOf('/usr/local/lib') == -1)
+      {
+        LD_LIBRARY_PATH = '/usr/local/lib:' + LD_LIBRARY_PATH;
+        core.exportVariable('LD_LIBRARY_PATH', LD_LIBRARY_PATH);
+      }
       options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON ' + options;
       options = options + ' ' + core.getInput('macos-options');
     }
