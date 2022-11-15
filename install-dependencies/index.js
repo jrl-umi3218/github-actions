@@ -379,6 +379,18 @@ async function run()
     else if(process.platform === 'darwin')
     {
       core.exportVariable('ARCHFLAGS', '-arch x86_64');
+      LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH ? process.env.LD_LIBRARY_PATH : '';
+      if(LD_LIBRARY_PATH.indexOf('/usr/local/lib') == -1)
+      {
+        LD_LIBRARY_PATH = '/usr/local/lib:' + LD_LIBRARY_PATH;
+        core.exportVariable('LD_LIBRARY_PATH', LD_LIBRARY_PATH);
+      }
+      DYLD_LIBRARY_PATH = process.env.DYLD_LIBRARY_PATH ? process.env.DYLD_LIBRARY_PATH : '';
+      if(DYLD_LIBRARY_PATH.indexOf('/usr/local/lib') == -1)
+      {
+        DYLD_LIBRARY_PATH = '/usr/local/lib:' + DYLD_LIBRARY_PATH;
+        core.exportVariable('DYLD_LIBRARY_PATH', DYLD_LIBRARY_PATH);
+      }
       const input = yaml.safeLoad(core.getInput('macos'));
       let options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
       options += ' ' + core.getInput('options') + ' ' + core.getInput('macos-options');
