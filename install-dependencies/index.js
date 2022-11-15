@@ -423,7 +423,6 @@ async function run()
         if(input.pip)
         {
           core.startGroup("Install pip dependencies");
-          await exec.exec('sudo python -m pip install ' + input.pip);
           await exec.exec('sudo python3 -m pip install ' + input.pip);
           core.endGroup();
         }
