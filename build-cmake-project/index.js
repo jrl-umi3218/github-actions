@@ -64,6 +64,7 @@ async function run()
       }
       options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON ' + options;
       options = options + ' ' + core.getInput('macos-options');
+      core.exportVariable('ARCHFLAGS', '-arch x86_64');
     }
     else
     {
