@@ -1,0 +1,20 @@
+name: Test install-dependencies (ROS)
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        install: [true, false]
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Test install ROS dependencies
+      uses: jrl-umi3218/github-actions/install-dependencies@master
+      with:
+        ros:
+          apt: ros-base
+          workspace:
+            - path: jrl-umi3218/mc_rtc_msgs
+            - path: jrl-umi3218/mc_rtc_data
+          install: ${{ matrix.install }}
