@@ -463,11 +463,11 @@ async function run()
   {
     core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', os.cpus().length);
     const btype = core.getInput('build-type');
-    const vcpkg_global = yaml.safeLoad(core.getInput('vcpkg'));
-    const ros_global = yaml.safeLoad(core.getInput('ros'));
+    const vcpkg_global = yaml.load(core.getInput('vcpkg'));
+    const ros_global = yaml.load(core.getInput('ros'));
     if(process.platform === 'win32')
     {
-      const input = yaml.safeLoad(core.getInput('windows'));
+      const input = yaml.load(core.getInput('windows'));
       if(!( (input && input.vcpkg) || vcpkg_global ))
       {
         await utils.setup_boost();
@@ -521,7 +521,7 @@ async function run()
       }
       const vcpkg = (input && input.vcpkg) || vcpkg_global;
       await handle_vcpkg(vcpkg, '');
-      const github = yaml.safeLoad(core.getInput('github'));
+      const github = yaml.load(core.getInput('github'));
       await handle_github(github, btype, options, false);
     }
     else if(process.platform === 'darwin')
@@ -539,7 +539,7 @@ async function run()
         DYLD_LIBRARY_PATH = '/usr/local/lib:' + DYLD_LIBRARY_PATH;
         core.exportVariable('DYLD_LIBRARY_PATH', DYLD_LIBRARY_PATH);
       }
-      const input = yaml.safeLoad(core.getInput('macos'));
+      const input = yaml.load(core.getInput('macos'));
       let options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
       options += ' ' + core.getInput('options') + ' ' + core.getInput('macos-options');
       if(input)
@@ -595,7 +595,7 @@ async function run()
       }
       const vcpkg = (input && input.vcpkg) || vcpkg_global;
       await handle_vcpkg(vcpkg, '');
-      const github = yaml.safeLoad(core.getInput('github'));
+      const github = yaml.load(core.getInput('github'));
       await handle_github(github, btype, options, true);
     }
     else
@@ -604,7 +604,7 @@ async function run()
       core.exportVariable('BOOST_ROOT', '');
       core.exportVariable('BOOST_ROOT_1_69_0', '');
       const compiler = core.getInput('compiler');
-      const input = yaml.safeLoad(core.getInput('ubuntu'));
+      const input = yaml.load(core.getInput('ubuntu'));
       if(compiler == 'clang')
       {
         core.exportVariable('CC', 'clang');
@@ -703,7 +703,7 @@ async function run()
       await handle_vcpkg(vcpkg, compiler);
       const ros = (input && input.ros) || ros_global;
       await handle_ros(ros);
-      const github = yaml.safeLoad(core.getInput('github'));
+      const github = yaml.load(core.getInput('github'));
       await handle_github(github, btype, options, true, true);
       if(ros)
       {
