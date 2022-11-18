@@ -74,6 +74,7 @@ async function bash_output(cmd)
 {
   let output = '';
   const options = {};
+  options.silent = true;
   options.listeners = {
     stdout: (data) => {
       output += data.toString();
@@ -337,7 +338,6 @@ async function handle_ros(ros)
     await exec.exec('rosdep update --include-eol-distros');
     core.endGroup();
     core.startGroup('Setup ROS env');
-    let vars = await bash_output(`. /opt/ros/${ros_distro}/setup.bash && env`);
     await use_ros_workspace(`/opt/ros/${ros_distro}/setup.bash`);
     core.endGroup();
   }
