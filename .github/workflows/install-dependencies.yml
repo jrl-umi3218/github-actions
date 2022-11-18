@@ -15,18 +15,20 @@ jobs:
       with:
         compiler: clang
         ubuntu: |
-          apt: libeigen3-dev libspacevecalg-dev
+          apt: libeigen3-dev libspacevecalg-dev libboost-all-dev libtinyxml2-dev libyaml-cpp-dev
           apt-mirrors:
             mc-rtc:
               cloudsmith: mc-rtc/head
           pip: Cython coverage nose numpy
           github:
-            - path: eigenteam/eigen-git-mirror
-              ref: 3.3.7
+            - path: jrl-umi3218/RBDyn
+              options: -DPYTHON_BINDING:BOOL=OFF
         macos: |
-          brew-taps: mc-rtc/mc-rtc
-          brew: eigen spacevecalg
+          brew: eigen
           pip: Cython coverage nose numpy
+          github:
+            - path: jrl-umi3218/SpaceVecAlg
+              options: -DPYTHON_BINDING:BOOL=OFF
         windows: |
           pip: Cython coverage nose numpy
           github:
