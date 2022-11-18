@@ -369,7 +369,6 @@ async function handle_ros_workspace(github, install)
   else
   {
     await bash('catkin init');
-    await use_ros_workspace(workspace);
   }
   core.endGroup();
   process.chdir(workspace_src);
@@ -418,6 +417,7 @@ async function handle_ros_workspace(github, install)
   else
   {
     await bash('catkin build');
+    await use_ros_workspace(`${workspace}/devel/setup.bash`);
   }
   core.endGroup();
 }
