@@ -1,0 +1,30 @@
+name: 'Setup the self-hosted environment'
+description: 'Setup the self-hosted environment'
+inputs:
+  GITHUB_PAT:
+    description: 'GitHub PAT to clone private repositories'
+    required: true
+    default: ''
+  GITE_PAT:
+    description: "LIRMM's GitLab PAT to clone private repositories"
+    required: true
+    default: ''
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        set -x
+        set -e
+        sudo sed -i -e 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//mirror:\/\/mirrors\.ubuntu\.com\/mirrors\.txt/' /etc/apt/sources.list
+        echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
+        if [[ -n "${{ inputs.GITHUB_PAT }}" ]]
+        then
+          git config --global url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf https://github.com/
+          git config --global url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf git@github.com:
+        fi
+        if [[ -n "${{ inputs.GITE_PAT }}" ]]
+        then
+          git config --global url."https://${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf https://gite.lirmm.fr/
+          git config --global url."https://${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf git@gite.lirmm.fr:
+        fi
+      shell: bash
