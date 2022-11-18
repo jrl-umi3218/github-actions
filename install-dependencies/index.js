@@ -350,7 +350,7 @@ async function handle_ros(ros)
   core.endGroup();
 }
 
-async function handle_ros_github(github, install)
+async function handle_ros_workspace(github, install)
 {
   if(!github)
   {
@@ -707,7 +707,7 @@ async function run()
       await handle_github(github, btype, options, true, true);
       if(ros)
       {
-        await handle_ros_github(ros.github, ros.install || false);
+        await handle_ros_workspace(ros.workspace, ros.install || false);
       }
     }
   }

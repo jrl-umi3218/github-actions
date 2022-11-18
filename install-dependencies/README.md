@@ -231,7 +231,7 @@ If true the catkin workspace created for this is installed to `/opt/ros/${ROS_DI
 ```yaml
 ros:
   apt: ros-base
-  github:
+  workspace:
     - path: jrl-umi3218/mc_rtc_data
   install: true
 ```
