@@ -22,5 +22,4 @@ jobs:
       run: |
         set -x
         set -e
-        roscd jvrc_description
-        pwd
+        rospack find jvrc_description
