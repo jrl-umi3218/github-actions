@@ -357,8 +357,8 @@ async function handle_ros_workspace(github, install)
     return;
   }
   const cwd = process.cwd();
-  let workspace = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'catkin_ws_'));
-  let workspace_src = await fsPromises.mkdir(path.join(workspace, 'src'), { recursive: true});
+  let workspace = await fsPromises.mkdtemp(`${os.tmpdir()}/catkin_ws_`);
+  let workspace_src = await fsPromises.mkdir(`${workspace}/src`, { recursive: true});
   process.chdir(workspace);
   if(install)
   {
