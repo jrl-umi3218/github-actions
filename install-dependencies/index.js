@@ -360,6 +360,7 @@ async function handle_ros_workspace(github, install)
   let workspace = await fsPromises.mkdtemp(`${os.tmpdir()}/catkin_ws_`);
   let workspace_src = await fsPromises.mkdir(`${workspace}/src`, { recursive: true});
   process.chdir(workspace);
+  core.startGroup('Initialize catkin workspace');
   if(install)
   {
     let ros_distro = await get_ros_distro();
@@ -370,6 +371,7 @@ async function handle_ros_workspace(github, install)
     await bash('catkin init');
     await use_ros_workspace(workspace);
   }
+  core.endGroup();
   process.chdir(workspace_src);
   for(const entry of github)
   {
