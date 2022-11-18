@@ -18,3 +18,9 @@ jobs:
             - path: jrl-umi3218/mc_rtc_msgs
             - path: jrl-umi3218/mc_rtc_data
           install: ${{ matrix.install }}
+    - name: Check package installation
+      run: |
+        set -x
+        set -e
+        roscd jvrc_description
+        pwd
