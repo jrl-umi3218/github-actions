@@ -3,6 +3,7 @@ const core = require('@actions/core');
 const crypto = require('crypto');
 const exec = require('@actions/exec');
 const fs = require('fs');
+const fsPromises = require('fs/promises');
 const github = require('@actions/github');
 const io = require('@actions/io');
 const os = require('os');
@@ -20,19 +21,30 @@ async function handle_ppa(ppas_str)
   }
 }
 
+async function get_dist_name()
+{
+  return bash_output('lsb_release -sc');
+}
+
+async function get_ros_distro()
+{
+  let dist_name = await get_dist_name();
+  if(dist_name == 'bionic')
+  {
+    return 'melodic';
+  }
+  if(dist_name == 'focal')
+  {
+    return 'noetic';
+  }
+  core.setFailed(`Cannot determine ROS distro for Linux distro: ${dist_name}`);
+}
+
 async function get_os_name()
 {
   if(process.platform == 'linux')
   {
-    let dist_name = '';
-    const options = {};
-    options.listeners = {
-      stdout: (data) => {
-        dist_name += data.toString();
-      }
-    };
-    await exec.exec('lsb_release', ['-sc'], options);
-    dist_name = dist_name.trim();
+    let dist_name = await get_dist_name();
     return `${process.platform}_${dist_name}`;
   }
   else
@@ -56,6 +68,19 @@ function hash(file)
 async function bash(cmd)
 {
   return exec.exec('bash', ['-c', cmd]);
+}
+
+async function bash_output(cmd)
+{
+  let output = '';
+  const options = {};
+  options.listeners = {
+    stdout: (data) => {
+      output += data.toString();
+    }
+  };
+  await exec.exec('bash', ['-c', cmd], options);
+  return output.trim();
 }
 
 async function bootstrap_vcpkg(vcpkg, compiler)
@@ -273,6 +298,128 @@ async function build_github_repo(path, ref, btype, options, sudo, build_dir)
   core.endGroup();
 }
 
+async function use_ros_workspace(setup)
+{
+  let vars = await bash_output(`. ${setup} && env`);
+  for(let V of vars.split('\n'))
+  {
+    let [name, value] = V.split('=');
+    if(name && name.startsWith('ROS'))
+    {
+      core.exportVariable(name, value);
+    }
+    else if(name && (name == 'PATH' || name == 'LD_LIBRARY_PATH' || name == 'DYLD_LIBRARY_PATH' || name == 'PYTHONPATH' || name == 'CMAKE_PREFIX_PATH'))
+    {
+      core.exportVariable(name, value);
+    }
+  }
+}
+
+async function handle_ros(ros)
+{
+  if(!ros)
+  {
+    return;
+  }
+  let ros_distro = await get_ros_distro();
+  if(!fs.existsSync('/etc/apt/sources.list.d/ros-latest.list'))
+  {
+    core.startGroup('Setup ROS mirror');
+    await bash(`sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'`);
+    await bash(`wget http://packages.ros.org/ros.key -O - | sudo apt-key add -`);
+    await bash('sudo apt-get update || true');
+    core.endGroup();
+    core.startGroup('Install ROS base packages');
+    await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-catkin-tools python3-rosdep`);
+    core.endGroup();
+    core.startGroup('Initialize rosdep');
+    await exec.exec('sudo rosdep init');
+    await exec.exec('rosdep update --include-eol-distros');
+    core.endGroup();
+    core.startGroup('Setup ROS env');
+    let vars = await bash_output(`. /opt/ros/${ros_distro}/setup.bash && env`);
+    await use_ros_workspace(`/opt/ros/${ros_distro}/setup.bash`);
+    core.endGroup();
+  }
+  if(!ros.apt)
+  {
+    return;
+  }
+  core.startGroup('Install extra ROS packages');
+  await exec.exec('sudo apt-get install -y ' + ros.apt.split(' ').reduce((prev, v) => `${prev} ros-${ros_distro}-${v}`, ''));
+  core.endGroup();
+}
+
+async function handle_ros_github(github, install)
+{
+  if(!github)
+  {
+    return;
+  }
+  const cwd = process.cwd();
+  let workspace = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'catkin_ws_'));
+  let workspace_src = await fsPromises.mkdir(path.join(workspace, 'src'), { recursive: true});
+  process.chdir(workspace);
+  if(install)
+  {
+    let ros_distro = await get_ros_distro();
+    await bash(`catkin config --init --install --install-space /opt/ros/${ros_distro}`);
+  }
+  else
+  {
+    await bash('catkin init');
+    await use_ros_workspace(workspace);
+  }
+  process.chdir(workspace_src);
+  for(const entry of github)
+  {
+    let ref = entry.ref ? entry.ref : "master";
+    let url = '';
+    if(entry.path.startsWith('https://') || entry.path.startsWith('git@'))
+    {
+      url = entry.path;
+    }
+    else
+    {
+      url = `https://github.com/${entry.path}`;
+    }
+    while(url.length > 1 && url[url.length - 1] == '/')
+    {
+      url = url.substr(0, url.length - 1);
+    }
+    core.startGroup(`Clone ${entry.path} into catkin workspace`);
+    if(ref == "master" || ref == "main")
+    {
+      await exec.exec(`git clone --recursive --depth 1 ${url}`);
+    }
+    else
+    {
+      let path = url.split('/').pop();
+      await exec.exec(`git clone --recursive ${url} ${path}`);
+      process.chdir(path);
+      await exec.exec(`git checkout ${ref}`);
+      await exec.exec('git submodule sync')
+      await exec.exec('git submodule update')
+      process.chdir(workspace_src);
+    }
+    core.endGroup();
+  }
+  process.chdir(workspace);
+  core.startGroup('rosdep install');
+  await bash('rosdep install --from-paths --reinstall --ignore-packages-from-source --default-yes --verbose .');
+  core.endGroup();
+  core.startGroup('catkin build');
+  if(install)
+  {
+    await bash('sudo catkin build');
+  }
+  else
+  {
+    await bash('catkin build');
+  }
+  core.endGroup();
+}
+
 async function handle_github(github, btype, options, sudo, linux = false)
 {
   if(!github)
@@ -317,6 +464,7 @@ async function run()
     core.exportVariable('CMAKE_BUILD_PARALLEL_LEVEL', os.cpus().length);
     const btype = core.getInput('build-type');
     const vcpkg_global = yaml.safeLoad(core.getInput('vcpkg'));
+    const ros_global = yaml.safeLoad(core.getInput('ros'));
     if(process.platform === 'win32')
     {
       const input = yaml.safeLoad(core.getInput('windows'));
@@ -553,8 +701,14 @@ async function run()
       }
       const vcpkg = (input && input.vcpkg) || vcpkg_global;
       await handle_vcpkg(vcpkg, compiler);
+      const ros = (input && input.ros) || ros_global;
+      await handle_ros(ros);
       const github = yaml.safeLoad(core.getInput('github'));
       await handle_github(github, btype, options, true, true);
+      if(ros)
+      {
+        await handle_ros_github(ros.github, ros.install || false);
+      }
     }
   }
   catch(error)

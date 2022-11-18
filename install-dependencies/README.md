@@ -178,23 +178,23 @@ If non-empty install vcpk on the host and use a manifest to install required dep
 
 The repository that should be cloned as vcpkg
 
-### `token`
+#### `token`
 
 GitHub authentification token. Should have write access to the `owner` organization to update binary packages.
 
-### `owner`
+#### `owner`
 
 (optional) Package owner. Defaults to `github.repo.owner`
 
-### `debug`
+#### `debug`
 
 (optional) If set to `true` will install with the `--debug` flag.
 
-### `registries`
+#### `registries`
 
 (optional) Array of registries to be used with vcpkg, the baseline is obtained from the latest commit on each registry main branch. If you wish to use a specific baseline you can provide a `vcpkg-configuration.json` in your repository. If a `vcpkg-configuration.json` already exists in the repository, the registries will be merged.
 
-### `cache_id`
+#### `cache_id`
 
 (optional) Defaults to 1, can be incremented to reset cache
 
@@ -207,6 +207,33 @@ vcpkg:
   registries:
   - repo: mc-rtc/vcpkg-registry
     packages: [ spacevecalg, rbdyn, eigen-qld, sch-core, tasks, mc-rbdyn-urdf, mc-rtc-data, eigen-quadprog, state-observation, hpp-spline, mc-rtc ]
+```
+
+### ros (Linux only)
+
+If non-empty setup a ROS mirror (the distribution is chosen automatically according to the Ubuntu distribution). It should be a valid yaml object with the following entries.
+
+#### apt
+
+ROS APT packages that will be installed without their `ros-${ROS_DISTRO}` prefix.
+
+#### workspace
+
+GitHub packages that will be cloned into a catkin workspace
+
+#### install
+
+If true the catkin workspace created for this is installed to `/opt/ros/${ROS_DISTRO}`. Otherwise the devel space is used.
+
+
+**Example**
+
+```yaml
+ros:
+  apt: ros-base
+  github:
+    - path: jrl-umi3218/mc_rtc_data
+  install: true
 ```
 
 ## Example usage

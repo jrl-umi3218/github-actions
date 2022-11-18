@@ -26,8 +26,12 @@ inputs:
     description: 'Install vcpkg and use the project manifest to install dependencies'
     required: true
     default: ''
+  ros:
+    description: 'Install ROS packages'
+    required: true
+    default: ''
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'index.js'
   post: 'save-vcpkg-cache.js'
   post-if: 'success()'
