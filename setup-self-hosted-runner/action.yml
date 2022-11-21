@@ -24,7 +24,7 @@ runs:
         fi
         if [[ -n "${{ inputs.GITE_PAT }}" ]]
         then
-          git config --global url."https://${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf https://gite.lirmm.fr/
-          git config --global --add url."https://${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf git@gite.lirmm.fr:
+          git config --global url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf https://gite.lirmm.fr/
+          git config --global --add url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf git@gite.lirmm.fr:
         fi
       shell: bash
