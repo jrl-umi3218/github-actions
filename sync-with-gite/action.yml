@@ -7,9 +7,6 @@ inputs:
   gite_path:
     description: "Path to the project in GitLab"
     required: true
-  ref:
-    description: "Which branch to push"
-    required: true
 runs:
   using: "composite"
   steps:
@@ -20,5 +17,5 @@ runs:
     - name: Sync
       run: |
         git remote add gite https://${{ inputs.GITE_PAT }}@gite.lirmm.fr/${{ inputs.gite_path }}
-        git push gitlab ${{ inputs.ref }}:${{ inputs.ref }}
+        git push gitlab ${{ github.ref }}:${{ github.ref }}
         git push --tags gitlab
