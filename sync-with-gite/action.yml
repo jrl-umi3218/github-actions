@@ -19,6 +19,6 @@ runs:
       run: |
         set -e
         set -x
-        git remote add gite https://${{ inputs.GITE_PAT }}@gite.lirmm.fr/${{ inputs.gite_path }}
+        git remote add gite https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/${{ inputs.gite_path }}
         git push gite ${{ github.ref }}:${{ github.ref }}
         git push --tags gite
