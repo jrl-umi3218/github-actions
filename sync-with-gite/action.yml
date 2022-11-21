@@ -15,6 +15,7 @@ runs:
         fetch-depth: 0
         submodules: recursive
     - name: Sync
+      shell: bash
       run: |
         git remote add gite https://${{ inputs.GITE_PAT }}@gite.lirmm.fr/${{ inputs.gite_path }}
         git push gitlab ${{ github.ref }}:${{ github.ref }}
