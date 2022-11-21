@@ -1,0 +1,24 @@
+name: 'Synchronize gite'
+description: 'Synchronize a given branch and tags with LIRMM GitLab instance'
+inputs:
+  GITE_PAT:
+    description: "LIRMM's GitLab PAT to clone private repositories"
+    required: true
+  gite_path:
+    description: "Path to the project in GitLab"
+    required: true
+  ref:
+    description: "Which branch to push"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        submodules: recursive
+    - name: Sync
+      run: |
+        git remote add gite https://${{ inputs.GITE_PAT }}@gite.lirmm.fr/${{ inputs.gite_path }}
+        git push gitlab ${{ inputs.ref }}:${{ inputs.ref }}
+        git push --tags gitlab
