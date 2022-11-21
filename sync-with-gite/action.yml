@@ -17,6 +17,8 @@ runs:
     - name: Sync
       shell: bash
       run: |
+        set -e
+        set -x
         git remote add gite https://${{ inputs.GITE_PAT }}@gite.lirmm.fr/${{ inputs.gite_path }}
-        git push gitlab ${{ github.ref }}:${{ github.ref }}
-        git push --tags gitlab
+        git push gite ${{ github.ref }}:${{ github.ref }}
+        git push --tags gite
