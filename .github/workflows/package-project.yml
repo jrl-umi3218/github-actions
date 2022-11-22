@@ -132,6 +132,7 @@ jobs:
       shell: bash
       run: |
         # We upload in all conditions except when building on PR or branch other than main-branch
+        set -x
         export PACKAGE_UPLOAD=true
         if ${{ startsWith(github.ref, 'refs/tags/') }}
         then
@@ -148,7 +149,7 @@ jobs:
         else
           export REF=`echo ${{ github.ref }} | sed -e 's@refs/[a-z]*/@@'`
           export USE_HEAD=true
-          if [ $REF != "master" ]
+          if [ $REF != "${{ inputs.main-branch }}" ]
           then
             export PACKAGE_UPLOAD=false
           fi
