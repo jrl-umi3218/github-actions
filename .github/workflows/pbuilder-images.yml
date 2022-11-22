@@ -12,13 +12,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist: [xenial, bionic, focal]
+        dist: [xenial, bionic, focal, jammy]
         arch: [i386, amd64]
         exclude:
-          # No more i386 support on focal
+          # No more i386 support since focal
           - dist: focal
             arch: i386
-    runs-on: ubuntu-18.04
+          - dist: jammy
+            arch: i386
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v1
     - name: Build image
@@ -32,20 +34,26 @@ jobs:
         echo "::group::Declare function"
         build-image()
         {
-          if [ "${{ matrix.dist }}" = "focal" ]
+          if [ -f Dockerfile.${{ matrix.dist }} ]
           then
-            cp Dockerfile.focal Dockerfile
+            cp Dockerfile.${{ matrix.dist }} Dockerfile
           fi
           sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile
           sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile
           sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile.ros
           sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile.ros
           export ROS_DISTRO=$1
+          export ROS2_DISTRO=$2
           export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
           if [ ! -z ${ROS_DISTRO} ]; then
             sed -i -e "s/@ROS_DISTRO@/${ROS_DISTRO}/" Dockerfile.ros
             export TAG="${TAG}-${ROS_DISTRO}"
             cp Dockerfile.ros Dockerfile
+          fi
+          if [ ! -z ${ROS2_DISTRO} ]; then
+            sed -i -e "s/@ROS_DISTRO@/${ROS2_DISTRO}/" Dockerfile.ros2
+            export TAG="${TAG}-${ROS2_DISTRO}"
+            cp Dockerfile.ros2 Dockerfile
           fi
           echo "::group::Build image"
           docker build -t gergondet/pbuilder:${TAG} .
@@ -55,16 +63,20 @@ jobs:
           echo "::endgroup::"
         }
         echo "::endgroup::"
-        build-image ""
+        build-image "" ""
         if [ "${{ matrix.dist }}" = "xenial" ]
         then
-          build-image "kinetic"
+          build-image "kinetic" ""
         fi
         if [ "${{ matrix.dist }}" = "bionic" -a "${{ matrix.arch }}" = "amd64" ]
         then
-          build-image "melodic"
+          build-image "melodic" ""
         fi
-        if [ "${{ matrix.dist }}" = "focal" -a "${{ matrix.arch }}" = "amd64" ]
+        if [ "${{ matrix.dist }}" = "focal" ]
         then
-          build-image "noetic"
+          build-image "noetic" ""
+        fi
+        if [ "${{ matrix.dist }}" = "jammy" ]
+        then
+          build-image "" "humble"
         fi
