@@ -1,0 +1,207 @@
+# This is a reusable workflow
+
+# On any branch/pull request it will:
+# - Build packages for selected Debian/Ubuntu distros
+#
+# On master, it will additionally:
+# - Build packages for selected Debian/Ubuntu distro
+# - Upload the packages to https://cloudsmith.io/~mc-rtc/repos/head/packages/
+#
+# On tagged versions it will:
+# - Create a GitHub release draft
+# - Attach the sources to the release
+# - Build packages for selected Debian/Ubuntu distro
+# - Upload the packages to https://cloudsmith.io/~mc-rtc/repos/stable/packages/
+#
+# On package-master trigger, it will rebuild and upload the latest master package
+#
+# On package-release trigger, it will rebuild and upload the latest release package
+
+on:
+  workflow_call:
+    inputs:
+      matrix:
+        description: "Package build matrix"
+        required: false
+        type: string
+        default: |
+          {
+            "dist": ["bionic", "focal"],
+            "arch": ["i386", "amd64"],
+            "exclude":
+            [
+              {"dist": "focal", "arch": "i386" }
+            ]
+          }
+      deps:
+        description: "Dependencies package jobs that will be triggered by this workflow"
+        required: false
+        type: string
+        default: ''
+      head-repo:
+        description: "Cloudsmith repo where the package exists"
+        required: false
+        default: "mc-rtc/head"
+        type: string
+      stable-repo:
+        description: "Cloudsmith repo where the package exists"
+        required: false
+        default: "mc-rtc/stable"
+        type: string
+      main-branch:
+        description: "If pushed to this branch, the head-repo is updated"
+        required: false
+        default: "master"
+        type: string
+    secrets:
+      CLOUDSMITH_API_KEY:
+        required: true
+      GH_TOKEN:
+        description: 'A token used to trigger dependent rebuilds'
+        required: true
+
+jobs:
+  # For a given tag vX.Y.Z, this checks:
+  # - set(PROJECT_VERSION X.Y.Z) in CMakeLists.txt
+  # - version X.Y.Z in debian/changelog
+  # If these checks fail, the tag is automatically deleted
+  #
+  # This job does not run on the master branch
+  check-tag:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    - name: Check version coherency
+      shell: bash
+      run: |
+        set -x
+        export VERSION=`echo ${{ github.ref }} | sed -e 's@refs/tags/v@@'`
+        echo "REJECTION=PROJECT_VERSION in CMakeLists.txt does not match tag" >> $GITHUB_ENV
+        grep -q "set(PROJECT_VERSION ${VERSION})" CMakeLists.txt
+        if [ -f debian/changelog ]
+        then
+          PKG_NAME=`grep "^Source:" debian/control|sed -e 's/Source: //'`
+          echo "REJECTION=Upstream version in debian/changelog does not match tag" >> $GITHUB_ENV
+          head -n 1 debian/changelog | grep -q "${PKG_NAME} (${VERSION}"
+        fi
+        if [ -f conanfile.py ]
+        then
+          echo "REJECTION=Conan package version does not match tag" >> $GITHUB_ENV
+          grep -q "version = \"${VERSION}\"" conanfile.py
+        fi
+        echo "REJECTION=" >> $GITHUB_ENV
+        export TAG=`echo ${{ github.ref }} | sed -e 's@refs/tags/@@'`
+        echo "RELEASE_TAG=${TAG}" >> $GITHUB_ENV
+    - name: Delete tag
+      run: |
+        set -x
+        curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -X DELETE https://api.github.com/repos/${{ github.repository }}/git/${{ github.ref }}
+      if: failure()
+    - name: Create release
+      uses: jrl-umi3218/github-actions/create-release@master
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ env.RELEASE_TAG }}
+  # This job builds binary packages for the provided distributions
+  build-packages:
+    needs: check-tag
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(inputs.matrix) }}
+    runs-on: ubuntu-20.04
+    outputs:
+      mirror: ${{ steps.setup-parameters.outputs.mirror }}
+      package-job: ${{ steps.setup-parameters.outputs.package-job }}
+      do-upload: ${{ steps.setup-parameters.outputs.do-upload }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    - name: Setup packaging parameters
+      id: setup-parameters
+      shell: bash
+      run: |
+        # We upload in all conditions except when building on PR or branch other than main-branch
+        export PACKAGE_UPLOAD=true
+        if ${{ startsWith(github.ref, 'refs/tags/') }}
+        then
+          export USE_HEAD=false
+        elif [ "${{ github.event.action }}" == "package-master" ]
+        then
+          export USE_HEAD=true
+        elif [ "${{ github.event.action }}" == "package-release" ]
+        then
+          export USE_HEAD=false
+          export REF=`git tag --sort=committerdate --list 'v[0-9]*'|tail -1`
+          git checkout $REF
+          git submodule sync && git submodule update
+        else
+          export REF=`echo ${{ github.ref }} | sed -e 's@refs/[a-z]*/@@'`
+          export USE_HEAD=true
+          if [ $REF != "master" ]
+          then
+            export PACKAGE_UPLOAD=false
+          fi
+        fi
+        if $USE_HEAD
+        then
+          echo "mirror=${{ inputs.head-repo }}" >> $GITHUB_OUTPUT
+          echo "package-job=package-master" >> $GITHUB_OUTPUT
+        else
+          echo "mirror=${{ inputs.stable-repo }}" >> $GITHUB_OUTPUT
+          echo "package-job=package-release" >> $GITHUB_OUTPUT
+        fi
+        echo "do-upload=${PACKAGE_UPLOAD}" >> $GITHUB_OUTPUT
+    - name: Build package
+      uses: jrl-umi3218/github-actions/build-package-native@master
+      with:
+        dist: ${{ matrix.dist }}
+        arch: ${{ matrix.arch }}
+        cloudsmith-repo: ${{ steps.setup-parameters.outputs.mirror }}
+    - uses: actions/upload-artifact@v3
+      with:
+        name: packages-${{ matrix.dist }}-${{ matrix.arch }}
+        path: /tmp/packages-${{ matrix.dist }}-${{ matrix.arch }}/
+      if: ${{ steps.setup-paramaters.outputs.do-upload }}
+  # This job upload binary packages for Ubuntu
+  upload-packages:
+    needs: build-packages
+    if: ${{ needs.build-packages.outputs.do-upload }}
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix: ${{ fromJson(inputs.matrix) }}
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Download packages
+      uses: actions/download-artifact@v3
+      with:
+        name: packages-${{ matrix.dist }}-${{ matrix.arch }}
+    - name: Upload
+      uses: jrl-umi3218/github-actions/upload-package@master
+      with:
+        dist: ubuntu/${{ matrix.dist }}
+        repo: ${{ needs.build-packages.outputs.mirror }}
+        path: packages-${{ matrix.dist }}-${{ matrix.arch }}
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+  mirror-sync-and-trigger:
+    needs: [build-packages, upload-packages]
+    if: ${{ needs.build-packages.outputs.do-upload && inputs.deps != '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        dep: ${{ fromJson(inputs.deps) }}
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Trigger rebuild
+      shell: bash
+      run: |
+        curl \
+          -H "Accept: application/vnd.github.everest-preview+json" \
+          -H "Authorization: token ${{ secrets.GH_PAGES_TOKEN }}"  \
+          --request POST \
+          --data "{\"event_type\": \"${{ needs.build-packages.outputs.package-job }}\"}" \
+          https://api.github.com/repos/${{ matrix.dep }}/dispatches
