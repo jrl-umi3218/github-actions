@@ -42,6 +42,8 @@ jobs:
           sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile
           sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile.ros
           sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile.ros
+          sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile.ros2
+          sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile.ros2
           export ROS_DISTRO=$1
           export ROS2_DISTRO=$2
           export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
