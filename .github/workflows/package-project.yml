@@ -53,6 +53,11 @@ on:
         required: false
         default: "master"
         type: string
+      with-ros:
+        description: "If true, build ROS packages as well"
+        required: false
+        default: false
+        type: boolean
     secrets:
       CLOUDSMITH_API_KEY:
         required: true
@@ -157,12 +162,56 @@ jobs:
           echo "package-job=package-release" >> $GITHUB_OUTPUT
         fi
         echo "do-upload=${PACKAGE_UPLOAD}" >> $GITHUB_OUTPUT
+    - name: Setup ROS packaging
+      id: setup-ros
+      shell: bash
+      run: |
+        set -x
+        if ! ${{ inputs.with-ros }}
+        then
+          echo "ros-distro=" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        export ROS_DISTRO=""
+        if [ "${{ matrix.dist }}" = "xenial" ]
+        then
+          export ROS_DISTRO="kinetic"
+        fi
+        if [ "${{ matrix.dist }}" = "bionic" -a "${{ matrix.arch }}" = "amd64" ]
+        then
+          export ROS_DISTRO="melodic"
+        fi
+        if [ "${{ matrix.dist }}" = "focal" ]
+        then
+          export ROS_DISTRO="noetic"
+        fi
+        if [ "${{ matrix.dist }}" = "jammy" ]
+        then
+          export ROS_DISTRO="humble"
+        fi
+        echo "ros-distro=${ROS_DISTRO}" >> $GITHUB_OUTPUT
+        if [ "${ROS_DISTRO}" = "" ]
+        then
+          exit 0
+        fi
+        if [ -f debian/control.ros ]
+        then
+          sed -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/control.ros | tee -a debian/control
+        fi
+        sed -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/control
+        sed -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/rules
+        for f in `find debian -type f -name 'ros-ROS_DISTRO-*'`
+        do
+          FOUT=`echo $f|sed -e"s/ROS_DISTRO/${ROS_DISTRO}/"`
+          sed -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" $f | tee -a $FOUT
+        done
     - name: Build package
       uses: jrl-umi3218/github-actions/build-package-native@master
       with:
         dist: ${{ matrix.dist }}
         arch: ${{ matrix.arch }}
         cloudsmith-repo: ${{ steps.setup-parameters.outputs.mirror }}
+        ros-distro: ${{ steps.setup-ros.outputs.ros-distro }}
     - uses: actions/upload-artifact@v3
       with:
         name: packages-${{ matrix.dist }}-${{ matrix.arch }}
