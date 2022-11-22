@@ -198,8 +198,10 @@ jobs:
         then
           sed -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/control.ros | tee -a debian/control
         fi
-        sed -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/control
-        sed -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/rules
+        sed -i -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/control
+        cat debian/control
+        sed -i -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/rules
+        cat debian/rules
         for f in `find debian -type f -name 'ros-ROS_DISTRO-*'`
         do
           FOUT=`echo $f|sed -e"s/ROS_DISTRO/${ROS_DISTRO}/"`
