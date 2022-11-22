@@ -167,7 +167,7 @@ jobs:
       with:
         name: packages-${{ matrix.dist }}-${{ matrix.arch }}
         path: /tmp/packages-${{ matrix.dist }}-${{ matrix.arch }}/
-      if: ${{ steps.setup-paramaters.outputs.do-upload }}
+      if: ${{ steps.setup-parameters.outputs.do-upload }}
   # This job upload binary packages for Ubuntu
   upload-packages:
     needs: build-packages
