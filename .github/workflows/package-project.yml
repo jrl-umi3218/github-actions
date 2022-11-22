@@ -204,7 +204,7 @@ jobs:
       run: |
         curl \
           -H "Accept: application/vnd.github.everest-preview+json" \
-          -H "Authorization: token ${{ secrets.GH_PAGES_TOKEN }}"  \
+          -H "Authorization: token ${{ secrets.GH_TOKEN }}"  \
           --request POST \
           --data "{\"event_type\": \"${{ needs.build-packages.outputs.package-job }}\"}" \
           https://api.github.com/repos/${{ matrix.dep }}/dispatches
