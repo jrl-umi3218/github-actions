@@ -182,6 +182,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: packages-${{ matrix.dist }}-${{ matrix.arch }}
+        path: packages-${{ matrix.dist }}-${{ matrix.arch }}
     - name: Upload
       uses: jrl-umi3218/github-actions/upload-package@master
       with:
