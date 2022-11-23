@@ -199,6 +199,7 @@ jobs:
         then
           sed -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/control.ros | tee -a debian/control
         fi
+        sed -i -e"s/# ros-@ROS_DISTRO@/ ros-${ROS_DISTRO}/" debian/control
         sed -i -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/control
         cat debian/control
         sed -i -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/rules
