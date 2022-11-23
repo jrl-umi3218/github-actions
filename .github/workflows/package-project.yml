@@ -219,11 +219,11 @@ jobs:
       with:
         name: packages-${{ matrix.dist }}-${{ matrix.arch }}
         path: /tmp/packages-${{ matrix.dist }}-${{ matrix.arch }}/
-      if: ${{ steps.setup-parameters.outputs.do-upload == true }}
+      if: ${{ steps.setup-parameters.outputs.do-upload == 'true' }}
   # This job upload binary packages for Ubuntu
   upload-packages:
     needs: build-packages
-    if: ${{ needs.build-packages.outputs.do-upload == true }}
+    if: ${{ needs.build-packages.outputs.do-upload == 'true' }}
     strategy:
       max-parallel: 1
       fail-fast: false
@@ -244,7 +244,7 @@ jobs:
         CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
   mirror-sync-and-trigger:
     needs: [build-packages, upload-packages]
-    if: ${{ needs.build-packages.outputs.do-upload == true && inputs.deps != '' }}
+    if: ${{ needs.build-packages.outputs.do-upload == 'true' && inputs.deps != '' }}
     strategy:
       fail-fast: false
       matrix:
