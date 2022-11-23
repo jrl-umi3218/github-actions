@@ -163,13 +163,6 @@ jobs:
           echo "package-job=package-release" >> $GITHUB_OUTPUT
         fi
         echo "do-upload=${PACKAGE_UPLOAD}" >> $GITHUB_OUTPUT
-    - name: Show outputs
-      shell: bash
-      run: |
-        set -x
-        echo "steps.setup-parameters.outputs.mirror: ##${{ steps.setup-parameters.outputs.mirror }}##"
-        echo "steps.setup-parameters.outputs.package-job: ##${{ steps.setup-parameters.outputs.package-job }}##"
-        echo "steps.setup-parameters.outputs.do-upload: ##${{ steps.setup-parameters.outputs.do-upload }}##"
     - name: Setup ROS packaging
       id: setup-ros
       shell: bash
@@ -226,11 +219,11 @@ jobs:
       with:
         name: packages-${{ matrix.dist }}-${{ matrix.arch }}
         path: /tmp/packages-${{ matrix.dist }}-${{ matrix.arch }}/
-      if: ${{ steps.setup-parameters.outputs.do-upload }}
+      if: ${{ steps.setup-parameters.outputs.do-upload == true }}
   # This job upload binary packages for Ubuntu
   upload-packages:
     needs: build-packages
-    if: ${{ needs.build-packages.outputs.do-upload }}
+    if: ${{ needs.build-packages.outputs.do-upload == true }}
     strategy:
       max-parallel: 1
       fail-fast: false
@@ -251,7 +244,7 @@ jobs:
         CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
   mirror-sync-and-trigger:
     needs: [build-packages, upload-packages]
-    if: ${{ needs.build-packages.outputs.do-upload && inputs.deps != '' }}
+    if: ${{ needs.build-packages.outputs.do-upload == true && inputs.deps != '' }}
     strategy:
       fail-fast: false
       matrix:
