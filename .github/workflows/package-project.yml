@@ -163,6 +163,13 @@ jobs:
           echo "package-job=package-release" >> $GITHUB_OUTPUT
         fi
         echo "do-upload=${PACKAGE_UPLOAD}" >> $GITHUB_OUTPUT
+    - name: Show outputs
+      shell: bash
+      run: |
+        set -x
+        echo "steps.setup-parameters.outputs.mirror: ##${{ steps.setup-parameters.outputs.mirror }}##"
+        echo "steps.setup-parameters.outputs.package-job: ##${{ steps.setup-parameters.outputs.package-job }}##"
+        echo "steps.setup-parameters.outputs.do-upload: ##${{ steps.setup-parameters.outputs.do-upload }}##"
     - name: Setup ROS packaging
       id: setup-ros
       shell: bash
