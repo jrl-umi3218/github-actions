@@ -48,6 +48,11 @@ on:
         required: false
         default: "mc-rtc/stable"
         type: string
+      update-stable-and-head:
+        description: "If true always update both the head-repo and the stable-repo"
+        required: false
+        default: false
+        type: boolean
       main-branch:
         description: "If pushed to this branch, the head-repo is updated"
         required: false
@@ -238,10 +243,27 @@ jobs:
         name: packages-${{ matrix.dist }}-${{ matrix.arch }}
         path: packages-${{ matrix.dist }}-${{ matrix.arch }}
     - name: Upload
+      if: ${{ inputs.update-stable-and-head == 'false' }}
       uses: jrl-umi3218/github-actions/upload-package@master
       with:
         dist: ubuntu/${{ matrix.dist }}
         repo: ${{ needs.build-packages.outputs.mirror }}
+        path: packages-${{ matrix.dist }}-${{ matrix.arch }}
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+    - name: Upload
+      if: ${{ inputs.update-stable-and-head == 'true' }}
+      uses: jrl-umi3218/github-actions/upload-package@master
+      with:
+        dist: ubuntu/${{ matrix.dist }}
+        repo: ${{ inputs.head-repo }}
+        path: packages-${{ matrix.dist }}-${{ matrix.arch }}
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+    - name: Upload
+      if: ${{ inputs.update-stable-and-head == 'true' }}
+      uses: jrl-umi3218/github-actions/upload-package@master
+      with:
+        dist: ubuntu/${{ matrix.dist }}
+        repo: ${{ inputs.stable-repo }}
         path: packages-${{ matrix.dist }}-${{ matrix.arch }}
         CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
   mirror-sync-and-trigger:
@@ -256,9 +278,25 @@ jobs:
     - name: Trigger rebuild
       shell: bash
       run: |
-        curl \
-          -H "Accept: application/vnd.github.everest-preview+json" \
-          -H "Authorization: token ${{ secrets.GH_TOKEN }}"  \
-          --request POST \
-          --data "{\"event_type\": \"${{ needs.build-packages.outputs.package-job }}\"}" \
-          https://api.github.com/repos/${{ matrix.dep }}/dispatches
+        if ${{ inputs.update-stable-and-head }}
+        then
+          curl \
+            -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}"  \
+            --request POST \
+            --data "{\"event_type\": \"package-master\"}" \
+            https://api.github.com/repos/${{ matrix.dep }}/dispatches
+          curl \
+            -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}"  \
+            --request POST \
+            --data "{\"event_type\": \"package-release\"}" \
+            https://api.github.com/repos/${{ matrix.dep }}/dispatches
+        else
+          curl \
+            -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}"  \
+            --request POST \
+            --data "{\"event_type\": \"${{ needs.build-packages.outputs.package-job }}\"}" \
+            https://api.github.com/repos/${{ matrix.dep }}/dispatches
+        fi
