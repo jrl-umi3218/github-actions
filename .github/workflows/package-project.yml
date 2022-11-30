@@ -243,7 +243,7 @@ jobs:
         name: packages-${{ matrix.dist }}-${{ matrix.arch }}
         path: packages-${{ matrix.dist }}-${{ matrix.arch }}
     - name: Upload
-      if: ${{ inputs.update-stable-and-head == 'false' }}
+      if: ${{ ! inputs.update-stable-and-head }}
       uses: jrl-umi3218/github-actions/upload-package@master
       with:
         dist: ubuntu/${{ matrix.dist }}
@@ -251,7 +251,7 @@ jobs:
         path: packages-${{ matrix.dist }}-${{ matrix.arch }}
         CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
     - name: Upload
-      if: ${{ inputs.update-stable-and-head == 'true' }}
+      if: ${{ inputs.update-stable-and-head }}
       uses: jrl-umi3218/github-actions/upload-package@master
       with:
         dist: ubuntu/${{ matrix.dist }}
@@ -259,7 +259,7 @@ jobs:
         path: packages-${{ matrix.dist }}-${{ matrix.arch }}
         CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
     - name: Upload
-      if: ${{ inputs.update-stable-and-head == 'true' }}
+      if: ${{ inputs.update-stable-and-head }}
       uses: jrl-umi3218/github-actions/upload-package@master
       with:
         dist: ubuntu/${{ matrix.dist }}
