@@ -63,6 +63,11 @@ on:
         required: false
         default: false
         type: boolean
+      latest-cmake:
+        description: "If true, use the latest CMake version to build the package"
+        required: false
+        default: false
+        type: boolean
     secrets:
       CLOUDSMITH_API_KEY:
         required: true
@@ -222,6 +227,7 @@ jobs:
         arch: ${{ matrix.arch }}
         cloudsmith-repo: ${{ steps.setup-parameters.outputs.mirror }}
         ros-distro: ${{ steps.setup-ros.outputs.ros-distro }}
+        latest-cmake: ${{ inputs.latest-cmake }}
     - uses: actions/upload-artifact@v3
       with:
         name: packages-${{ matrix.dist }}-${{ matrix.arch }}

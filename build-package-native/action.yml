@@ -22,6 +22,10 @@ inputs:
     description: 'Extra signing keys to accept'
     required: true
     default: ''
+  latest-cmake:
+    description: 'If true add CMake mirror in the builder'
+    required: true
+    default: false
 runs:
   using: 'node16'
   main: 'index.js'
