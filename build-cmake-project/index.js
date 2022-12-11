@@ -62,12 +62,6 @@ async function run()
         LD_LIBRARY_PATH = '/usr/local/lib:' + LD_LIBRARY_PATH;
         core.exportVariable('LD_LIBRARY_PATH', LD_LIBRARY_PATH);
       }
-      DYLD_LIBRARY_PATH = process.env.DYLD_LIBRARY_PATH ? process.env.DYLD_LIBRARY_PATH : '';
-      if(DYLD_LIBRARY_PATH.indexOf('/usr/local/lib') == -1)
-      {
-        DYLD_LIBRARY_PATH = '/usr/local/lib:' + DYLD_LIBRARY_PATH;
-        core.exportVariable('DYLD_LIBRARY_PATH', DYLD_LIBRARY_PATH);
-      }
       options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON ' + options;
       options = options + ' ' + core.getInput('macos-options');
       core.exportVariable('ARCHFLAGS', '-arch x86_64');
