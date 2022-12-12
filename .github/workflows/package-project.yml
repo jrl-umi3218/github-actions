@@ -58,6 +58,11 @@ on:
         required: false
         default: "master"
         type: string
+      main-repo:
+        description: "Upload only runs if the workflow is running in this repo"
+        required: false
+        default: ""
+        type: string
       with-ros:
         description: "If true, build ROS packages as well"
         required: false
@@ -164,6 +169,10 @@ jobs:
           then
             export PACKAGE_UPLOAD=false
           fi
+        fi
+        if [ "${{ inputs.main-repo }}" != ""  -a "${{ inputs.main-repo }}" != "${{ github.repository }}" ]
+        then
+          export PACKAGE_UPLOAD=false
         fi
         if $USE_HEAD
         then
