@@ -536,7 +536,7 @@ async function run()
         core.exportVariable('LD_LIBRARY_PATH', LD_LIBRARY_PATH);
       }
       const input = yaml.load(core.getInput('macos'));
-      let options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
+      let options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF -DCMAKE_MACOSX_RPATH:BOOL=ON';
       options += ' ' + core.getInput('options') + ' ' + core.getInput('macos-options');
       if(input)
       {

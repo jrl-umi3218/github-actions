@@ -62,7 +62,7 @@ async function run()
         LD_LIBRARY_PATH = '/usr/local/lib:' + LD_LIBRARY_PATH;
         core.exportVariable('LD_LIBRARY_PATH', LD_LIBRARY_PATH);
       }
-      options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON ' + options;
+      options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON -DCMAKE_MACOSX_RPATH:BOOL=ON' + options;
       options = options + ' ' + core.getInput('macos-options');
       core.exportVariable('ARCHFLAGS', '-arch x86_64');
     }
