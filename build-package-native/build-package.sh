@@ -2,13 +2,13 @@
 
 install-project-dependencies()
 {
+  @EXTRA_SETUP_COMMANDS@
+  apt-get update
+  apt-get -y upgrade
   apt-get update
   mk-build-deps -i -r -t "apt-get -y" /package/@REPO@/debian/control
 }
 
-@EXTRA_SETUP_COMMANDS@
-apt-get update
-apt-get -y upgrade
 install-project-dependencies
 while [ $? -ne 0 ]
 do
