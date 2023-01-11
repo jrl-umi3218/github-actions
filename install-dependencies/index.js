@@ -633,6 +633,10 @@ async function run()
           await handle_ppa(input.ppa);
           core.endGroup();
         }
+        if(!fs.existsSync('/etc/apt/apt.conf.d/80-retries'))
+        {
+          await bash("echo 'Acquire::Retries \"10\";' | sudo tee /etc/apt/apt.conf.d/80-retries");
+        }
         core.startGroup("Update APT mirror");
         await bash('sudo apt-get update || true');
         core.endGroup();
