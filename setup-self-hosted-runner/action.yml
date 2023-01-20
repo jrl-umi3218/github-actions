@@ -15,7 +15,7 @@ runs:
     - run: |
         set -x
         set -e
-        sudo sed -i -e 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//mirror:\/\/mirrors\.ubuntu\.com\/mirrors\.txt/' /etc/apt/sources.list
+        sudo sed -i -e 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//http:\/\/jp.archive\.ubuntu\.com\/ubuntu\//' /etc/apt/sources.list
         echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
         if [[ -n "${{ inputs.GITHUB_PAT }}" ]]
         then
