@@ -27,4 +27,6 @@ runs:
           git config --global url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf https://gite.lirmm.fr/
           git config --global --add url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf git@gite.lirmm.fr:
         fi
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@example.com"
       shell: bash
