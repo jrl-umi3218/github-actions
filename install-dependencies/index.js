@@ -323,13 +323,16 @@ async function handle_ros(ros)
     return;
   }
   let ros_distro = await get_ros_distro();
-  if(!fs.existsSync('/etc/apt/sources.list.d/ros-latest.list'))
+  if(!process.env.ROS_DISTRO)
   {
-    core.startGroup('Setup ROS mirror');
-    await bash(`sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'`);
-    await bash(`wget http://packages.ros.org/ros.key -O - | sudo apt-key add -`);
-    await bash('sudo apt-get update || true');
-    core.endGroup();
+    if(!fs.existsSync('/etc/apt/sources.list.d/ros-latest.list'))
+    {
+      core.startGroup('Setup ROS mirror');
+      await bash(`sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'`);
+      await bash(`wget http://packages.ros.org/ros.key -O - | sudo apt-key add -`);
+      await bash('sudo apt-get update || true');
+      core.endGroup();
+    }
     core.startGroup('Install ROS base packages');
     await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-catkin-tools python3-rosdep`);
     core.endGroup();
