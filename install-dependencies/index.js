@@ -252,7 +252,14 @@ async function build_github_repo(path, ref, btype, options, sudo, build_dir)
   const cwd = process.cwd();
   const project_path = cwd + '/' + path;
   process.chdir(project_path);
-  await exec.exec('git checkout ' + ref)
+  if(ref === 'master')
+  {
+    await bash('git checkout master || git checkout main')
+  }
+  else
+  {
+    await exec.exec('git checkout ' + ref)
+  }
   await exec.exec('git submodule sync')
   await exec.exec('git submodule update')
   process.chdir(cwd);
