@@ -47,7 +47,10 @@ runs:
         set +x
         . devel/setup.bash
         set -x
-        sudo rosdep init
+        if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]
+        then
+          sudo rosdep init
+        fi
         rosdep update
         rosdep install -y -r --from-paths src --ignore-src
       shell: bash
