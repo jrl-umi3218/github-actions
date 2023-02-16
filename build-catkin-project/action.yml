@@ -33,6 +33,7 @@ runs:
         cd ${GITHUB_WORKSPACE}/catkin_ws
         catkin init
         catkin build --limit-status-rate 0.1
+      shell: bash
     - name: Checkout repository code
       uses: actions/checkout@v3
       with:
@@ -49,6 +50,7 @@ runs:
         sudo rosdep init
         rosdep update
         rosdep install -y -r --from-paths src --ignore-src
+      shell: bash
     - name: Catkin build
       run: |
         set -e
@@ -58,3 +60,4 @@ runs:
         . devel/setup.bash
         set -x
         catkin build cnoid_ros_utils --limit-status-rate 0.1 -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}  ${{ inputs.cmake-args }}
+      shell: bash
