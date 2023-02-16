@@ -1,0 +1,65 @@
+# This is is a reusable workflow
+
+# On call it will:
+# - if ROS_DISTRO is not set call install-dependencies to set it up
+# - create a catkin workspace in ${GITHUB_WORKSPACE}/catkin_ws
+# - clone the project in the workspace
+# - run rosdep
+# - run catkin build
+
+
+on:
+  workflow_call:
+    inputs:
+      build-type:
+        description: "CMAKE_BUILD_TYPE for the project"
+        required: false
+        type: string
+        default: 'RelWithDebInfo'
+      cmake-args:
+        description: "Extra cmake arguments"
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  build-catkin-project:
+    runs-on: ubuntu-20.04
+    - name: Setup ROS
+      if: env.ROS_DISTRO == ''
+      uses: jrl-umi3218/github-actions/install-dependencies@master
+      with:
+        ubuntu: |
+          ros: |
+            apt: ros-base
+    - name: Setup workspace
+      run: |
+        mkdir -p ${GITHUB_WORKSPACE}/catkin_ws/src
+        cd ${GITHUB_WORKSPACE}/catkin_ws
+        catkin init
+        catkin build --limit-status-rate 0.1
+    - name: Checkout repository code
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        path: catkin_ws/src/${{ github.repository }}
+    - name: Rosdep install
+      run: |
+        set -e
+        set -x
+        cd ${GITHUB_WORKSPACE}/catkin_ws
+        set +x
+        . devel/setup.bash
+        set -x
+        sudo rosdep init
+        rosdep update
+        rosdep install -y -r --from-paths src --ignore-src
+    - name: Catkin build
+      run: |
+        set -e
+        set -x
+        cd ${GITHUB_WORKSPACE}/catkin_ws
+        set +x
+        . devel/setup.bash
+        set -x
+        catkin build cnoid_ros_utils --limit-status-rate 0.1 -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}  ${{ inputs.cmake-args }}
