@@ -6,25 +6,20 @@
 # - clone the project in the workspace
 # - run rosdep
 # - run catkin build
-
-
-on:
-  workflow_call:
-    inputs:
-      build-type:
-        description: "CMAKE_BUILD_TYPE for the project"
-        required: false
-        type: string
-        default: 'RelWithDebInfo'
-      cmake-args:
-        description: "Extra cmake arguments"
-        required: false
-        type: string
-        default: ''
-
-jobs:
-  build-catkin-project:
-    runs-on: ubuntu-20.04
+inputs:
+  build-type:
+    description: "CMAKE_BUILD_TYPE for the project"
+    required: true
+    type: string
+    default: 'RelWithDebInfo'
+  cmake-args:
+    description: "Extra cmake arguments"
+    required: true
+    type: string
+    default: ''
+runs:
+  using: "composite"
+  steps:
     - name: Setup ROS
       if: env.ROS_DISTRO == ''
       uses: jrl-umi3218/github-actions/install-dependencies@master
