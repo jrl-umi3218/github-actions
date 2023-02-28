@@ -106,7 +106,7 @@ jobs:
         else
           echo "REJECTION=PROJECT_VERSION in CMakeLists.txt does not match tag" >> $GITHUB_ENV
           grep -q "set(PROJECT_VERSION ${VERSION})" CMakeLists.txt
-        endif
+        fi
         if [ -f debian/changelog ]
         then
           PKG_NAME=`grep "^Source:" debian/control|sed -e 's/Source: //'`
