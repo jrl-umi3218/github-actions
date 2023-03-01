@@ -341,7 +341,7 @@ async function handle_ros(ros)
       core.endGroup();
     }
     core.startGroup('Install ROS base packages');
-    await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-catkin-tools python3-rosdep`);
+    await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-catkin-tools python3-rosdep python3-wstool`);
     core.endGroup();
     core.startGroup('Initialize rosdep');
     await exec.exec('sudo rosdep init');

@@ -39,6 +39,18 @@ runs:
       with:
         submodules: recursive
         path: catkin_ws/src/${{ github.repository }}
+    - name: Download dependent repository codes
+      run: |
+        set -e
+        set -x
+        cd ${GITHUB_WORKSPACE}/catkin_ws
+        if [ -f src/${{ github.repository }}/depends.rosinstall ]
+        then
+          wstool init src
+          wstool merge -t src src/${{ github.repository }}/depends.rosinstall -y
+          wstool update -t src
+        fi
+      shell: bash
     - name: Rosdep install
       run: |
         set -e
