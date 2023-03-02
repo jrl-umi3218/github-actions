@@ -74,5 +74,5 @@ runs:
         set +x
         . devel/setup.bash
         set -x
-        catkin build cnoid_ros_utils --limit-status-rate 0.1 -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}  ${{ inputs.cmake-args }}
+        catkin build --limit-status-rate 0.1 -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}  ${{ inputs.cmake-args }}
       shell: bash
