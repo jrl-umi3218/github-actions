@@ -164,7 +164,7 @@ jobs:
         elif [ "${{ github.event.action }}" == "package-release" ]
         then
           export USE_HEAD=false
-          git remote update origin
+          git fetch --tags
           export REF=`git tag --sort=committerdate --list 'v[0-9]*'|tail -1`
           git checkout $REF
           git submodule sync && git submodule update
