@@ -79,7 +79,7 @@ runs:
         set +x
         . devel/setup.bash
         set -x
-        catkin build --limit-status-rate 0.1 -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} ${{ inputs.cmake-args }} ${{ inputs.catkin-packages }}
+        catkin build --limit-status-rate 0.1 --cmake-args -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} ${{ inputs.cmake-args }} ${{ inputs.catkin-packages }}
       shell: bash
     - name: Run test
       run: |
@@ -89,6 +89,6 @@ runs:
         set +x
         . devel/setup.bash
         set -x
-        catkin build --limit-status-rate 0.1 -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} --catkin-make-args run_tests ${{ inputs.cmake-args }} ${{ inputs.catkin-packages }}
+        catkin build --limit-status-rate 0.1 --cmake-args -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} ${{ inputs.cmake-args }} --catkin-make-args run_tests ${{ inputs.catkin-packages }}
         catkin_test_results --verbose --all build
       shell: bash
