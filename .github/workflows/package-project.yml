@@ -219,8 +219,8 @@ jobs:
         echo "ros-distro=${ROS_DISTRO}" >> $GITHUB_OUTPUT
         if [ "${ROS_DISTRO}" = "" ]
         then
-          sed -i -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/control
-          cat debian/control
+          sed -i -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/rules
+          cat debian/rules
           exit 0
         fi
         if [ -f debian/control.ros ]
