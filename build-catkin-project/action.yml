@@ -17,6 +17,11 @@ inputs:
     required: true
     type: string
     default: ''
+  catkin-args:
+    description: "Extra catkin arguments"
+    required: false
+    type: string
+    default: ''
   build-packages:
     description: "Catkin packages to be built (default is all packages)"
     required: false
@@ -84,7 +89,7 @@ runs:
         set +x
         . devel/setup.bash
         set -x
-        catkin build ${{ inputs.build-packages }} --limit-status-rate 0.1 --cmake-args -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} ${{ inputs.cmake-args }}
+        catkin build ${{ inputs.build-packages }} --limit-status-rate 0.1 ${{ inputs.catkin-args }} --cmake-args -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} ${{ inputs.cmake-args }}
       shell: bash
     - name: Run test
       run: |
@@ -94,6 +99,6 @@ runs:
         set +x
         . devel/setup.bash
         set -x
-        catkin build ${{ inputs.test-packages }} --limit-status-rate 0.1 --cmake-args -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} ${{ inputs.cmake-args }} --catkin-make-args run_tests
+        catkin build ${{ inputs.test-packages }} --limit-status-rate 0.1 ${{ inputs.catkin-args }} --cmake-args -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} ${{ inputs.cmake-args }} --catkin-make-args run_tests
         catkin_test_results --verbose --all build
       shell: bash
