@@ -195,7 +195,7 @@ jobs:
         set -x
         if [ "${{ matrix.dist }}" = "xenial" -o "${{ matrix.dist }}" = "bionic" -o "${{ matrix.dist }}" = "focal" ]
         then
-          sed -i -e"s/#PYTHON2//" debian/control
+          sed -i -e"s/#PYTHON2 //" debian/control
         else
           sed -i -e"s/-DPYTHON_DEB_ROOT=\$(TMP)/-DPYTHON_DEB_ROOT=\$(TMP) -DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON/" debian/rules
         fi
