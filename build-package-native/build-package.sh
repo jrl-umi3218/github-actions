@@ -1,5 +1,8 @@
 #!/bin/bash
 
+export DEBEMAIL=jrl-idh+ci@gmail.com
+export DEBFULLNAME="JRL/IDH Continuous Integration Tool"
+
 install-project-dependencies()
 {
   @EXTRA_SETUP_COMMANDS@
