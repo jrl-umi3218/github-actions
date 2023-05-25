@@ -197,7 +197,7 @@ jobs:
         then
           sed -i -e"s/#PYTHON2 //" debian/control
         else
-          sed -i -e"s/-DPYTHON_DEB_ROOT=\$(TMP)/-DPYTHON_DEB_ROOT=\$(TMP) -DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON/" debian/rules
+          sed -i -e"s/-DPYTHON_DEB_ROOT=\$(TMP)/-DPYTHON_DEB_ROOT=\$(TMP) -DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=OFF -DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON/" debian/rules
         fi
     - name: Setup ROS packaging
       id: setup-ros
