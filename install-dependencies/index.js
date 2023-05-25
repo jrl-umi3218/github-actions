@@ -708,7 +708,12 @@ async function run()
         if(input.apt)
         {
           core.startGroup("Install APT dependencies");
-          await exec.exec('sudo apt-get install -y ' + input.apt);
+          let apt = input.apt;
+          if(!distro_has_python2_and_python3)
+          {
+            apt = apt.split(' ').filter(word => !word.startsWith('python-') && word != 'cython').join(' ');
+          }
+          await exec.exec('sudo apt-get install -y ' + apt);
           core.endGroup();
         }
         if(input.pip)
