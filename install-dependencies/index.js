@@ -707,7 +707,7 @@ async function run()
           core.startGroup("Install pip dependencies");
           if(has_python2_and_python3)
           {
-            await exec.exec('sudo python2 -m pip install ' + input.pip);
+            await exec.exec('sudo python -m pip install ' + input.pip);
           }
           await exec.exec('sudo python3 -m pip install ' + input.pip);
           core.endGroup();
