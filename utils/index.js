@@ -22,6 +22,20 @@ async function setup_boost()
   }
 }
 
+async function bash_output(cmd)
+{
+  let output = '';
+  const options = {};
+  options.silent = true;
+  options.listeners = {
+    stdout: (data) => {
+      output += data.toString();
+    }
+  };
+  await exec.exec('bash', ['-c', cmd], options);
+  return output.trim();
+}
+
 async function get_dist_name()
 {
   return bash_output('lsb_release -sc');
@@ -41,6 +55,7 @@ async function distro_has_python2_and_python3()
   return false;
 }
 
-exports.setup_boost = setup_boost;
-exports.get_dist_name = get_dist_name;
+exports.bash_output = bash_output;
 exports.distro_has_python2_and_python3 = distro_has_python2_and_python3;
+exports.get_dist_name = get_dist_name;
+exports.setup_boost = setup_boost;

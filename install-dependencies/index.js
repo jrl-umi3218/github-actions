@@ -69,20 +69,6 @@ async function bash(cmd)
   return exec.exec('bash', ['-c', cmd]);
 }
 
-async function bash_output(cmd)
-{
-  let output = '';
-  const options = {};
-  options.silent = true;
-  options.listeners = {
-    stdout: (data) => {
-      output += data.toString();
-    }
-  };
-  await exec.exec('bash', ['-c', cmd], options);
-  return output.trim();
-}
-
 async function bootstrap_vcpkg(vcpkg, compiler)
 {
   if(!vcpkg)
@@ -307,7 +293,7 @@ async function build_github_repo(path, ref, btype, options, sudo, build_dir)
 
 async function use_ros_workspace(setup)
 {
-  let vars = await bash_output(`. ${setup} && env`);
+  let vars = await utils.bash_output(`. ${setup} && env`);
   for(let V of vars.split('\n'))
   {
     let [name, value] = V.split('=');
