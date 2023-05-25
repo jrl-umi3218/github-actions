@@ -5,6 +5,20 @@ const os = require('os');
 
 const utils = require('../utils');
 
+async function distro_has_python2_and_python3()
+{
+  let dist_name = await get_dist_name();
+  if(dist_name == 'bionic')
+  {
+    return true;
+  }
+  if(dist_name == 'focal')
+  {
+    return true;
+  }
+  return false;
+}
+
 async function run()
 {
   try
@@ -74,7 +88,15 @@ async function run()
         LD_LIBRARY_PATH = '/usr/local/lib:' + LD_LIBRARY_PATH;
         core.exportVariable('LD_LIBRARY_PATH', LD_LIBRARY_PATH);
       }
-      options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON ' + options;
+      let has_python2_and_python3 = await utils.distro_has_python2_and_python3();
+      if(has_python2_and_python3)
+      {
+        options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON ' + options;
+      }
+      else
+      {
+        options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON ' + options;
+      }
       options = options + ' ' + core.getInput('linux-options');
       const compiler = core.getInput('compiler');
       if(compiler == 'clang')

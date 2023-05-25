@@ -22,4 +22,25 @@ async function setup_boost()
   }
 }
 
+async function get_dist_name()
+{
+  return bash_output('lsb_release -sc');
+}
+
+async function distro_has_python2_and_python3()
+{
+  let dist_name = await get_dist_name();
+  if(dist_name == 'bionic')
+  {
+    return true;
+  }
+  if(dist_name == 'focal')
+  {
+    return true;
+  }
+  return false;
+}
+
 exports.setup_boost = setup_boost;
+exports.get_dist_name = get_dist_name;
+exports.distro_has_python2_and_python3 = distro_has_python2_and_python3;

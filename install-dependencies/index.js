@@ -21,21 +21,20 @@ async function handle_ppa(ppas_str)
   }
 }
 
-async function get_dist_name()
-{
-  return bash_output('lsb_release -sc');
-}
-
 async function get_ros_distro()
 {
-  let dist_name = await get_dist_name();
+  let dist_name = await utils.get_dist_name();
   if(dist_name == 'bionic')
   {
-    return 'melodic';
+    return [false, 'melodic'];
   }
   if(dist_name == 'focal')
   {
-    return 'noetic';
+    return [false, 'noetic'];
+  }
+  if(dist_name == 'jammy')
+  {
+    return [true, 'iron'];
   }
   core.setFailed(`Cannot determine ROS distro for Linux distro: ${dist_name}`);
 }
@@ -44,7 +43,7 @@ async function get_os_name()
 {
   if(process.platform == 'linux')
   {
-    let dist_name = await get_dist_name();
+    let dist_name = await utils.get_dist_name();
     return `${process.platform}_${dist_name}`;
   }
   else
@@ -329,14 +328,22 @@ async function handle_ros(ros)
   {
     return;
   }
-  let ros_distro = await get_ros_distro();
+  let [is_ros2, ros_distro] = await get_ros_distro();
   if(!process.env.ROS_DISTRO)
   {
     if(!fs.existsSync('/etc/apt/sources.list.d/ros-latest.list'))
     {
       core.startGroup('Setup ROS mirror');
-      await bash(`sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'`);
-      await bash(`wget http://packages.ros.org/ros.key -O - | sudo apt-key add -`);
+      if(!is_ros2)
+      {
+        await bash(`sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'`);
+        await bash(`wget http://packages.ros.org/ros.key -O - | sudo apt-key add -`);
+      }
+      else
+      {
+        await bash(`wget https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -O - | sudo apt-key add -`);
+        await bash(`sudo sh -c 'echo "deb http://packages.ros.org/ros2/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'`);
+      }
       await bash('sudo apt-get update || true');
       core.endGroup();
     }
@@ -373,7 +380,7 @@ async function handle_ros_workspace(github, install)
   core.startGroup('Initialize catkin workspace');
   if(install)
   {
-    let ros_distro = await get_ros_distro();
+    let [is_ros2, ros_distro] = await get_ros_distro();
     await bash(`catkin config --init --install --install-space /opt/ros/${ros_distro}`);
   }
   else
@@ -629,7 +636,16 @@ async function run()
       {
         core.warning('Compiler is set to ' + compiler + ' which is not recognized by this action');
       }
-      let options = '-DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DBUILD_TESTING:BOOL=OFF';
+      let options = '-DBUILD_TESTING:BOOL=OFF';
+      let has_python2_and_python3 = await utils.distro_has_python2_and_python3();
+      if(has_python2_and_python3)
+      {
+        options += ' -DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON';
+      }
+      else
+      {
+        options += ' -DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON';
+      }
       options += ' ' + core.getInput('options') + ' ' + core.getInput('linux-options');
       if(input)
       {
@@ -698,7 +714,10 @@ async function run()
         if(input.pip)
         {
           core.startGroup("Install pip dependencies");
-          await exec.exec('sudo python -m pip install ' + input.pip);
+          if(has_python2_and_python3)
+          {
+            await exec.exec('sudo python2 -m pip install ' + input.pip);
+          }
           await exec.exec('sudo python3 -m pip install ' + input.pip);
           core.endGroup();
         }
