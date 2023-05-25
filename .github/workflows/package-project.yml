@@ -189,6 +189,16 @@ jobs:
           echo "package-job=package-release" >> $GITHUB_OUTPUT
         fi
         echo "do-upload=${PACKAGE_UPLOAD}" >> $GITHUB_OUTPUT
+    - name: Handle Python 2
+      shell: bash
+      run: |
+        set -x
+        if [ "${{ matrix.dist }}" = "xenial" -o "${{ matrix.dist }}" = "bionic" -o "${{ matrix.dist }}" = "focal" ]
+        then
+          sed -i -e"s/#PYTHON2//" debian/control
+        else
+          sed -i -e"s/-DPYTHON_DEB_ROOT=\$(TMP)/-DPYTHON_DEB_ROOT=\$(TMP) -DPYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3:BOOL=ON -DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON/" debian/rules
+        fi
     - name: Setup ROS packaging
       id: setup-ros
       shell: bash
@@ -214,7 +224,7 @@ jobs:
         fi
         if [ "${{ matrix.dist }}" = "jammy" ]
         then
-          export ROS_DISTRO="humble"
+          export ROS_DISTRO="iron"
         fi
         echo "ros-distro=${ROS_DISTRO}" >> $GITHUB_OUTPUT
         if [ "${ROS_DISTRO}" = "" ]
