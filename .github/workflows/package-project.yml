@@ -78,7 +78,7 @@ on:
         required: true
       GH_TOKEN:
         description: 'A token used to trigger dependent rebuilds'
-        required: true
+        required: false
 
 jobs:
   # For a given tag vX.Y.Z, this checks:
