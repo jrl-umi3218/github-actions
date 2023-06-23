@@ -11,7 +11,7 @@
   "dependencies": {
     "@actions/core": "^1.9.1",
     "@actions/exec": "^1.0.4",
-    "@actions/github": "^2.2.0",
+    "@actions/github": "^5.1.1",
     "boolean": "^3.0.2",
     "js-yaml": "^3.14.0"
   }
