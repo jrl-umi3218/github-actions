@@ -223,7 +223,11 @@ GitHub packages that will be cloned into a catkin workspace
 
 #### install
 
-If true the catkin workspace created for this is installed to `/opt/ros/${ROS_DISTRO}`. Otherwise the devel space is used.
+If true the catkin workspace created for this is installed to `/opt/ros/${ROS_DISTRO}`. Otherwise the devel space is used. The default is false.
+
+#### catkin-args
+
+Arguments passed to `catkin build`
 
 
 **Example**
@@ -234,6 +238,7 @@ ros:
   workspace:
     - path: jrl-umi3218/mc_rtc_data
   install: true
+  catkin-args: -DSOME_FEATURE:BOOL=ON
 ```
 
 ## Example usage
