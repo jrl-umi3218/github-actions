@@ -353,7 +353,7 @@ async function handle_ros(ros)
   core.endGroup();
 }
 
-async function handle_ros_workspace(github, install, catkin_args)
+async function handle_ros_workspace(github, install, catkin_args, btype)
 {
   if(!github)
   {
@@ -413,13 +413,14 @@ async function handle_ros_workspace(github, install, catkin_args)
   await bash('rosdep install --from-paths --reinstall --ignore-packages-from-source --default-yes --verbose .');
   core.endGroup();
   core.startGroup('catkin build');
+  let catkin_build_cmd = 'catkin build ' + catkin_args + ' --cmake-args -DCMAKE_BUILD_TYPE=' + btype
   if(install)
   {
-    await bash('sudo catkin build ' + catkin_args);
+    await bash('sudo ' + catkin_build_cmd);
   }
   else
   {
-    await bash('catkin build ' + catkin_args);
+    await bash(catkin_build_cmd);
     await use_ros_workspace(`${workspace}/devel/setup.bash`);
   }
   core.endGroup();
@@ -727,7 +728,7 @@ async function run()
       await handle_github(github, btype, options, true, true);
       if(ros)
       {
-        await handle_ros_workspace(ros.workspace, ros.install || false, ros['catkin-args'] || '');
+        await handle_ros_workspace(ros.workspace, ros.install || false, ros['catkin-args'] || '', btype);
       }
     }
   }
