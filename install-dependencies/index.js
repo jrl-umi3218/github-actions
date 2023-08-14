@@ -353,7 +353,7 @@ async function handle_ros(ros)
   core.endGroup();
 }
 
-async function handle_ros_workspace(github, install, catkin_args, btype, skiplist, buidlist)
+async function handle_ros_workspace(github, install, catkin_args, btype, skiplist, buildlist)
 {
   if(!github)
   {
