@@ -353,7 +353,7 @@ async function handle_ros(ros)
   core.endGroup();
 }
 
-async function handle_ros_workspace(github, install, catkin_args, btype)
+async function handle_ros_workspace(github, install, catkin_args, btype, skiplist, buidlist)
 {
   if(!github)
   {
@@ -372,6 +372,14 @@ async function handle_ros_workspace(github, install, catkin_args, btype)
   else
   {
     await bash('catkin init');
+  }
+  if(skiplist)
+  {
+    await bash(`catkin config --skiplist ${skiplist}`)
+  }
+  if(buildlist)
+  {
+    await bash(`catkin config --buildlist ${buildlist}`)
   }
   core.endGroup();
   process.chdir(workspace_src);
@@ -728,7 +736,7 @@ async function run()
       await handle_github(github, btype, options, true, true);
       if(ros)
       {
-        await handle_ros_workspace(ros.workspace, ros.install || false, ros['catkin-args'] || '', btype);
+        await handle_ros_workspace(ros.workspace, ros.install || false, ros['catkin-args'] || '', btype, ros.skiplist, ros.buildlist);
       }
     }
   }

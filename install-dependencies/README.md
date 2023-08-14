@@ -229,6 +229,14 @@ If true the catkin workspace created for this is installed to `/opt/ros/${ROS_DI
 
 Arguments passed to `catkin build`
 
+#### skiplist
+
+Configure the workspace [skiplist](https://catkin-tools.readthedocs.io/en/latest/verbs/catkin_config.html#buildlisting-and-skiplisting-packages)
+
+#### buildlist
+
+Configure the workspace [buildlist](https://catkin-tools.readthedocs.io/en/latest/verbs/catkin_config.html#buildlisting-and-skiplisting-packages)
+
 
 **Example**
 
