@@ -1,4 +1,3 @@
-# Use the boost_1_77_0-msvc-14.1-64.exe for Windows 2016
 function DownloadFileWithRetry
 {
   param(
@@ -36,7 +35,7 @@ function DownloadFileWithRetry
     Get-FileHash $Out | Format-List
   }
 }
-$Url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.77.0/boost_1_77_0-msvc-14.2-64.exe"
+$Url = "https://boostorg.jfrog.io/artifactory/main/release/1.83.0/binaries/boost_1_83_0-msvc-14.3-64.exe"
 $Out = "$env:TEMP\boost.exe"
 DownloadFileWithRetry -Url "$Url" -Out "$Out"
-Start-Process -Wait -FilePath "$Out" "/SILENT","/SP-","/SUPPRESSMSGBOXES","/DIR=C:\hostedtoolcache\windows\Boost\1.77.0\x86_64"
+Start-Process -Wait -FilePath "$Out" "/SILENT","/SP-","/SUPPRESSMSGBOXES","/DIR=C:\hostedtoolcache\windows\Boost\1.83.0\x86_64"
