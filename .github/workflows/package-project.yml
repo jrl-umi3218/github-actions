@@ -267,7 +267,7 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix: ${{ fromJson(inputs.matrix) }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Download packages
       uses: actions/download-artifact@v3
