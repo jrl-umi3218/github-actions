@@ -297,7 +297,7 @@ async function use_ros_workspace(setup)
   for(let V of vars.split('\n'))
   {
     let [name, value] = V.split('=');
-    if(name && name.startsWith('ROS'))
+    if(name && (name.startsWith('ROS') || name.startsWith('AMENT')))
     {
       core.exportVariable(name, value);
     }
@@ -334,12 +334,22 @@ async function handle_ros(ros)
       core.endGroup();
     }
     core.startGroup('Install ROS base packages');
-    await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-catkin-tools python3-rosdep python3-wstool`);
+    if(!is_ros2)
+    {
+      await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-catkin-tools python3-rosdep python3-wstool`);
+    }
+    else
+    {
+      await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-colcon-common-extensions`);
+    }
     core.endGroup();
-    core.startGroup('Initialize rosdep');
-    await exec.exec('sudo rosdep init');
-    await exec.exec('rosdep update --include-eol-distros');
-    core.endGroup();
+    if(!is_ros2)
+    {
+      core.startGroup('Initialize rosdep');
+      await exec.exec('sudo rosdep init');
+      await exec.exec('rosdep update --include-eol-distros');
+      core.endGroup();
+    }
     core.startGroup('Setup ROS env');
     await use_ros_workspace(`/opt/ros/${ros_distro}/setup.bash`);
     core.endGroup();
