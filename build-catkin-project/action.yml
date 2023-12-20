@@ -37,6 +37,11 @@ inputs:
     required: false
     type: string
     default: ''
+  skip-test:
+    description: "Whether to skip test"
+    required: false
+    type: boolean
+    default: false
 runs:
   using: "composite"
   steps:
@@ -97,6 +102,7 @@ runs:
         catkin build ${{ inputs.build-packages }} --limit-status-rate 0.1 ${{ inputs.catkin-build-args }} --cmake-args -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} ${{ inputs.cmake-args }}
       shell: bash
     - name: Run test
+      if: ${{ !inputs.skip-test }}
       run: |
         set -e
         set -x
