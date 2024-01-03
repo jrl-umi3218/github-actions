@@ -102,7 +102,7 @@ runs:
         catkin build ${{ inputs.build-packages }} --limit-status-rate 0.1 ${{ inputs.catkin-build-args }} --cmake-args -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} ${{ inputs.cmake-args }}
       shell: bash
     - name: Run test
-      if: ${{ !inputs.skip-test }}
+      if: ${{ inputs.skip-test == false || inputs.skip-test == 'false' }}
       run: |
         set -e
         set -x
