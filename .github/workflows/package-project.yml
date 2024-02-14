@@ -210,17 +210,21 @@ jobs:
           exit 0
         fi
         export ROS_DISTRO=""
+        export ROS_VERSION=2
         if [ "${{ matrix.dist }}" = "xenial" ]
         then
           export ROS_DISTRO="kinetic"
+          export ROS_VERSION=1
         fi
         if [ "${{ matrix.dist }}" = "bionic" -a "${{ matrix.arch }}" = "amd64" ]
         then
           export ROS_DISTRO="melodic"
+          export ROS_VERSION=1
         fi
         if [ "${{ matrix.dist }}" = "focal" ]
         then
           export ROS_DISTRO="noetic"
+          export ROS_VERSION=1
         fi
         if [ "${{ matrix.dist }}" = "jammy" ]
         then
@@ -239,13 +243,16 @@ jobs:
         fi
         sed -i -e"s/# ros-@ROS_DISTRO@/ ros-${ROS_DISTRO}/" debian/control
         sed -i -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/control
+        sed -i -e"s/#ROS${ROS_VERSION} / " debian/control
         cat debian/control
         sed -i -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/rules
+        sed -i -e"s/#ROS${ROS_VERSION} / " debian/rules
         cat debian/rules
         for f in `find debian -type f -name 'ros-ROS_DISTRO-*'`
         do
           FOUT=`echo $f|sed -e"s/ROS_DISTRO/${ROS_DISTRO}/"`
           sed -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" $f | tee -a $FOUT
+          sed -i -e"s/#ROS${ROS_VERSION} / " ${FOUT}
         done
     - name: Build package
       uses: jrl-umi3218/github-actions/build-package-native@master
