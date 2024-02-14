@@ -243,16 +243,16 @@ jobs:
         fi
         sed -i -e"s/# ros-@ROS_DISTRO@/ ros-${ROS_DISTRO}/" debian/control
         sed -i -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/control
-        sed -i -e"s/#ROS${ROS_VERSION} / " debian/control
+        sed -i -e"s/#ROS${ROS_VERSION} / /" debian/control
         cat debian/control
         sed -i -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" debian/rules
-        sed -i -e"s/#ROS${ROS_VERSION} / " debian/rules
+        sed -i -e"s/#ROS${ROS_VERSION} / /" debian/rules
         cat debian/rules
         for f in `find debian -type f -name 'ros-ROS_DISTRO-*'`
         do
           FOUT=`echo $f|sed -e"s/ROS_DISTRO/${ROS_DISTRO}/"`
           sed -e"s/@ROS_DISTRO@/${ROS_DISTRO}/" $f | tee -a $FOUT
-          sed -i -e"s/#ROS${ROS_VERSION} / " ${FOUT}
+          sed -i -e"s/#ROS${ROS_VERSION} / /" ${FOUT}
         done
     - name: Build package
       uses: jrl-umi3218/github-actions/build-package-native@master
