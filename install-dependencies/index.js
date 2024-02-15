@@ -340,16 +340,13 @@ async function handle_ros(ros)
     }
     else
     {
-      await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-colcon-common-extensions`);
+      await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-colcon-common-extensions python3-rosdep`);
     }
     core.endGroup();
-    if(!is_ros2)
-    {
-      core.startGroup('Initialize rosdep');
-      await exec.exec('sudo rosdep init');
-      await exec.exec('rosdep update --include-eol-distros');
-      core.endGroup();
-    }
+    core.startGroup('Initialize rosdep');
+    await exec.exec('sudo rosdep init');
+    await exec.exec('rosdep update --include-eol-distros');
+    core.endGroup();
     core.startGroup('Setup ROS env');
     await use_ros_workspace(`/opt/ros/${ros_distro}/setup.bash`);
     core.endGroup();
