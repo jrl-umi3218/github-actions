@@ -92,9 +92,6 @@ runs:
         set -e
         set -x
         cd ${GITHUB_WORKSPACE}/${{ inputs.workspace-dir }}
-        set +x
-        . devel/setup.bash
-        set -x
         COLCON_OPTIONS="--merge-install"
         if [ "${{ inputs.build-packages }}" != "" ]
         then
