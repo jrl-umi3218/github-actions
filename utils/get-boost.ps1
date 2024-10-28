@@ -22,6 +22,7 @@ function DownloadFileWithRetry
     }
     catch
     {
+      Write-Output $_
       if(Test-Path $Out)
       {
         Remove-Item $Out
