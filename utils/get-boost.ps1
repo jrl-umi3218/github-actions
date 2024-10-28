@@ -24,7 +24,6 @@ function DownloadFileWithRetry
     }
     catch
     {
-      Write-Output $_
       if(Test-Path $Out)
       {
         Remove-Item $Out
@@ -42,4 +41,4 @@ $Url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.83.0/boost
 $Out = "$env:TEMP\boost.exe"
 echo "$Out" 
 DownloadFileWithRetry -Url "$Url" -Out "$Out"
-Start-Process -Wait -FilePath "$Out" -ArgumentList "/SILENT", "/SP-", "/SUPPRESSMSGBOXES", "/DIR=C:\hostedtoolcache\windows\Boost\1.83.0\x86_64"
+Start-Process -Wait -FilePath "$Out" -ArgumentList "/SILENT", "/SP-", "/SUPPRESSMSGBOXES", "/DIR=C:\hostedtoolcache\windows\Boost\1.82.0\x86_64"
