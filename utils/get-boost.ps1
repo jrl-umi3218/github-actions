@@ -17,7 +17,11 @@ function DownloadFileWithRetry
     }
     try
     {
-      (New-Object System.Net.WebClient).DownloadFile($Url, $Out)
+      using (WebClient wc = new WebClient())
+      {
+          wc.Headers.Add("User-Agent: Other"); 
+          wc.DownloadFile($Url, $Out);
+      }
       break
     }
     catch
@@ -36,7 +40,7 @@ function DownloadFileWithRetry
     Get-FileHash $Out | Format-List
   }
 }
-$Url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.83.0/boost_1_83_0-msvc-14.3-64.exe/download"
+$Url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.83.0/boost_1_83_0-msvc-14.3-64.exe"
 $Out = "$env:TEMP\boost.exe"
 echo "$Out" 
 DownloadFileWithRetry -Url "$Url" -Out "$Out"
