@@ -17,11 +17,9 @@ function DownloadFileWithRetry
     }
     try
     {
-      using (WebClient wc = new System.Net.WebClient())
-      {
-          wc.Headers.Add("User-Agent: Other"); 
-          wc.DownloadFile($Url, $Out);
-      }
+      WebClient wc = new System.Net.WebClient()
+      wc.Headers.Add("User-Agent: Other"); 
+      wc.DownloadFile($Url, $Out);
       break
     }
     catch
