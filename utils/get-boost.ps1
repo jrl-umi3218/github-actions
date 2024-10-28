@@ -36,7 +36,7 @@ function DownloadFileWithRetry
     Get-FileHash $Out | Format-List
   }
 }
-$Url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.83.0/boost_1_83_0-msvc-14.3-64.exe"
+$Url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.83.0/boost_1_83_0-msvc-14.3-64.exe/download"
 $Out = "$env:TEMP\boost.exe"
 echo "$Out" 
 DownloadFileWithRetry -Url "$Url" -Out "$Out"
