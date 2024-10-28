@@ -38,4 +38,4 @@ function DownloadFileWithRetry
 $Url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.83.0/boost_1_83_0-msvc-14.3-64.exe"
 $Out = "$env:TEMP\boost.exe"
 DownloadFileWithRetry -Url "$Url" -Out "$Out"
-Start-Process -Wait -FilePath "$Out" "/SILENT","/SP-","/SUPPRESSMSGBOXES","/DIR=C:\hostedtoolcache\windows\Boost\1.82.0\x86_64"
+Start-Process -Wait -FilePath "$Out" -ArgumentList "/SILENT", "/SP-", "/SUPPRESSMSGBOXES", "/DIR=C:\hostedtoolcache\windows\Boost\1.83.0\x86_64"
