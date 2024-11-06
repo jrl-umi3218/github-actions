@@ -12,13 +12,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist: [xenial, bionic, focal, jammy]
+        dist: [xenial, bionic, focal, jammy, noble]
         arch: [i386, amd64]
         exclude:
           # No more i386 support since focal
           - dist: focal
             arch: i386
           - dist: jammy
+            arch: i386
+          - dist: noble
             arch: i386
     runs-on: ubuntu-20.04
     steps:
