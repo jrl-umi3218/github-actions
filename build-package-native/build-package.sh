@@ -20,6 +20,7 @@ do
   install-project-dependencies
 done
 cd /package/@REPO@
+git config --global --add safe.directory `pwd`
 PKG_SHA=`git rev-parse --short HEAD`
 PKG_DATE=`date +"%Y%m%d%H%M%S"`
 dch -l -$PKG_DATE-$PKG_SHA --distribution `lsb_release -sc` "Automated release"
