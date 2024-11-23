@@ -34,7 +34,11 @@ async function get_ros_distro()
   }
   if(dist_name == 'jammy')
   {
-    return [true, 'iron'];
+    return [true, 'humble'];
+  }
+  if(dist_name == 'noble')
+  {
+    return [true, 'jazzy'];
   }
   core.setFailed(`Cannot determine ROS distro for Linux distro: ${dist_name}`);
 }
