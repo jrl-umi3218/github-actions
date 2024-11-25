@@ -262,7 +262,7 @@ jobs:
         cloudsmith-repo: ${{ steps.setup-parameters.outputs.mirror }}
         ros-distro: ${{ steps.setup-ros.outputs.ros-distro }}
         latest-cmake: ${{ inputs.latest-cmake }}
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: packages-${{ matrix.dist }}-${{ matrix.arch }}
         path: /tmp/packages-${{ matrix.dist }}-${{ matrix.arch }}/
@@ -277,10 +277,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Download packages
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
-        name: packages-${{ matrix.dist }}-${{ matrix.arch }}
+        pattern: packages-*
         path: packages-${{ matrix.dist }}-${{ matrix.arch }}
+        merge-multiple: true
     - name: Upload
       if: ${{ ! inputs.update-stable-and-head }}
       uses: jrl-umi3218/github-actions/upload-package@master
