@@ -279,7 +279,7 @@ jobs:
     - name: Download packages
       uses: actions/download-artifact@v4
       with:
-        pattern: packages-*
+        name: packages-${{ matrix.dist }}-${{ matrix.arch }}
         path: packages-${{ matrix.dist }}-${{ matrix.arch }}
         merge-multiple: true
     - name: Upload
