@@ -86,3 +86,7 @@ jobs:
         then
           build-image "" "humble"
         fi
+        if [ "${{ matrix.dist }}" = "noble" ]
+        then
+          build-image "" "jazzy"
+        fi
