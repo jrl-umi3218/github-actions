@@ -230,6 +230,10 @@ jobs:
         then
           export ROS_DISTRO="humble"
         fi
+        if [ "${{ matrix.dist }}" = "noble" ]
+        then
+          export ROS_DISTRO="jazzy"
+        fi
         echo "ros-distro=${ROS_DISTRO}" >> $GITHUB_OUTPUT
         if [ "${ROS_DISTRO}" = "" ]
         then
