@@ -619,6 +619,13 @@ async function run()
     }
     else
     {
+      LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH ? process.env.LD_LIBRARY_PATH : '';
+      if(LD_LIBRARY_PATH.indexOf('/usr/local/lib') == -1)
+      {
+        LD_LIBRARY_PATH = '/usr/local/lib:' + LD_LIBRARY_PATH;
+        core.exportVariable('LD_LIBRARY_PATH', LD_LIBRARY_PATH);
+      }
+      
       await bash('sudo rm -f /etc/apt/sources.list.d/dotnetdev.list /etc/apt/sources.list.d/microsoft-prod.list || true');
       core.exportVariable('BOOST_ROOT', '');
       core.exportVariable('BOOST_ROOT_1_69_0', '');
