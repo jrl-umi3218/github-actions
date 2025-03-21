@@ -103,9 +103,12 @@ jobs:
         then
           echo "REJECTION=version in package.xml does not match tag" >> $GITHUB_ENV
           grep -q "<version>${VERSION}</version>" package.xml
-        else
+        elif [ -f CMakeLists.txt ]
+        then
           echo "REJECTION=PROJECT_VERSION in CMakeLists.txt does not match tag" >> $GITHUB_ENV
           grep -q "set(PROJECT_VERSION ${VERSION})" CMakeLists.txt || grep -q "project(.* VERSION ${VERSION}.*" CMakeLists.txt
+        else
+          echo "This package does not contain a package.xml nor a CMakeLists.txt, skipping check"
         fi
         if [ -f debian/changelog ]
         then
