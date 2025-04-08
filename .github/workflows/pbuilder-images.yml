@@ -77,7 +77,6 @@ jobs:
         }
         echo "::endgroup::"
         build-image "" "" ""
-        build-image "" "" "openrtm2"
         if [ "${{ matrix.dist }}" = "xenial" ]
         then
           build-image "kinetic" "" ""
@@ -89,12 +88,15 @@ jobs:
         if [ "${{ matrix.dist }}" = "focal" ]
         then
           build-image "noetic" "" ""
+          build-image "" "" "openrtm2"
         fi
         if [ "${{ matrix.dist }}" = "jammy" ]
         then
           build-image "" "humble" ""
+          build-image "" "" "openrtm2"
         fi
         if [ "${{ matrix.dist }}" = "noble" ]
         then
           build-image "" "jazzy" ""
+          build-image "" "" "openrtm2"
         fi
