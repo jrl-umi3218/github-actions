@@ -24,9 +24,9 @@ jobs:
             arch: i386
           - dist: oracular
             arch: i386
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build image
       run: |
         set -x
@@ -48,8 +48,11 @@ jobs:
           sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile.ros
           sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile.ros2
           sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile.ros2
+          sed -i -e's/@ARCH@/${{ matrix.arch }}/' Dockerfile.openrtm2
+          sed -i -e's/@DIST@/${{ matrix.dist }}/' Dockerfile.openrtm2
           export ROS_DISTRO=$1
           export ROS2_DISTRO=$2
+          export WITH_OPENRTM2=$3
           export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
           if [ ! -z ${ROS_DISTRO} ]; then
             sed -i -e "s/@ROS_DISTRO@/${ROS_DISTRO}/" Dockerfile.ros
@@ -61,6 +64,10 @@ jobs:
             export TAG="${TAG}-${ROS2_DISTRO}"
             cp Dockerfile.ros2 Dockerfile
           fi
+          if [ ! -z ${WITH_OPENRTM2} ]; then
+            export TAG="${TAG}-${WITH_OPENRTM2}"
+            cp Dockerfile.openrtm2 Dockerfile
+          fi
           echo "::group::Build image"
           docker build -t gergondet/pbuilder:${TAG} .
           echo "::endgroup::"
@@ -69,24 +76,25 @@ jobs:
           echo "::endgroup::"
         }
         echo "::endgroup::"
-        build-image "" ""
+        build-image "" "" ""
+        build-image "" "" "openrtm2"
         if [ "${{ matrix.dist }}" = "xenial" ]
         then
-          build-image "kinetic" ""
+          build-image "kinetic" "" ""
         fi
         if [ "${{ matrix.dist }}" = "bionic" -a "${{ matrix.arch }}" = "amd64" ]
         then
-          build-image "melodic" ""
+          build-image "melodic" "" ""
         fi
         if [ "${{ matrix.dist }}" = "focal" ]
         then
-          build-image "noetic" ""
+          build-image "noetic" "" ""
         fi
         if [ "${{ matrix.dist }}" = "jammy" ]
         then
-          build-image "" "humble"
+          build-image "" "humble" ""
         fi
         if [ "${{ matrix.dist }}" = "noble" ]
         then
-          build-image "" "jazzy"
+          build-image "" "jazzy" ""
         fi

@@ -1,0 +1,14 @@
+FROM gergondet/pbuilder:@DIST@-@ARCH@
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y tzdata
+
+RUN apt-get install -y curl wget sudo
+
+RUN curl -s -o /tmp/openrtm2_install_ubuntu.sh https://raw.githubusercontent.com/OpenRTM/OpenRTM-aist/master/scripts/openrtm2_install_ubuntu.sh
+RUN bash -c yes | bash /tmp/openrtm2_install_ubuntu.sh
+
+RUN sudo sed -i "s/dl rt Threads::Threads/-ldl -lrt/g" /usr/bin/rtm2-config
+RUN sudo sed -i "s/-lrtmCamera -lrtmManipulator//g" /usr/bin/rtm2-config
+
+ENV LANG=en_US.UTF-8
