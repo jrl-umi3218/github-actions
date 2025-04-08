@@ -16,7 +16,7 @@ async function run()
     dist = core.getInput("dist");
     arch = core.getInput("arch");
     ros_distro = core.getInput("ros-distro");
-    with_openrtm2 = core.getInput("with-openrtm2")
+    with_openrtm2 = core.getBooleanInput("with-openrtm2")
     cloudsmith_repo = core.getInput("cloudsmith-repo");
     other_gpg_keys = core.getInput("other-gpg-keys").split(' ').filter(x => x.length != 0);
     other_mirrors = core.getInput("other-mirrors").split(' ').filter(x => x.length != 0);
@@ -35,7 +35,7 @@ async function run()
     {
       tag += '-' + ros_distro;
     }
-    if(with_openrtm2 != '')
+    if(with_openrtm2)
     {
       tag += '-openrtm2';
     }

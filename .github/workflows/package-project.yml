@@ -68,6 +68,11 @@ on:
         required: false
         default: false
         type: boolean
+      with-openrtm2:
+        description: "If true, build openrtm2 packages as well"
+        required: false
+        default: false
+        type: boolean
       latest-cmake:
         description: "If true, use the latest CMake version to build the package"
         required: false
@@ -269,6 +274,7 @@ jobs:
         cloudsmith-repo: ${{ steps.setup-parameters.outputs.mirror }}
         ros-distro: ${{ steps.setup-ros.outputs.ros-distro }}
         latest-cmake: ${{ inputs.latest-cmake }}
+        with-openrtm2: ${{ inputs.with-openrtm2 }}
     - uses: actions/upload-artifact@v4
       with:
         name: packages-${{ matrix.dist }}-${{ matrix.arch }}
