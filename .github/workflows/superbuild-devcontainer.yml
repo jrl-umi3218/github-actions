@@ -25,6 +25,16 @@ on:
         default: ''
         description: 'Space-separated list of build-arg for docker. Ex "BUILD_VERSION=standalone KEEP_INSTALL=false"'
 
+      build-standalone:
+        type: boolean
+        required: false
+        default: true
+
+      build-devcontainer:
+        type: boolean
+        required: false
+        default: true
+
       repository:
         type: string
         description: "path to the superbuild repository to clone and package"
@@ -68,7 +78,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [jammy, noble]
+        # os: [jammy, noble]
+        os: [jammy]
     env:
       SSH_KEY: ${{ secrets.SSH_KEY }}
 
@@ -94,10 +105,6 @@ jobs:
           echo "SSH_AUTH_SOCK = ${{ env.SSH_AUTH_SOCK }}"
           ssh-add -l
 
-    - name: Free Disk Space (Ubuntu)
-      if: ${{ inputs.free-disk-space }}
-      uses: jlumbroso/free-disk-space@main
-
     - name: Clone superbuild repository
       uses: actions/checkout@v4
       with:
@@ -106,17 +113,9 @@ jobs:
         ref: ${{ inputs.branch }}
         ssh-key: ${{ env.SSH_KEY }}
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 'latest'
-
-    - name: Upgrade NPM
-      shell: bash
-      run: npm install -g npm@latest
-
-    - name: Check NPM Version
-      run: npm -v
+    - name: Free Disk Space (Ubuntu)
+      if: ${{ inputs.free-disk-space }}
+      uses: jlumbroso/free-disk-space@main
 
     - name: Check docker
       shell: bash
@@ -141,13 +140,19 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: 'Docker: Build Standalone Release'
+    - name: Setup common docker build options
+      shell: bash
       env:
         CONTAINER_NAME: ${{ inputs.container-repository }}
-        CONTAINER_TAG: ${{ matrix.os }}-standalone-${{ env.RELEASE_TAG }}
-      shell: bash
       run: |
-        echo "::group::Prepare docker"
+        echo "CONTAINER_NAME: $CONTAINER_NAME"
+        echo "CONTAINER_NAME=$CONTAINER_NAME" >> $GITHUB_ENV
+
+        if [ "${{ env.SSH_KEY }}" != '' ]; then
+          SSH_OPT="--ssh default"
+          echo "SSH_OPT=$SSH_OPT"
+          echo "SSH_OPT=$SSH_OPT" >> $GITHUB_ENV;
+        fi
         CMAKE_PRESET="${{ inputs.preset }}"
         if [ "${{ matrix.os }}" = "noble" ]; then
           echo "os is noble"
@@ -157,14 +162,16 @@ jobs:
         fi
         echo "CMAKE_PRESET: $CMAKE_PRESET"
         echo "CMAKE_PRESET=$CMAKE_PRESET" >> $GITHUB_ENV
+        echo "UBUNTU_VERSION=${{ matrix.os }}" >> $GITHUB_ENV
 
-        if [ "${{ env.SSH_KEY }}" != '' ]; then
-          SSH_OPT='--ssh default'
-          echo "SSH_OPT=$SSH_OPT"
-          echo "SSH_OPT='--ssh default'" >> $GITHUB_ENV;
-        fi
-        echo "CONTAINER_NAME: $CONTAINER_NAME"
-        echo "CONTAINER_NAME=$CONTAINER_NAME" >> $GITHUB_ENV
+    - name: 'Docker: Build Standalone Release'
+      if: ${{ inputs.build-standalone }}
+      env:
+        CONTAINER_TAG: ${{ matrix.os }}-standalone-${{ env.RELEASE_TAG }}
+      shell: bash
+      run: |
+        echo "::group::Prepare docker"
+
         CONTAINER_FULL_NAME=$CONTAINER_NAME:$CONTAINER_TAG
         echo "CONTAINER_FULL_NAME=$CONTAINER_FULL_NAME" >> $GITHUB_ENV
         echo "::endgroup::"
@@ -194,54 +201,45 @@ jobs:
         echo "::endgroup::"
 
     - name: 'Docker: Push Standalone Release (public repositories)'
-      if: ${{ inputs.push }}
+      if: ${{ inputs.build-standalone && inputs.push }}
       shell: bash
       run: |
         docker push $CONTAINER_FULL_NAME
 
     - name: Free Disk Space (Ubuntu)
-      if: ${{ inputs.free-disk-space }}
+      if: ${{ inputs.free-disk-space && inputs.build-devcontainer}}
       uses: jlumbroso/free-disk-space@main
 
+    - name: Setup Node.js
+      if: ${{ inputs.build-devcontainer }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+
+    - name: Upgrade NPM
+      if: ${{ inputs.build-devcontainer }}
+      shell: bash
+      run: |
+        npm install -g npm@latest
+        echo "Checking NPM vesion"
+        npm -v
+
     - name: Configure devcontainer env
+      if: ${{ inputs.build-devcontainer }}
       shell: bash
       run: |
         echo "DEVCONTAINER_NAME=${{ inputs.container-repository }}" >> $GITHUB_ENV
         echo "DEVCONTAINER_TAG=${{ matrix.os }}-devcontainer-${{ env.RELEASE_TAG }}" >> $GITHUB_ENV
         echo "DEVCONTAINER_FULL_NAME=$CONTAINER_NAME:${{ matrix.os }}-devcontainer-${{ env.RELEASE_TAG }}" >> $GITHUB_ENV
         echo "BUILD_VERSION=devcontainer" >> $GITHUB_ENV
-        echo "UBUNTU_VERSION=${{ matrix.os }}" >> $GITHUB_ENV
-
-    # - name: Build devcontainer image
-    #   shell: bash
-    #   run: |
-    #     echo "::group::Build devcontainer image $DEVCONTAINER_FULL_NAME"
-    #     devcontainer build --workspace-folder . \
-    #       --image-name $DEVCONTAINER_FULL_NAME \
-    #       $SSH_OPT \
-    #       --build-arg CMAKE_PRESET=$CMAKE_PRESET \
-    #       --build-arg BUILD_VERSION=standalone \
-    #       --build-arg UBUNTU_VERSION="${{ matrix.os }}" \
-    #       $BUILD_ARGS
-    #     echo "::endgroup::"
-    #
-    #     echo "::group::Check devcontainer's docker image size $DEVCONTAINER_FULL_NAME"
-    #     docker images
-    #     docker ps
-    #     docker inspect -f "{{ .Size }}" $DEVCONTAINER_FULL_NAME | numfmt --to=si
-    #     echo "::endgroup::"
-    #
-    #     echo "::group::Push devcontainer image $DEVCONTAINER_FULL_NAME"
-    #     if [ ${{ inputs.push }} ]; then
-    #       echo "Pushing the image to $DEVCONTAINER_FULL_NAME"
-    #       docker push $DEVCONTAINER_FULL_NAME
-    #     else
-    #       echo "Push skipped for $DEVCONTAINER_FULL_NAME"
-    #     fi
-    #     echo "::endgroup::"
-
+        if [ "${{ env.SSH_KEY }}" != '' ]; then
+          SSH_OPT="--ssh=default"
+          echo "SSH_OPT=$SSH_OPT"
+          echo "SSH_OPT=$SSH_OPT" >> $GITHUB_ENV;
+        fi
 
     - name: Build and push dev container image
+      if: ${{ inputs.build-devcontainer }}
       uses: devcontainers/ci@v0.3
       with:
         imageName: ${{ env.DEVCONTAINER_NAME}}
@@ -251,6 +249,7 @@ jobs:
         push: ${{ inputs.push && 'always' || 'never' }}
 
     - name: 'Docker: Check devcontainer size'
+      if: ${{ inputs.build-devcontainer }}
       shell: bash
       run: |
         docker images
