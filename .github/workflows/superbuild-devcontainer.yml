@@ -26,6 +26,12 @@ on:
         required: false
         default: relwithdebinfo
 
+      include-preset-in-name:
+        type: boolean
+        required: false
+        default: false
+        description: "Whether to include the preset name in the container name"
+
       custom-entrypoint-standalone:
         type: string
         required: false
@@ -180,12 +186,19 @@ jobs:
         echo "CMAKE_PRESET: $CMAKE_PRESET"
         echo "CMAKE_PRESET=$CMAKE_PRESET" >> $GITHUB_ENV
         echo "UBUNTU_VERSION=${{ matrix.os }}" >> $GITHUB_ENV
+        
+        # Create tag suffix with optional preset inclusion
+        TAG_SUFFIX="${{ env.RELEASE_TAG }}"
+        if [ "${{ inputs.include-preset-in-name }}" = "true" ]; then
+          TAG_SUFFIX="$CMAKE_PRESET-$TAG_SUFFIX"
+        fi
+        echo "TAG_SUFFIX=$TAG_SUFFIX" >> $GITHUB_ENV
 
     - name: 'Docker: Build Standalone Images (Release + Devel)'
       if: ${{ inputs.build-standalone-release || inputs.build-standalone-devel }}
       env:
-        CONTAINER_TAG_RELEASE: ${{ matrix.os }}-standalone-release-${{ env.RELEASE_TAG }}
-        CONTAINER_TAG_DEVEL: ${{ matrix.os }}-standalone-devel-${{ env.RELEASE_TAG }}
+        CONTAINER_TAG_RELEASE: ${{ matrix.os }}-standalone-release-${{ env.TAG_SUFFIX }}
+        CONTAINER_TAG_DEVEL: ${{ matrix.os }}-standalone-devel-${{ env.TAG_SUFFIX }}
       shell: bash
       run: |
         echo "::group::Prepare docker"
@@ -237,6 +250,7 @@ jobs:
         fi
         echo "::endgroup::"
 
+
     - name: 'Docker: Push Standalone Images'
       if: ${{ (inputs.build-standalone-release || inputs.build-standalone-devel) && inputs.push }}
       shell: bash
@@ -274,8 +288,8 @@ jobs:
       shell: bash
       run: |
         echo "DEVCONTAINER_NAME=${{ inputs.container-repository }}" >> $GITHUB_ENV
-        echo "DEVCONTAINER_TAG=${{ matrix.os }}-devcontainer-${{ env.RELEASE_TAG }}" >> $GITHUB_ENV
-        echo "DEVCONTAINER_FULL_NAME=$CONTAINER_NAME:${{ matrix.os }}-devcontainer-${{ env.RELEASE_TAG }}" >> $GITHUB_ENV
+        echo "DEVCONTAINER_TAG=${{ matrix.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
+        echo "DEVCONTAINER_FULL_NAME=$CONTAINER_NAME:${{ matrix.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
 
     - name: 'Docker: Build Devcontainer Image'
       if: ${{ inputs.build-devcontainer }}
