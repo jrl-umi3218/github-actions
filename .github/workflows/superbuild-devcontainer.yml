@@ -21,6 +21,13 @@ on:
         type: string
         default: ubuntu-24.04
         description: "Runner to use for the job."
+
+      os:
+        type: string
+        required: false
+        default: jammy
+        description: "Ubuntu version to use for the job. Supported values: jammy, noble"
+
       preset:
         type: string
         required: false
@@ -98,11 +105,6 @@ jobs:
       contents: read
       packages: write
     runs-on: ${{ inputs.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        # os: [jammy, noble]
-        os: [jammy]
     env:
       SSH_KEY: ${{ secrets.SSH_KEY }}
 
@@ -177,16 +179,10 @@ jobs:
           echo "SSH_OPT=$SSH_OPT" >> $GITHUB_ENV;
         fi
         CMAKE_PRESET="${{ inputs.preset }}"
-        if [ "${{ matrix.os }}" = "noble" ]; then
-          echo "os is noble"
-          CMAKE_PRESET=relwithdebinfo-noble
-        else
-          echo "os is not noble"
-        fi
         echo "CMAKE_PRESET: $CMAKE_PRESET"
         echo "CMAKE_PRESET=$CMAKE_PRESET" >> $GITHUB_ENV
-        echo "UBUNTU_VERSION=${{ matrix.os }}" >> $GITHUB_ENV
-        
+        echo "UBUNTU_VERSION=${{ inputs.os }}" >> $GITHUB_ENV
+
         # Create tag suffix with optional preset inclusion
         TAG_SUFFIX="${{ env.RELEASE_TAG }}"
         if [ "${{ inputs.include-preset-in-name }}" = "true" ]; then
@@ -197,8 +193,8 @@ jobs:
     - name: 'Docker: Build Standalone Images (Release + Devel)'
       if: ${{ inputs.build-standalone-release || inputs.build-standalone-devel }}
       env:
-        CONTAINER_TAG_RELEASE: ${{ matrix.os }}-standalone-release-${{ env.TAG_SUFFIX }}
-        CONTAINER_TAG_DEVEL: ${{ matrix.os }}-standalone-devel-${{ env.TAG_SUFFIX }}
+        CONTAINER_TAG_RELEASE: ${{ inputs.os }}-standalone-release-${{ env.TAG_SUFFIX }}
+        CONTAINER_TAG_DEVEL: ${{ inputs.os }}-standalone-devel-${{ env.TAG_SUFFIX }}
       shell: bash
       run: |
         echo "::group::Prepare docker"
@@ -227,7 +223,7 @@ jobs:
             --target standalone-release \
             --build-arg CMAKE_PRESET=$CMAKE_PRESET \
             --build-arg BUILD_VERSION=standalone \
-            --build-arg UBUNTU_VERSION="${{ matrix.os }}" \
+            --build-arg UBUNTU_VERSION="${{ inputs.os }}" \
             $BUILD_ARGS
 
           echo "Standalone Release image size:"
@@ -242,7 +238,7 @@ jobs:
             --target standalone-devel \
             --build-arg CMAKE_PRESET=$CMAKE_PRESET \
             --build-arg BUILD_VERSION=standalone \
-            --build-arg UBUNTU_VERSION="${{ matrix.os }}" \
+            --build-arg UBUNTU_VERSION="${{ inputs.os }}" \
             $BUILD_ARGS
 
           echo "Standalone Devel image size:"
@@ -288,8 +284,8 @@ jobs:
       shell: bash
       run: |
         echo "DEVCONTAINER_NAME=${{ inputs.container-repository }}" >> $GITHUB_ENV
-        echo "DEVCONTAINER_TAG=${{ matrix.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
-        echo "DEVCONTAINER_FULL_NAME=$CONTAINER_NAME:${{ matrix.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
+        echo "DEVCONTAINER_TAG=${{ inputs.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
+        echo "DEVCONTAINER_FULL_NAME=$CONTAINER_NAME:${{ inputs.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
 
     - name: 'Docker: Build Devcontainer Image'
       if: ${{ inputs.build-devcontainer }}
@@ -301,7 +297,7 @@ jobs:
           --target devcontainer \
           --build-arg CMAKE_PRESET=$CMAKE_PRESET \
           --build-arg BUILD_VERSION=devcontainer \
-          --build-arg UBUNTU_VERSION="${{ matrix.os }}"
+          --build-arg UBUNTU_VERSION="${{ inputs.os }}"
 
         echo "Devcontainer image size:"
         docker inspect -f "{{ .Size }}" $DEVCONTAINER_FULL_NAME | numfmt --to=si
