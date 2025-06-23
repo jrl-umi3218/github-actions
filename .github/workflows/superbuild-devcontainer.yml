@@ -265,6 +265,16 @@ jobs:
       if: ${{ inputs.free-disk-space && inputs.build-devcontainer}}
       uses: jlumbroso/free-disk-space@main
 
+    - name: Clean Docker before devcontainer build
+      if: ${{ inputs.free-disk-space && inputs.build-devcontainer }}
+      shell: bash
+      run: |
+        echo "Pruning unused Docker resources..."
+        docker system prune -af || true
+        docker builder prune -af || true
+        docker image prune -af || true
+        docker volume prune -f || true
+
     - name: Setup Node.js
       if: ${{ inputs.build-devcontainer }}
       uses: actions/setup-node@v4
