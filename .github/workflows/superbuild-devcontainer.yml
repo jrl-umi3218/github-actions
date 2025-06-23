@@ -33,6 +33,18 @@ on:
         required: false
         default: relwithdebinfo
 
+      release-tag:
+        type: string
+        required: false
+        default: ''
+        description: "Release tag to use for the job. If not specified, 'latest' will be used."
+
+      tag-name-prefix:
+        type: string
+        required: false
+        default: ''
+        description: "Prefix for the container tag. This can be used to distiguish different containers published to the same container registry. For example you could build several demos with different presets and use this prefix to distinguish them. The tag will be of the form: <tag-name-prefix>-<preset>-<os>-<release-tag>"
+
       include-preset-in-name:
         type: boolean
         required: false
@@ -150,9 +162,9 @@ jobs:
     - name: Check release
       shell: bash
       run: |
-        if [ -n "${{ github.event.client_payload.tag }}" ]; then
-          echo "This is a release, using version tag ${{ github.event.client_payload.tag }}"
-          echo "RELEASE_TAG=${{ github.event.client_payload.tag }}" >> $GITHUB_ENV
+        if [ -n "${{ inputs.release-tag }}" ]; then
+          echo "This is a release, using version tag ${{ inputs.release-tag }}"
+          echo "RELEASE_TAG=${{ inputs.release-tag }}" >> $GITHUB_ENV
         else
           echo "This is not a release, using latest tag"
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
@@ -189,12 +201,13 @@ jobs:
           TAG_SUFFIX="$CMAKE_PRESET-$TAG_SUFFIX"
         fi
         echo "TAG_SUFFIX=$TAG_SUFFIX" >> $GITHUB_ENV
+        echo "TAG_NAME_PREFIX=${{ inputs.tag-name-prefix }}${{ inputs.tag-name-prefix && '-' || '' }}" >> $GITHUB_ENV
 
     - name: 'Docker: Build Standalone Images (Release + Devel)'
       if: ${{ inputs.build-standalone-release || inputs.build-standalone-devel }}
       env:
-        CONTAINER_TAG_RELEASE: ${{ inputs.os }}-standalone-release-${{ env.TAG_SUFFIX }}
-        CONTAINER_TAG_DEVEL: ${{ inputs.os }}-standalone-devel-${{ env.TAG_SUFFIX }}
+        CONTAINER_TAG_RELEASE: ${{ env.TAG_NAME_PREFIX }}${{ inputs.os }}-standalone-release-${{ env.TAG_SUFFIX }}
+        CONTAINER_TAG_DEVEL: ${{ env.TAG_NAME_PREFIX }}${{ inputs.os }}-standalone-devel-${{ env.TAG_SUFFIX }}
       shell: bash
       run: |
         echo "::group::Prepare docker"
@@ -294,7 +307,7 @@ jobs:
       shell: bash
       run: |
         echo "DEVCONTAINER_NAME=${{ inputs.container-repository }}" >> $GITHUB_ENV
-        echo "DEVCONTAINER_TAG=${{ inputs.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
+        echo "DEVCONTAINER_TAG=${{ env.TAG_NAME_PREFIX }}${{ inputs.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
         echo "DEVCONTAINER_FULL_NAME=$CONTAINER_NAME:${{ inputs.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
 
     - name: 'Docker: Build Devcontainer Image'
