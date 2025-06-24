@@ -221,7 +221,12 @@ jobs:
         echo "::group::Configuring build-args"
         BUILD_ARGS=""
         if [ ${{ inputs.custom-entrypoint-standalone }} != '' ]; then
-          BUILD_ARGS="--build-arg CUSTOM_ENTRYPOINT=${{ inputs.custom-entrypoint-standalone }}"
+          # CUSTOM_ENTRYPOINT="${{ github.workspace }}/${{ inputs.custom-entrypoint-standalone }}"
+          CUSTOM_ENTRYPOINT="${{ inputs.custom-entrypoint-standalone }}"
+          echo "CUSTOM_ENTRYPOINT: $CUSTOM_ENTRYPOINT"
+          cat $CUSTOM_ENTRYPOINT
+          pwd
+          BUILD_ARGS="--build-arg CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT"
         fi
         for arg in ${{ inputs.build-args }}; do
           BUILD_ARGS="$BUILD_ARGS --build-arg $arg"
