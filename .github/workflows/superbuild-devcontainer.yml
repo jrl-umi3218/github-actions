@@ -78,6 +78,11 @@ on:
         required: false
         default: true
 
+      image-source-repo:
+        type: string
+        required: false
+        description: "The repository to which this image is linked. Only affect the image labels."
+
       repository:
         type: string
         description: "path to the superbuild repository to clone and package"
@@ -208,6 +213,7 @@ jobs:
       env:
         CONTAINER_TAG_RELEASE: ${{ env.TAG_NAME_PREFIX }}${{ inputs.os }}-standalone-release-${{ env.TAG_SUFFIX }}
         CONTAINER_TAG_DEVEL: ${{ env.TAG_NAME_PREFIX }}${{ inputs.os }}-standalone-devel-${{ env.TAG_SUFFIX }}
+        IMAGE_SOURCE_REPO: ${{ inputs.image-source-repo && inputs.image-source-repo || github.repository  }}
       shell: bash
       run: |
         echo "::group::Prepare docker"
@@ -219,7 +225,9 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Configuring build-args"
-        BUILD_ARGS=""
+
+        echo "IMAGE_SOURCE_REPO=$IMAGE_SOURCE_REPO" >> $GITHUB_ENV
+        BUILD_ARGS="--build-arg IMAGE_SOURCE_REPO=$IMAGE_SOURCE_REPO"
         if [ ${{ inputs.custom-entrypoint-standalone }} != '' ]; then
           # CUSTOM_ENTRYPOINT="${{ github.workspace }}/${{ inputs.custom-entrypoint-standalone }}"
           CUSTOM_ENTRYPOINT="${{ inputs.custom-entrypoint-standalone }}"
@@ -325,7 +333,8 @@ jobs:
           --target devcontainer \
           --build-arg CMAKE_PRESET=$CMAKE_PRESET \
           --build-arg BUILD_VERSION=devcontainer \
-          --build-arg UBUNTU_VERSION="${{ inputs.os }}"
+          --build-arg UBUNTU_VERSION="${{ inputs.os }}" \
+          --build-arg IMAGE_SOURCE_REPO=$IMAGE_SOURCE_REPO
 
         echo "Devcontainer image size:"
         docker inspect -f "{{ .Size }}" $DEVCONTAINER_FULL_NAME | numfmt --to=si
