@@ -191,7 +191,7 @@ jobs:
         echo "CONTAINER_NAME=$CONTAINER_NAME" >> $GITHUB_ENV
 
         if [ "${{ env.SSH_KEY }}" != '' ]; then
-          SSH_OPT="--ssh default"
+          SSH_OPT="--ssh default=$SSH_AUTH_SOCK"
           echo "SSH_OPT=$SSH_OPT"
           echo "SSH_OPT=$SSH_OPT" >> $GITHUB_ENV;
         fi
@@ -244,6 +244,7 @@ jobs:
 
         echo "::group::Build Standalone Release Image"
         if [ "${{ inputs.build-standalone-release }}" = "true" ]; then
+          set -x          # activate debugging from here
           docker build . -f .github/devcontainer/Dockerfile $SSH_OPT \
             --tag $CONTAINER_FULL_NAME_RELEASE \
             --target standalone-release \
@@ -251,6 +252,7 @@ jobs:
             --build-arg BUILD_VERSION=standalone \
             --build-arg UBUNTU_VERSION="${{ inputs.os }}" \
             $BUILD_ARGS
+          set +x
 
           echo "Standalone Release image size:"
           docker inspect -f "{{ .Size }}" $CONTAINER_FULL_NAME_RELEASE | numfmt --to=si
