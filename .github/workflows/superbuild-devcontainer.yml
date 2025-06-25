@@ -228,7 +228,7 @@ jobs:
 
         echo "IMAGE_SOURCE_REPO=$IMAGE_SOURCE_REPO" >> $GITHUB_ENV
         BUILD_ARGS="--build-arg IMAGE_SOURCE_REPO=$IMAGE_SOURCE_REPO"
-        if [ ${{ inputs.custom-entrypoint-standalone }} != '' ]; then
+        if [ "${{ inputs.custom-entrypoint-standalone }}" != '' ]; then
           # CUSTOM_ENTRYPOINT="${{ github.workspace }}/${{ inputs.custom-entrypoint-standalone }}"
           CUSTOM_ENTRYPOINT="${{ inputs.custom-entrypoint-standalone }}"
           echo "CUSTOM_ENTRYPOINT: $CUSTOM_ENTRYPOINT"
