@@ -1,0 +1,371 @@
+# This reusable workflow builds and publishes Docker images for mc-rtc-superbuild in three variants:
+#
+# 1. standalone-release: Minimal production image (~2-4GB) with install files + catkin workspaces
+#    - Use case: Running controllers/simulators in production environments
+#
+# 2. standalone-devel: Full development image (~10-20GB) with sources + build + install + ccache
+#    - Use case: Complete reproducible development environment with all build artifacts
+#
+# 3. devcontainer: VS Code devcontainer image (~1-2GB) with system packages + ccache
+#    - Use case: Development with mounted source code and fast incremental builds
+#
+# The workflow optimizes build times by sharing the expensive build stage between standalone variants.
+
+name: mc-rtc-superbuild packaging with Docker/Devcontainer
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        required: false
+        type: string
+        default: ubuntu-24.04
+        description: "Runner to use for the job."
+
+      os:
+        type: string
+        required: false
+        default: jammy
+        description: "Ubuntu version to use for the job. Supported values: jammy, noble"
+
+      preset:
+        type: string
+        required: false
+        default: relwithdebinfo
+
+      release-tag:
+        type: string
+        required: false
+        default: ''
+        description: "Release tag to use for the job. If not specified, 'latest' will be used."
+
+      tag-name-prefix:
+        type: string
+        required: false
+        default: ''
+        description: "Prefix for the container tag. This can be used to distiguish different containers published to the same container registry. For example you could build several demos with different presets and use this prefix to distinguish them. The tag will be of the form: <tag-name-prefix>-<preset>-<os>-<release-tag>"
+
+      include-preset-in-name:
+        type: boolean
+        required: false
+        default: false
+        description: "Whether to include the preset name in the container name"
+
+      custom-entrypoint-standalone:
+        type: string
+        required: false
+        default: ''
+        description: 'Path to a custom entrypoint script to include in the standalone image'
+
+      build-args:
+        type: string
+        required: false
+        default: ''
+        description: 'Space-separated list of build-arg for docker. Ex "BUILD_VERSION=standalone KEEP_INSTALL=false"'
+
+      build-standalone-release:
+        type: boolean
+        required: false
+        default: true
+
+      build-standalone-devel:
+        type: boolean
+        required: false
+        default: true
+
+      build-devcontainer:
+        type: boolean
+        required: false
+        default: true
+
+      image-source-repo:
+        type: string
+        required: false
+        description: "The repository to which this image is linked. Only affect the image labels."
+
+      repository:
+        type: string
+        description: "path to the superbuild repository to clone and package"
+        required: false
+        default: ''
+
+      branch:
+        type: string
+        description: "superbuild branch to use"
+        default: ''
+        required: false
+
+      free-disk-space:
+        type: boolean
+        required: false
+        default: false
+
+      container-repository:
+        type: string
+        required: true
+        description: "Full path the the github container registry package path: ghcr.io/mc-rtc/mc-rtc-superbuild"
+
+      push:
+        type: boolean
+        required: false
+        default: true
+        description: "Whether to push to the container-repository"
+
+    secrets:
+      SSH_KEY:
+        description: "Private ssh key with access to clone the private repositories specified in the superbuild"
+        required: false
+
+jobs:
+  reusable_workflow_job:
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ${{ inputs.runner }}
+    env:
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+
+    steps:
+    - name: Dump github context
+      env:
+       GITHUB_CONTEXT: ${{ toJson(github) }}
+      shell: bash
+      run: |
+        echo "$GITHUB_CONTEXT"
+
+    # Configures ssh-agent if SSH_KEY secret exists
+    - name: Configure ssh-agent
+      if: ${{ env.SSH_KEY != '' }}
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_KEY }}
+
+    - name: Check ssh-agent
+      if: ${{ env.SSH_KEY != '' }}
+      shell: bash
+      run: |
+          echo "SSH_AUTH_SOCK = ${{ env.SSH_AUTH_SOCK }}"
+          ssh-add -l
+
+    - name: Clone superbuild repository
+      if: ${{ env.SSH_KEY != '' }}
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        repository: ${{ inputs.repository }}
+        ref: ${{ inputs.branch }}
+        ssh-key: ${{ env.SSH_KEY }}
+
+    # XXX why do we need to split between ssh/non ssh version?
+    - name: Clone superbuild repository
+      if: ${{ env.SSH_KEY == '' }}
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        repository: ${{ inputs.repository }}
+        ref: ${{ inputs.branch }}
+
+    # - name: Test private clone
+    #   shell: bash
+    #   run: |
+    #       git clone git@github.com:isri-aist/mc-hrp4
+
+    - name: Free Disk Space (Ubuntu)
+      if: ${{ inputs.free-disk-space }}
+      uses: jlumbroso/free-disk-space@main
+
+    - name: Check docker
+      shell: bash
+      run: |
+          docker ps
+
+    - name: Check release
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.release-tag }}" ]; then
+          echo "This is a release, using version tag ${{ inputs.release-tag }}"
+          echo "RELEASE_TAG=${{ inputs.release-tag }}" >> $GITHUB_ENV
+        else
+          echo "This is not a release, using latest tag"
+          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+        fi
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup common docker build options
+      shell: bash
+      env:
+        CONTAINER_NAME: ${{ inputs.container-repository }}
+      run: |
+        echo "CONTAINER_NAME: $CONTAINER_NAME"
+        echo "CONTAINER_NAME=$CONTAINER_NAME" >> $GITHUB_ENV
+
+        if [ "${{ env.SSH_KEY }}" != '' ]; then
+          SSH_OPT="--ssh default"
+          echo "SSH_OPT=$SSH_OPT"
+          echo "SSH_OPT=$SSH_OPT" >> $GITHUB_ENV;
+        fi
+        CMAKE_PRESET="${{ inputs.preset }}"
+        echo "CMAKE_PRESET: $CMAKE_PRESET"
+        echo "CMAKE_PRESET=$CMAKE_PRESET" >> $GITHUB_ENV
+        echo "UBUNTU_VERSION=${{ inputs.os }}" >> $GITHUB_ENV
+
+        # Create tag suffix with optional preset inclusion
+        TAG_SUFFIX="${{ env.RELEASE_TAG }}"
+        if [ "${{ inputs.include-preset-in-name }}" = "true" ]; then
+          TAG_SUFFIX="$CMAKE_PRESET-$TAG_SUFFIX"
+        fi
+        echo "TAG_SUFFIX=$TAG_SUFFIX" >> $GITHUB_ENV
+        echo "TAG_NAME_PREFIX=${{ inputs.tag-name-prefix }}${{ inputs.tag-name-prefix && '-' || '' }}" >> $GITHUB_ENV
+
+    - name: 'Docker: Build Standalone Images (Release + Devel)'
+      if: ${{ inputs.build-standalone-release || inputs.build-standalone-devel }}
+      env:
+        CONTAINER_TAG_RELEASE: ${{ env.TAG_NAME_PREFIX }}${{ inputs.os }}-standalone-release-${{ env.TAG_SUFFIX }}
+        CONTAINER_TAG_DEVEL: ${{ env.TAG_NAME_PREFIX }}${{ inputs.os }}-standalone-devel-${{ env.TAG_SUFFIX }}
+        IMAGE_SOURCE_REPO: ${{ inputs.image-source-repo && inputs.image-source-repo || github.repository  }}
+      shell: bash
+      run: |
+        echo "::group::Prepare docker"
+
+        CONTAINER_FULL_NAME_RELEASE=$CONTAINER_NAME:$CONTAINER_TAG_RELEASE
+        CONTAINER_FULL_NAME_DEVEL=$CONTAINER_NAME:$CONTAINER_TAG_DEVEL
+        echo "CONTAINER_FULL_NAME_RELEASE=$CONTAINER_FULL_NAME_RELEASE" >> $GITHUB_ENV
+        echo "CONTAINER_FULL_NAME_DEVEL=$CONTAINER_FULL_NAME_DEVEL" >> $GITHUB_ENV
+        echo "::endgroup::"
+
+        echo "::group::Configuring build-args"
+
+        echo "IMAGE_SOURCE_REPO=$IMAGE_SOURCE_REPO" >> $GITHUB_ENV
+        BUILD_ARGS="--build-arg IMAGE_SOURCE_REPO=$IMAGE_SOURCE_REPO"
+        if [ "${{ inputs.custom-entrypoint-standalone }}" != '' ]; then
+          # CUSTOM_ENTRYPOINT="${{ github.workspace }}/${{ inputs.custom-entrypoint-standalone }}"
+          CUSTOM_ENTRYPOINT="${{ inputs.custom-entrypoint-standalone }}"
+          echo "CUSTOM_ENTRYPOINT: $CUSTOM_ENTRYPOINT"
+          cat $CUSTOM_ENTRYPOINT
+          pwd
+          BUILD_ARGS="--build-arg CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT"
+        fi
+        for arg in ${{ inputs.build-args }}; do
+          BUILD_ARGS="$BUILD_ARGS --build-arg $arg"
+        done
+        echo "Extra build args: $BUILD_ARGS"
+        echo "::endgroup::"
+
+        echo "::group::Build Standalone Release Image"
+        if [ "${{ inputs.build-standalone-release }}" = "true" ]; then
+          set -x          # activate debugging from here
+          docker build . -f .github/devcontainer/Dockerfile $SSH_OPT \
+            --tag $CONTAINER_FULL_NAME_RELEASE \
+            --target standalone-release \
+            --build-arg CMAKE_PRESET=$CMAKE_PRESET \
+            --build-arg BUILD_VERSION=standalone \
+            --build-arg UBUNTU_VERSION="${{ inputs.os }}" \
+            $BUILD_ARGS
+          set +x
+
+          echo "Standalone Release image size:"
+          docker inspect -f "{{ .Size }}" $CONTAINER_FULL_NAME_RELEASE | numfmt --to=si
+        fi
+        echo "::endgroup::"
+
+        echo "::group::Build Standalone Devel Image"
+        if [ "${{ inputs.build-standalone-devel }}" = "true" ]; then
+          docker build . -f .github/devcontainer/Dockerfile $SSH_OPT \
+            --tag $CONTAINER_FULL_NAME_DEVEL \
+            --target standalone-devel \
+            --build-arg CMAKE_PRESET=$CMAKE_PRESET \
+            --build-arg BUILD_VERSION=standalone \
+            --build-arg UBUNTU_VERSION="${{ inputs.os }}" \
+            $BUILD_ARGS
+
+          echo "Standalone Devel image size:"
+          docker inspect -f "{{ .Size }}" $CONTAINER_FULL_NAME_DEVEL | numfmt --to=si
+        fi
+        echo "::endgroup::"
+
+
+    - name: 'Docker: Push Standalone Images'
+      if: ${{ (inputs.build-standalone-release || inputs.build-standalone-devel) && inputs.push }}
+      shell: bash
+      run: |
+        if [ "${{ inputs.build-standalone-release }}" = "true" ]; then
+          echo "Pushing standalone-release image..."
+          docker push $CONTAINER_FULL_NAME_RELEASE
+        fi
+
+        if [ "${{ inputs.build-standalone-devel }}" = "true" ]; then
+          echo "Pushing standalone-devel image..."
+          docker push $CONTAINER_FULL_NAME_DEVEL
+        fi
+
+    - name: Free Disk Space (Ubuntu)
+      if: ${{ inputs.free-disk-space && inputs.build-devcontainer}}
+      uses: jlumbroso/free-disk-space@main
+
+    - name: Clean Docker before devcontainer build
+      if: ${{ inputs.free-disk-space && inputs.build-devcontainer }}
+      shell: bash
+      run: |
+        echo "Pruning unused Docker resources..."
+        docker system prune -af || true
+        docker builder prune -af || true
+        docker image prune -af || true
+        docker volume prune -f || true
+
+    - name: Setup Node.js
+      if: ${{ inputs.build-devcontainer }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+
+    - name: Upgrade NPM
+      if: ${{ inputs.build-devcontainer }}
+      shell: bash
+      run: |
+        npm install -g npm@latest
+        echo "Checking NPM vesion"
+        npm -v
+
+    - name: Configure devcontainer env
+      if: ${{ inputs.build-devcontainer }}
+      shell: bash
+      run: |
+        echo "DEVCONTAINER_NAME=${{ inputs.container-repository }}" >> $GITHUB_ENV
+        echo "DEVCONTAINER_TAG=${{ env.TAG_NAME_PREFIX }}${{ inputs.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
+        echo "DEVCONTAINER_FULL_NAME=$CONTAINER_NAME:${{ inputs.os }}-devcontainer-${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
+
+    - name: 'Docker: Build Devcontainer Image'
+      if: ${{ inputs.build-devcontainer }}
+      shell: bash
+      run: |
+        echo "::group::Build Devcontainer Image"
+        docker build . -f .github/devcontainer/Dockerfile $SSH_OPT \
+          --tag $DEVCONTAINER_FULL_NAME \
+          --target devcontainer \
+          --build-arg CMAKE_PRESET=$CMAKE_PRESET \
+          --build-arg BUILD_VERSION=devcontainer \
+          --build-arg UBUNTU_VERSION="${{ inputs.os }}" \
+          --build-arg IMAGE_SOURCE_REPO=$IMAGE_SOURCE_REPO
+
+        echo "Devcontainer image size:"
+        docker inspect -f "{{ .Size }}" $DEVCONTAINER_FULL_NAME | numfmt --to=si
+        echo "::endgroup::"
+
+    - name: 'Docker: Push Devcontainer Image'
+      if: ${{ inputs.build-devcontainer && inputs.push }}
+      shell: bash
+      run: |
+        echo "Pushing devcontainer image..."
+        docker push $DEVCONTAINER_FULL_NAME
+
+    - name: 'Docker: Check all image sizes'
+      shell: bash
+      run: |
+        echo "All built images:"
+        docker images
