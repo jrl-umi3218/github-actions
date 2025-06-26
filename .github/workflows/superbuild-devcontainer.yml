@@ -148,12 +148,27 @@ jobs:
           ssh-add -l
 
     - name: Clone superbuild repository
+      if: ${{ env.SSH_KEY != '' }}
       uses: actions/checkout@v4
       with:
         submodules: recursive
         repository: ${{ inputs.repository }}
         ref: ${{ inputs.branch }}
         ssh-key: ${{ env.SSH_KEY }}
+
+    # XXX why do we need to split between ssh/non ssh version?
+    - name: Clone superbuild repository
+      if: ${{ env.SSH_KEY == '' }}
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        repository: ${{ inputs.repository }}
+        ref: ${{ inputs.branch }}
+
+    # - name: Test private clone
+    #   shell: bash
+    #   run: |
+    #       git clone git@github.com:isri-aist/mc-hrp4
 
     - name: Free Disk Space (Ubuntu)
       if: ${{ inputs.free-disk-space }}
@@ -191,7 +206,7 @@ jobs:
         echo "CONTAINER_NAME=$CONTAINER_NAME" >> $GITHUB_ENV
 
         if [ "${{ env.SSH_KEY }}" != '' ]; then
-          SSH_OPT="--ssh default=$SSH_AUTH_SOCK"
+          SSH_OPT="--ssh default"
           echo "SSH_OPT=$SSH_OPT"
           echo "SSH_OPT=$SSH_OPT" >> $GITHUB_ENV;
         fi
