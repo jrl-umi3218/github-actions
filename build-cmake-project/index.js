@@ -68,16 +68,15 @@ async function run()
       options = options + ' ' + core.getInput('windows-options');
       sudo = false;
     }
-    else if(process.platform === 'darwin')
-    {
-      LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH ? process.env.LD_LIBRARY_PATH : '';
-      if(LD_LIBRARY_PATH.indexOf('/usr/local/lib') == -1)
-      {
-        LD_LIBRARY_PATH = '/usr/local/lib:' + LD_LIBRARY_PATH;
-        core.exportVariable('LD_LIBRARY_PATH', LD_LIBRARY_PATH);
+    else if (process.platform === 'darwin') {
+      DYLD_LIBRARY_PATH = process.env.DYLD_LIBRARY_PATH || '';
+      if (!DYLD_LIBRARY_PATH.includes('/usr/local/lib')) {
+        DYLD_LIBRARY_PATH = '/usr/local/lib:' + DYLD_LIBRARY_PATH;
+        core.exportVariable('DYLD_LIBRARY_PATH', DYLD_LIBRARY_PATH);
       }
-      options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON -DCMAKE_MACOSX_RPATH:BOOL=ON' + options;
-      options = options + ' ' + core.getInput('macos-options');
+
+      options = '-DPYTHON_BINDING_FORCE_PYTHON3:BOOL=ON -DCMAKE_MACOSX_RPATH:BOOL=ON ' + options;
+      options += ' ' + core.getInput('macos-options');
       core.exportVariable('ARCHFLAGS', '-arch x86_64');
     }
     else
