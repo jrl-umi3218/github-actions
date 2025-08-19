@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/pbuilder-images.yml'
       - 'docker/**'
+  workflow_dispatch:
 
 jobs:
   build:
