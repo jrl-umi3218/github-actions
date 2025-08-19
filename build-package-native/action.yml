@@ -22,6 +22,10 @@ inputs:
     description: 'Extra signing keys to accept'
     required: true
     default: ''
+  with-openrtm2:
+    description: 'If true, build openrtm2 packages as well'
+    required: false
+    default: false
   latest-cmake:
     description: 'If true add CMake mirror in the builder'
     required: true
