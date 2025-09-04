@@ -89,6 +89,12 @@ on:
         required: false
         default: ''
 
+      mc-rtc-config-path:
+        type: string
+        description: "Path to a custom mc_rtc.yaml config file. This file should be within the install path of mc-rtc-superbuild"
+        required: false
+        default: ''
+
       branch:
         type: string
         description: "superbuild branch to use"
@@ -215,6 +221,7 @@ jobs:
         echo "CMAKE_PRESET=$CMAKE_PRESET" >> $GITHUB_ENV
         echo "UBUNTU_VERSION=${{ inputs.os }}" >> $GITHUB_ENV
 
+
         # Create tag suffix with optional preset inclusion
         TAG_SUFFIX="${{ env.RELEASE_TAG }}"
         if [ "${{ inputs.include-preset-in-name }}" = "true" ]; then
@@ -251,6 +258,13 @@ jobs:
           pwd
           BUILD_ARGS="--build-arg CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT"
         fi
+
+        if [ "${{ inputs.mc-rtc-config-path }}" != '' ]; then
+          MC_RTC_CONTROLLER_CONFIG="${{ inputs.mc-rtc-config-path }}"
+          echo "MC_RTC_CONTROLLER_CONFIG path: $MC_RTC_CONTROLLER_CONFIG"
+          BUILD_ARGS="$BUILD_ARGS --build-arg MC_RTC_CONTROLLER_CONFIG=$MC_RTC_CONTROLLER_CONFIG"
+        fi
+
         for arg in ${{ inputs.build-args }}; do
           BUILD_ARGS="$BUILD_ARGS --build-arg $arg"
         done
