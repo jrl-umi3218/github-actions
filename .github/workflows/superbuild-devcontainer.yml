@@ -260,7 +260,9 @@ jobs:
         fi
 
         if [ "${{ inputs.mc-rtc-config-path }}" != '' ]; then
-          BUILD_ARGS="$BUILD_ARGS --build-arg MC_RTC_CONTROLLER_CONFIG=${{ inputs.mc-rtc-config-path }}"
+          MC_RTC_YAML="${{ inputs.mc-rtc-config-path }}"
+          BUILD_ARGS="$BUILD_ARGS --build-arg MC_RTC_CONTROLLER_CONFIG=$MC_RTC_YAML"
+          echo "BUILD_ARGS: $BUILD_ARGS"
         fi
 
         for arg in ${{ inputs.build-args }}; do
