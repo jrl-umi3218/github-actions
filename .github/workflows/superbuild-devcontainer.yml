@@ -138,7 +138,14 @@ jobs:
       shell: bash
       run: |
         echo "$GITHUB_CONTEXT"
-
+    - name: Clean github workspace (self-hosted)
+      shell: bash
+      run: |
+        if [ -n "${GITHUB_WORKSPACE}" ]; then
+          echo "Deleting all files in $GITHUB_WORKSPACE"
+          # ls -lR ${GITHUB_WORKSPACE}
+          rm -rfv ${GITHUB_WORKSPACE}/*
+        fi
     # Configures ssh-agent if SSH_KEY secret exists
     - name: Configure ssh-agent
       if: ${{ env.SSH_KEY != '' }}
