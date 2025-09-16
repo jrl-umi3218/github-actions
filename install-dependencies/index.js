@@ -348,6 +348,16 @@ async function handle_ros(ros)
     }
     core.endGroup();
     core.startGroup('Initialize rosdep');
+
+    const rosdepList = '/etc/ros/rosdep/sources.list.d/20-default.list';
+    try {
+      if (fs.existsSync(rosdepList)) {
+        await exec.exec(`sudo rm ${rosdepList}`);
+      }
+    } catch (err) {
+      core.warning(`Failed to check or remove ${rosdepList}: ${err}`);
+    }
+
     await exec.exec('sudo rosdep init');
     await exec.exec('rosdep update --include-eol-distros');
     core.endGroup();
