@@ -374,86 +374,97 @@ async function handle_ros(ros)
   core.endGroup();
 }
 
-async function handle_ros_workspace(github, install, catkin_args, btype, skiplist, buildlist)
-{
-  if(!github)
-  {
-    return;
-  }
-  const cwd = process.cwd();
-  let workspace = await fsPromises.mkdtemp(`${os.tmpdir()}/catkin_ws_`);
-  let workspace_src = await fsPromises.mkdir(`${workspace}/src`, { recursive: true});
-  process.chdir(workspace);
-  core.startGroup('Initialize catkin workspace');
-  if(install)
-  {
-    let [is_ros2, ros_distro] = await get_ros_distro();
-    await bash(`catkin config --init --install --install-space /opt/ros/${ros_distro}`);
-  }
-  else
-  {
-    await bash('catkin init');
-  }
-  if(skiplist)
-  {
-    await bash(`catkin config --skiplist ${skiplist}`)
-  }
-  if(buildlist)
-  {
-    await bash(`catkin config --buildlist ${buildlist}`)
-  }
-  core.endGroup();
-  process.chdir(workspace_src);
-  for(const entry of github)
-  {
+// ROS workspace build
+async function create_workspace(prefix) {
+  const workspace = await fsPromises.mkdtemp(`${os.tmpdir()}/${prefix}_ws_`);
+  const src = `${workspace}/src`;
+  await fsPromises.mkdir(src, { recursive: true });
+  return { workspace, src };
+}
+
+async function clone_repos(github, src) {
+  process.chdir(src);
+  for (const entry of github) {
     let ref = entry.ref ? entry.ref : "master";
-    let url = '';
-    if(entry.path.startsWith('https://') || entry.path.startsWith('git@'))
-    {
-      url = entry.path;
-    }
-    else
-    {
-      url = `https://github.com/${entry.path}`;
-    }
-    while(url.length > 1 && url[url.length - 1] == '/')
-    {
-      url = url.substr(0, url.length - 1);
-    }
-    core.startGroup(`Clone ${entry.path} into catkin workspace`);
-    if(ref == "master" || ref == "main")
-    {
-      await exec.exec(`git clone --recursive --depth 1 ${url}`);
-    }
-    else
-    {
-      let path = url.split('/').pop();
-      await exec.exec(`git clone --recursive ${url} ${path}`);
-      process.chdir(path);
+    let url = entry.path.startsWith('https://') || entry.path.startsWith('git@')
+      ? entry.path
+      : `https://github.com/${entry.path}`;
+    let repoName = url.split('/').pop();
+    core.startGroup(`Clone ${entry.path} into workspace`);
+    await exec.exec(`git clone --recursive ${url} ${repoName}`);
+    if (ref !== "master" && ref !== "main") {
+      process.chdir(`${src}/${repoName}`);
       await exec.exec(`git checkout ${ref}`);
-      await exec.exec('git submodule sync')
-      await exec.exec('git submodule update')
-      process.chdir(workspace_src);
+      await exec.exec('git submodule sync');
+      await exec.exec('git submodule update');
+      process.chdir(src);
     }
     core.endGroup();
   }
+}
+
+async function handle_ros1_workspace(github, install, catkin_args, btype, skiplist, buildlist, ros_distro) {
+  const { workspace, src } = await create_workspace('catkin');
+  process.chdir(workspace);
+
+  core.startGroup('Initialize catkin workspace');
+  if (install) {
+    await bash(`catkin config --init --install --install-space /opt/ros/${ros_distro}`);
+  } else {
+    await bash('catkin init');
+  }
+  if (skiplist) {
+    await bash(`catkin config --skiplist ${skiplist}`);
+  }
+  if (buildlist) {
+    await bash(`catkin config --buildlist ${buildlist}`);
+  }
+  core.endGroup();
+
+  await clone_repos(github, src);
+
   process.chdir(workspace);
   core.startGroup('rosdep install');
   await bash('rosdep install --from-paths --reinstall --ignore-packages-from-source --default-yes --verbose .');
   core.endGroup();
+
   core.startGroup('catkin build');
-  let catkin_build_cmd = 'catkin build ' + catkin_args + ' --cmake-args -DCMAKE_BUILD_TYPE=' + btype
-  if(install)
-  {
+  let catkin_build_cmd = 'catkin build ' + catkin_args + ' --cmake-args -DCMAKE_BUILD_TYPE=' + btype;
+  if (install) {
     await bash('sudo ' + catkin_build_cmd);
-  }
-  else
-  {
+  } else {
     await bash(catkin_build_cmd);
     await use_ros_workspace(`${workspace}/devel/setup.bash`);
   }
   core.endGroup();
 }
+
+async function handle_ros2_workspace(github, btype, ros_distro) {
+  const { workspace, src } = await create_workspace('colcon');
+  await clone_repos(github, src);
+
+  process.chdir(workspace);
+  core.startGroup('rosdep install');
+  await exec.exec(`rosdep install --from-paths src --ignore-src --rosdistro ${ros_distro} -y`);
+  core.endGroup();
+
+  core.startGroup('colcon build');
+  await exec.exec(`colcon build --cmake-args -DCMAKE_BUILD_TYPE=${btype}`);
+  core.endGroup();
+
+  await use_ros_workspace(`${workspace}/install/setup.bash`);
+}
+
+async function handle_ros_workspace(github, install, catkin_args, btype, skiplist, buildlist) {
+  if (!github) return;
+  let [is_ros2, ros_distro] = await get_ros_distro();
+  if (is_ros2) {
+    await handle_ros2_workspace(github, btype, ros_distro);
+  } else {
+    await handle_ros1_workspace(github, install, catkin_args, btype, skiplist, buildlist, ros_distro);
+  }
+}
+// end of ROS workspace build
 
 async function handle_github(github, btype, options, sudo, linux = false)
 {
