@@ -26,7 +26,7 @@ on:
         type: string
         default: |
           {
-            "dist": ["bionic", "focal"],
+            "dist": ["focal", "jammy"],
             "arch": ["i386", "amd64"],
             "exclude":
             [
