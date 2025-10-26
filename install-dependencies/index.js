@@ -345,6 +345,7 @@ async function handle_ros(ros)
     else
     {
       await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-colcon-common-extensions python3-rosdep`);
+      await exec.exec('python -m pip install wstool');
     }
     core.endGroup();
     core.startGroup('Initialize rosdep');
