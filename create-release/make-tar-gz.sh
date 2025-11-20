@@ -2,10 +2,10 @@
 
 set -x
 
-REPO_DIR=$1
+REPO_DIR=$(realpath "$1")
 PROJECT_NAME=$2
 TAG=$3
-OUT=`pwd`/$PROJECT_NAME.tar
+OUT=$(pwd)/$PROJECT_NAME.tar
 
 cd $REPO_DIR
 PREFIX=$PROJECT_NAME-$TAG

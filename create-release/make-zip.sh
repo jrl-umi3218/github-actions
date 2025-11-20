@@ -2,15 +2,14 @@
 
 set -x
 
-if [ ! -x "$(command -v zipmerge)" ]
-then
+if [ ! -x "$(command -v zipmerge)" ]; then
   sudo apt-get -qq update && sudo apt-get -qq install zipmerge
 fi
 
-REPO_DIR=$1
+REPO_DIR=$(realpath "$1")
 PROJECT_NAME=$2
 TAG=$3
-OUT=`pwd`/$PROJECT_NAME.zip
+OUT=$(pwd)/$PROJECT_NAME.zip
 
 cd $REPO_DIR
 PREFIX=$PROJECT_NAME-$TAG
