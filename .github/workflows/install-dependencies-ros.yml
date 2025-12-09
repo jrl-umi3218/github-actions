@@ -22,4 +22,4 @@ jobs:
       run: |
         set -x
         set -e
-        rospack find jvrc_description
+        ros2 pkg prefix jvrc_description
