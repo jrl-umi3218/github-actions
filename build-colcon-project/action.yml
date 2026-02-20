@@ -73,6 +73,8 @@ runs:
           wstool init src
           wstool merge -t src src/${{ github.repository }}/depends.rosinstall -y
           wstool update -t src
+        elif [ -f src/${{ github.repository }}/depends.repos ]; then
+          vcs import src < src/${{ github.repository }}/depends.repos
         fi
       shell: bash
     - name: Rosdep install
