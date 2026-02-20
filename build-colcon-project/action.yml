@@ -68,7 +68,7 @@ runs:
         set -e
         set -x
         cd ${GITHUB_WORKSPACE}/${{ inputs.workspace-dir }}
-        if [ -f src/${{ github.repository }}/depends.rosinstall ]
+        if [[ -f "${DEP_PATH}/depends.rosinstall" && "${ROS_DISTRO}" == "humble" ]]
         then
           wstool init src
           wstool merge -t src src/${{ github.repository }}/depends.rosinstall -y
