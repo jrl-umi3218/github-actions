@@ -97,7 +97,7 @@ runs:
         COLCON_OPTIONS="--merge-install"
         if [ "${{ inputs.build-packages }}" != "" ]
         then
-          COLCON_OPTIONS="${COLCON_OPTIONS} --packages-select ${{ inputs.build-packages }}"
+          COLCON_OPTIONS="${COLCON_OPTIONS} --packages-up-to ${{ inputs.build-packages }}"
         fi
         colcon build ${COLCON_OPTIONS} ${{ inputs.colcon-build-args }} --cmake-args -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} ${{ inputs.cmake-args }}
       shell: bash
