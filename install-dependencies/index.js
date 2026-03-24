@@ -345,7 +345,7 @@ async function handle_ros(ros)
     else
     {
       await exec.exec(`sudo apt-get install -y ros-${ros_distro}-ros-base python3-colcon-common-extensions python3-rosdep python3-vcstool`);
-      if(process.env.ROS_DISTRO == "humble")
+      if(ros_distro == "humble")
       {
         await exec.exec('sudo apt-get install -y python3-wstool');
       }
