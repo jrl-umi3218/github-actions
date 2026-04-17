@@ -16,4 +16,14 @@ if `git fetch --depth=1 origin gh-pages:gh-pages`; then
     cp -r doc/pictures build/doc/doxygen-html/
   fi
   cd build/doc && $GITHUB_WORKSPACE/cmake/github/update-doxygen-doc.sh -r $GITHUB_WORKSPACE -b $GITHUB_WORKSPACE/build
+  cd build/doc && \
+    # old jrl-cmakemodules as submodules
+    if [ -x "$GITHUB_WORKSPACE/cmake/github/update-doxygen-doc.sh" ]; then \
+      "$GITHUB_WORKSPACE/cmake/github/update-doxygen-doc.sh" -r "$GITHUB_WORKSPACE" -b "$GITHUB_WORKSPACE/build"; \
+    elif [ -x "$GITHUB_WORKSPACE/build/_deps/jrl-cmakemodules-src/github/update-doxygen-doc.sh" ]; then \
+      # jrl-cmakemodules v1.1.2
+      "$GITHUB_WORKSPACE/build/_deps/jrl-cmakemodules-src/github/update-doxygen-doc.sh" -r "$GITHUB_WORKSPACE" -b "$GITHUB_WORKSPACE/build"; \
+    else
+      echo "Error: the script update-doxygen-doc.sh was not found, does the project use jrl-cmakemodules?"
+    fi
 fi
