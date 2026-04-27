@@ -6,6 +6,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # If true the catkin workspace created for this is installed to /opt/ros/${ROS_DISTRO}. Otherwise the devel space is used. The default is false.
         install: [true, false]
     runs-on: ubuntu-22.04
     steps:
