@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist: [xenial, bionic, focal, jammy, noble, oracular]
+        dist: [focal, jammy, noble, oracular, resolute]
         arch: [i386, amd64]
         exclude:
           # No more i386 support since focal
@@ -34,7 +34,7 @@ jobs:
         export TAG="${{ matrix.dist }}-${{ matrix.arch }}"
         echo "::group::Login to Docker Hub"
         cd docker
-        docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PWD }}
+        echo "${{ secrets.DOCKER_HUB_PWD }}" | docker login -u "${{ secrets.DOCKER_HUB_USER }}" --password-stdin
         echo "::endgroup::"
         echo "::group::Declare function"
         build-image()
@@ -78,14 +78,6 @@ jobs:
         }
         echo "::endgroup::"
         build-image "" "" ""
-        if [ "${{ matrix.dist }}" = "xenial" ]
-        then
-          build-image "kinetic" "" ""
-        fi
-        if [ "${{ matrix.dist }}" = "bionic" -a "${{ matrix.arch }}" = "amd64" ]
-        then
-          build-image "melodic" "" ""
-        fi
         if [ "${{ matrix.dist }}" = "focal" ]
         then
           build-image "noetic" "" ""
@@ -99,5 +91,10 @@ jobs:
         if [ "${{ matrix.dist }}" = "noble" ]
         then
           build-image "" "jazzy" ""
+          build-image "" "" "openrtm2"
+        fi
+        if [ "${{ matrix.dist }}" = "resolute" ]
+        then
+          build-image "" "lyrical" ""
           build-image "" "" "openrtm2"
         fi
