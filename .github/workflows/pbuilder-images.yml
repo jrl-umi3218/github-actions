@@ -14,17 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         dist: [focal, jammy, noble, oracular, resolute]
-        arch: [i386, amd64]
-        exclude:
-          # No more i386 support since focal
-          - dist: focal
-            arch: i386
-          - dist: jammy
-            arch: i386
-          - dist: noble
-            arch: i386
-          - dist: oracular
-            arch: i386
+        arch: [amd64]
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
