@@ -40,6 +40,10 @@ async function get_ros_distro()
   {
     return [true, 'jazzy'];
   }
+  if(dist_name == 'resolute')
+  {
+    return [true, 'lyrical'];
+  }
   core.setFailed(`Cannot determine ROS distro for Linux distro: ${dist_name}`);
 }
 
