@@ -85,9 +85,7 @@ jobs:
         fi
         if [ "${{ matrix.dist }}" = "resolute" ]
         then
-          build-image "" "" ""
-          ## ROS2 lyrical is not released yet
-          # build-image "" "lyrical" ""
+          build-image "" "lyrical" ""
           ## openrtm2 is not released yet
           # build-image "" "" "openrtm2"
         fi
