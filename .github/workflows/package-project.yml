@@ -89,7 +89,7 @@ jobs:
   #
   # This job does not run on the master branch
   check-tag:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
