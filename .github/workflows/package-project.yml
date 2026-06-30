@@ -74,6 +74,11 @@ on:
         required: false
         default: false
         type: boolean
+      control-file:
+        description: "Path to an alternative debian/control file (e.g., debian/control.custom)"
+        required: false
+        default: ""
+        type: string
     secrets:
       CLOUDSMITH_API_KEY:
         required: true
@@ -154,6 +159,21 @@ jobs:
       with:
         submodules: recursive
     - uses: ssrobins/install-cmake@v1
+    - name: Select custom debian/control base
+      shell: bash
+      run: |
+        set -x
+        if [ -n "${{ inputs.control-file }}" ]; then
+          if [ -f "${{ inputs.control-file }}" ]; then
+            echo "Using custom control file: ${{ inputs.control-file }}"
+            cp -f "${{ inputs.control-file }}" debian/control
+          else
+            echo 'Error: Specified control file "${{ inputs.control-file }}" does not exist!'
+            exit 1
+          fi
+        else
+          echo "No alternative control file specified. Using the default debian/control."
+        fi
     - name: Setup packaging parameters
       id: setup-parameters
       shell: bash
