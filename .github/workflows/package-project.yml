@@ -74,13 +74,19 @@ on:
         required: false
         default: false
         type: boolean
+      control-file:
+        description: "Path to an alternative debian/control file (e.g., debian/control.custom)"
+        required: false
+        default: ""
+        type: string
     secrets:
       CLOUDSMITH_API_KEY:
         required: true
       GH_TOKEN:
         description: 'A token used to trigger dependent rebuilds'
         required: false
-
+permissions:
+  contents: write
 jobs:
   # For a given tag vX.Y.Z, this checks:
   # - set(PROJECT_VERSION X.Y.Z) in CMakeLists.txt
@@ -129,12 +135,12 @@ jobs:
     - name: Delete tag
       run: |
         set -x
-        curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -X DELETE https://api.github.com/repos/${{ github.repository }}/git/${{ github.ref }}
+        curl --header 'authorization: Bearer ${{ github.token }}' -X DELETE https://api.github.com/repos/${{ github.repository }}/git/${{ github.ref }}
       if: failure()
     - name: Create release
       uses: jrl-umi3218/github-actions/create-release@master
       with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
         tag: ${{ env.RELEASE_TAG }}
       if: startsWith(github.ref, 'refs/tags/')
   # This job builds binary packages for the provided distributions
@@ -153,6 +159,21 @@ jobs:
       with:
         submodules: recursive
     - uses: ssrobins/install-cmake@v1
+    - name: Select custom debian/control base
+      shell: bash
+      run: |
+        set -x
+        if [ -n "${{ inputs.control-file }}" ]; then
+          if [ -f "${{ inputs.control-file }}" ]; then
+            echo "Using custom control file: ${{ inputs.control-file }}"
+            cp -f "${{ inputs.control-file }}" debian/control
+          else
+            echo 'Error: Specified control file "${{ inputs.control-file }}" does not exist!'
+            exit 1
+          fi
+        else
+          echo "No alternative control file specified. Using the default debian/control."
+        fi
     - name: Setup packaging parameters
       id: setup-parameters
       shell: bash
