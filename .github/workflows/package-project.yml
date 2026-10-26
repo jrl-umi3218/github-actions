@@ -79,6 +79,10 @@ on:
         required: false
         default: ""
         type: string
+      free-disk-space:
+        type: boolean
+        required: false
+        default: false
     secrets:
       CLOUDSMITH_API_KEY:
         required: true
@@ -97,6 +101,10 @@ jobs:
   check-tag:
     runs-on: ubuntu-latest
     steps:
+    - name: Free Disk Space (Ubuntu)
+      if: ${{ inputs.free-disk-space }}
+      uses: jlumbroso/free-disk-space@main
+
     - uses: actions/checkout@v4
       with:
         submodules: recursive
