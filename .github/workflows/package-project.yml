@@ -101,10 +101,6 @@ jobs:
   check-tag:
     runs-on: ubuntu-latest
     steps:
-    - name: Free Disk Space (Ubuntu)
-      if: ${{ inputs.free-disk-space }}
-      uses: jlumbroso/free-disk-space@main
-
     - uses: actions/checkout@v7
       with:
         submodules: recursive
@@ -149,7 +145,11 @@ jobs:
       package-job: ${{ steps.setup-parameters.outputs.package-job }}
       do-upload: ${{ steps.setup-parameters.outputs.do-upload }}
     steps:
-    - uses: actions/checkout@v4
+    - name: Free Disk Space (Ubuntu)
+      if: ${{ inputs.free-disk-space }}
+      uses: jlumbroso/free-disk-space@main
+
+    - uses: actions/checkout@v7
       with:
         submodules: recursive
     - uses: ssrobins/install-cmake@v1
