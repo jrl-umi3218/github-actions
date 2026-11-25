@@ -19,12 +19,14 @@ runs:
         echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
         if [[ -n "${{ inputs.GITHUB_PAT }}" ]]
         then
-          git config --global url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf https://github.com/
+          git config --global --unset-all url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf || true
+          git config --global --add url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf https://github.com/
           git config --global --add url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf git@github.com:
         fi
         if [[ -n "${{ inputs.GITE_PAT }}" ]]
         then
-          git config --global url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf https://gite.lirmm.fr/
+          git config --global --unset-all url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf || true
+          git config --global --add url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf https://gite.lirmm.fr/
           git config --global --add url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf git@gite.lirmm.fr:
         fi
         git config --global user.name "GitHub Actions"
