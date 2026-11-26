@@ -13,25 +13,26 @@ runs:
   using: "composite"
   steps:
     - run: |
+        set -x
         set -e
         sudo sed -i -e 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//http:\/\/jp.archive\.ubuntu\.com\/ubuntu\//' /etc/apt/sources.list
         echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
-
-        rm -f ~/.gitconfig ~/.config/git/config ~/.git-credentials
-
-        git config --global credential.helper store
-
-        if [[ -n "${{ inputs.GITHUB_PAT }}" ]]; then
-          git config --global url."https://github.com/".insteadOf git@github.com:
-          printf "https://x-access-token:%s@github.com\n" "${{ inputs.GITHUB_PAT }}" >> ~/.git-credentials
+        if [[ -n "${{ inputs.GITHUB_PAT }}" ]]
+        then
+          git config --global --get-regexp '^url\..*github\.com/.*\.insteadof$' \
+            | awk '{print $1}' \
+            | xargs -r -n1 git config --global --unset-all || true
+          git config --global url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf https://github.com/
+          git config --global --add url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf git@github.com:
         fi
-
-        if [[ -n "${{ inputs.GITE_PAT }}" ]]; then
-          git config --global url."https://gite.lirmm.fr/".insteadOf git@gite.lirmm.fr:
-          printf "https://oauth2:%s@gite.lirmm.fr\n" "${{ inputs.GITE_PAT }}" >> ~/.git-credentials
+        if [[ -n "${{ inputs.GITE_PAT }}" ]]
+        then
+          git config --global --get-regexp '^url\..*gite\.lirmm\.fr/.*\.insteadof$' \
+            | awk '{print $1}' \
+            | xargs -r -n1 git config --global --unset-all || true
+          git config --global url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf https://gite.lirmm.fr/
+          git config --global --add url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf git@gite.lirmm.fr:
         fi
-
-        chmod 600 ~/.git-credentials || true
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@example.com"
       shell: bash
