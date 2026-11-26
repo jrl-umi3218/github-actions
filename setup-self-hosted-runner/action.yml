@@ -17,6 +17,8 @@ runs:
         set -e
         sudo sed -i -e 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//http:\/\/jp.archive\.ubuntu\.com\/ubuntu\//' /etc/apt/sources.list
         echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
+        rm -f ~/.gitconfig ~/.config/git/config ~/.git-credentials
+        sudo git config --system --unset-all http.https://github.com/.extraHeader || true
         if [[ -n "${{ inputs.GITHUB_PAT }}" ]]
         then
           git config --global --get-regexp '^url\..*github\.com/.*\.insteadof$' \
