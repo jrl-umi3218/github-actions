@@ -17,17 +17,18 @@ runs:
         set -e
         sudo sed -i -e 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//http:\/\/jp.archive\.ubuntu\.com\/ubuntu\//' /etc/apt/sources.list
         echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
+        rm ~/.config/git/config
         if [[ -n "${{ inputs.GITHUB_PAT }}" ]]
         then
-          git config --global --unset-all url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf || true
-          git config --global --add url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf https://github.com/
-          git config --global --add url."https://${{ inputs.GITHUB_PAT }}@github.com/".insteadOf git@github.com:
+          AUTH_GH=$(printf "x-access-token:%s" "${{ inputs.GITHUB_PAT }}" | base64 -w0)
+          git config --global --unset-all http.https://github.com/.extraHeader || true
+          git config --global http.https://github.com/.extraHeader "AUTHORIZATION: basic ${AUTH_GH}"
         fi
         if [[ -n "${{ inputs.GITE_PAT }}" ]]
         then
-          git config --global --unset-all url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf || true
-          git config --global --add url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf https://gite.lirmm.fr/
-          git config --global --add url."https://oauth2:${{ inputs.GITE_PAT }}@gite.lirmm.fr/".insteadOf git@gite.lirmm.fr:
+          AUTH_GITE=$(printf "oauth2:%s" "${{ inputs.GITE_PAT }}" | base64 -w0)
+          git config --global --unset-all http.https://gite.lirmm.fr/.extraHeader || true
+          git config --global http.https://gite.lirmm.fr/.extraHeader "AUTHORIZATION: basic ${AUTH_GITE}"
         fi
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@example.com"
