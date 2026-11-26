@@ -17,7 +17,7 @@ runs:
         set -e
         sudo sed -i -e 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//http:\/\/jp.archive\.ubuntu\.com\/ubuntu\//' /etc/apt/sources.list
         echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
-        rm ~/.config/git/config
+        rm -f ~/.gitconfig ~/.config/git/config
         if [[ -n "${{ inputs.GITHUB_PAT }}" ]]
         then
           AUTH_GH=$(printf "x-access-token:%s" "${{ inputs.GITHUB_PAT }}" | base64 -w0)
